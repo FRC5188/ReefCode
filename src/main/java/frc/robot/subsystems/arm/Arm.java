@@ -10,6 +10,10 @@ public class Arm extends SubsystemBase {
     _io = io;
   }
 
+  public void setIntakeSpeed(double speed) {
+    _io.setIntakeMotorSpeed(speed);
+  }
+
   @Override
   public void periodic() {
     

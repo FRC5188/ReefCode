@@ -15,6 +15,8 @@ public interface ArmIO {
         public double _intakeMotorVelocityRotationsPerMin = 0.0;
         public double _intakeMotorCurrent = 0.0;
         public double _intakeMotorVoltage = 0.0;
+
+        public boolean _lightSensorState = false;
     }
 
     public default void updateInputs(ArmIOInputs inputs) {}

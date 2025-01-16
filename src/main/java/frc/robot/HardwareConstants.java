@@ -6,11 +6,10 @@ public class HardwareConstants {
         public static final int PDH_ID = 1;
 
         public static final int ARM_MTR_ID = 14;
-
-        public static final int LIGHT_SENSOR_CHANNEL = 1;
     }
 
     public class DIO {
         // Add digitial I/O ports used here
+        public static final int LIGHT_SENSOR_CHANNEL = 0;
     }
 }

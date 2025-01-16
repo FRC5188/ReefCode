@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.HardwareConstants.CAN;
+import frc.robot.HardwareConstants.DIO;
 
 public class RealArmIO implements ArmIO {
     private SparkFlex _armMotor;
@@ -13,7 +14,7 @@ public class RealArmIO implements ArmIO {
     public RealArmIO() {
         _armMotor = new SparkFlex(CAN.ARM_MTR_ID, MotorType.kBrushless);
 
-        _lightSensor = new DigitalInput(CAN.LIGHT_SENSOR_CHANNEL);
+        _lightSensor = new DigitalInput(DIO.LIGHT_SENSOR_CHANNEL);
     }
 
     public void updateInputs(ArmIOInputs inputs) {

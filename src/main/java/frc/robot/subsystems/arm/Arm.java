@@ -2,6 +2,7 @@ package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.arm.io.ArmIO;
 import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
@@ -36,6 +37,7 @@ public class Arm extends SubsystemBase {
     _inputs = new ArmIOInputs();
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
+    
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
@@ -52,6 +54,10 @@ public class Arm extends SubsystemBase {
     _prevLightSensorVal = current;
     return hasPiece;
 }
+
+  public void runArmPID() {
+    _io.setArmMotorSpeed(_armPidController.calculate(_inputs._armEncoderPositionDegrees));
+  }
 
   @Override
   public void periodic() {

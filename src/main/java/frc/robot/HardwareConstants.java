@@ -11,5 +11,6 @@ public class HardwareConstants {
 
     public class DIO {
         // Add digitial I/O ports used here
+        public static final int LIGHT_SENSOR_CHANNEL = 0;
     }
 }

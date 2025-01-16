@@ -11,6 +11,17 @@ public class ArmCommands {
     public ArmCommands(Arm arm) {
         _arm = arm;
     }
+
+    public Command spit() {
+        return new StartEndCommand(
+        () -> {
+            _arm.setIntakeSpeed(0.5);
+        },
+        () -> {
+            _arm.setIntakeSpeed(0);
+        },
+        _arm).withTimeout(1);
+    }
   
     public Command setArmPosition(ArmPosition setpoint) {
         return new InstantCommand(
@@ -31,3 +42,4 @@ public class ArmCommands {
             _arm).until(() -> _arm.hasPiece());
     }
 }
+

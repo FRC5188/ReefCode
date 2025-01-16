@@ -51,11 +51,14 @@ public class Arm extends SubsystemBase {
     boolean hasPiece = _prevLightSensorVal && !current;
     _prevLightSensorVal = current;
     return hasPiece;
-}
+  }
+
+  public boolean armAtSetpoint() {
+    return _armPidController.atGoal(); 
+  } 
 
   @Override
   public void periodic() {
     
   }
-
 }

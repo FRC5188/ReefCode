@@ -53,6 +53,10 @@ public class Arm extends SubsystemBase {
     return hasPiece;
 }
 
+  public void runArmPID() {
+    _io.setArmMotorSpeed(_armPidController.calculate(_inputs._armEncoderPositionDegrees));
+  }
+
   @Override
   public void periodic() {
     

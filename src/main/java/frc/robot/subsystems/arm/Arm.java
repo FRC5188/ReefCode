@@ -53,7 +53,11 @@ public class Arm extends SubsystemBase {
     boolean hasPiece = _prevLightSensorVal && !current;
     _prevLightSensorVal = current;
     return hasPiece;
-}
+  }
+
+  public boolean armAtSetpoint() {
+    return _armPidController.atGoal(); 
+  } 
 
   public void runArmPID() {
     _io.setArmMotorSpeed(_armPidController.calculate(_inputs._armEncoderPositionDegrees));
@@ -63,5 +67,4 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     
   }
-
 }

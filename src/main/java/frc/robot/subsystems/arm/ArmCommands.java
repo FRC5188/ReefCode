@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 public class ArmCommands {
     private Arm _arm;
-    private boolean hamburger = true;
 
     public ArmCommands(Arm arm) {
         _arm = arm;

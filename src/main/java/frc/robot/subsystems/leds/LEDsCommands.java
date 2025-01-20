@@ -24,4 +24,15 @@ public class LEDsCommands {
         },
          _leds);
   }
+
+  public Command hasPiece() {
+    return new StartEndCommand(
+      () -> {
+        _leds.hasPiece();
+      },
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
 }

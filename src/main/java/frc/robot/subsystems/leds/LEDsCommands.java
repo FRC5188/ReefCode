@@ -24,4 +24,15 @@ public class LEDsCommands {
         },
          _leds);
   }
+  
+  public Command elevatorOrArmIsMoving() {
+    return new StartEndCommand(
+      () -> {
+        _leds.elevatorOrArmIsMoving();
+      },
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
 }

@@ -27,19 +27,19 @@ public class LEDs extends SubsystemBase {
 
         // RobotIdle(new LEDColor(0, 0, 255), null, 0),
 
-        BlinkGreen(new LEDColor(0, 255, 0), null, 3);
+        BlinkGreen(new LEDColor(0, 255, 0), null, 3),
         
-        // SolidGreen(new LEDColor(0, 255, 0), null, 0),
+        SolidGreen(new LEDColor(0, 255, 0), null, 0),
 
         // BlinkDarkBlue(null, new StrobeAnimation(0, 0, 120, 1, 0.5, _numLEDs), 0),
 
         // SolidDarkBlue(new LEDColor(0, 0, 150), null, 0),
 
-        // PartyMode(null, new RainbowAnimation(100, 0.5, _numLEDs), 0),
+        PartyMode(null, new RainbowAnimation(100, 0.5, _numLEDs), 3),
    
-        // SolidTeal(new LEDColor(0,225,174), null, 0),
+        SolidTeal(new LEDColor(0,225,174), null, 0),
 
-        // SolidCoral(new LEDColor(250, 130, 120), null, 0);
+        SolidCoral(new LEDColor(250, 130, 120), null, 0);
 
         
         LEDColor _color;
@@ -97,5 +97,26 @@ public class LEDs extends SubsystemBase {
             runAnimation(LEDAnimation.BlinkGreen);
             _alreadyRunning = false;
         }
+    }
+
+    public void pickingUpCoral() {
+        if(!_alreadyRunning) {
+            runAnimation(LEDAnimation.SolidCoral);
+            _alreadyRunning = false;
+        }
+    }
+
+    public void pickingUpAlgae() {
+        if(!_alreadyRunning) {
+            runAnimation(LEDAnimation.SolidTeal);
+            _alreadyRunning = false;
+        }
+    }
+
+    public void robotHasClimbed() {
+        if(!_alreadyRunning) {
+            runAnimation(LEDAnimation.PartyMode);
+            _alreadyRunning = false;
+        }      
     }
 }

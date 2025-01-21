@@ -11,9 +11,9 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -22,6 +22,9 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.HardwareConstants.CAN;
+import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
+import frc.robot.subsystems.elevator.io.ElevatorIO;
+import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
@@ -55,40 +58,28 @@ public class Elevator extends SubsystemBase {
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
   private boolean _isCalibrated;
-  private SparkFlex _primaryMotor;
-  private SparkFlex _secondaryMotor;
 
   private ProfiledPIDController _elevatorMotorPID;
 
-  public Elevator() {
+  private ElevatorIO _io;
+  private ElevatorIOInputs _inputs;
+
+  public Elevator(ElevatorIO io) {
+    _io = io;
+    _inputs = new ElevatorIOInputs();
 
     _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD, new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
     _elevatorMotorPID.setTolerance(ELEVATOR_MOTOR_TOLERANCE);
     _elevatorMotorPID.setGoal(0.25);
-
-    // Declares both motors
-    _primaryMotor = new SparkFlex(CAN.PRIMARY_ELEVATOR_ID, MotorType.kBrushless);
-    _secondaryMotor = new SparkFlex(CAN.SECONDARY_ELEVATOR_ID, MotorType.kBrushless);
-
-    // _primaryMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-    // _secondaryMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-    SparkFlexConfig primaryConfig = new SparkFlexConfig();
-    primaryConfig.inverted(true);
-    primaryConfig.idleMode(IdleMode.kCoast);
-    _primaryMotor.configure(primaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-
-    // Sets the primary to lead the secondary
-    _secondaryMotor.setControl(new Follower(_primaryMotor.getDeviceID(), false));
-
   }
 
   // Runs the motors down at the calibration speed
   public void runMotorsDown() {
-    _primaryMotor.set(CALIBRATION_SPEED);
+    _io.setElevatorSpeed(CALIBRATION_SPEED);
   }
 
   public void stopMotors() {
-    _primaryMotor.set(0);
+    _io.setElevatorSpeed(0);
   }
 
   public void setSetpoint(ElevatorPosition setpoint) {
@@ -120,18 +111,18 @@ public class Elevator extends SubsystemBase {
 
   // Checks if above limit
   public boolean isAboveCurrentLimit() {
-    return _primaryMotor.getStatorCurrent().getValueAsDouble() > HARD_STOP_CURRENT_LIMIT;
+    return _inputs._elevatorMotorCurrent > HARD_STOP_CURRENT_LIMIT;
   }
 
   // Sets the encoder values to 0
   public void resetEncoders() {
-    _primaryMotor.setPosition(0);
+    _io.resetEncoder();
     _elevatorMotorPID.reset(getCurrentPosInches()); // TODO: Make it so this runs when auto and teleop init
   }
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-    _primaryMotor.set(_elevatorMotorPID.calculate(getCurrentPosInches()));
+    _io.setElevatorSpeed(_elevatorMotorPID.calculate(getCurrentPosInches()));
   }
 
   public boolean isCalibrated() {
@@ -144,17 +135,19 @@ public class Elevator extends SubsystemBase {
 
   // Converts the motors position from weird units to normal people inches
   public double getCurrentPosInches() {
-    return _primaryMotor.getPosition().getValue().magnitude() * MOTOR_CONVERSION;
+    return _inputs._elevatorPosition * MOTOR_CONVERSION;
   }
 
   @Override
   public void periodic() {
+    _io.updateInputs(_inputs);
+
     // This method will be called once per scheduler run
     Logger.recordOutput("Elevator/currentPos", getCurrentPosInches());
     Logger.recordOutput("Elevator/targetPos", _elevatorMotorPID.getGoal().position);
     Logger.recordOutput("Elevator/isAboveCurrentLimit", isAboveCurrentLimit());
-    Logger.recordOutput("Elevator/Current", _primaryMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Elevator/motorSpeed", _primaryMotor.get());
+    Logger.recordOutput("Elevator/Current", _inputs._elevatorMotorCurrent);
+    Logger.recordOutput("Elevator/motorSpeed", _inputs._elevatorSpeed);
     Logger.recordOutput("Elevator/CurrentSetpoint", _elevatorMotorPID.getSetpoint().position);
 
     // Logger.recordOutput("Elevator/motorSpeed", _primaryMotor.get());

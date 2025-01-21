@@ -65,6 +65,6 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+    _io.updateInputs(_inputs);
   }
 }

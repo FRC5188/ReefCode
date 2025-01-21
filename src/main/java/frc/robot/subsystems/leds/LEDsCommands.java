@@ -29,6 +29,61 @@ public class LEDsCommands {
     return new StartEndCommand(
       () -> {
         _leds.hasPiece();
+      }, 
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
+  
+  public Command pickingUpCoral() {
+    return new StartEndCommand(
+      () -> {
+        _leds.pickingUpCoral();
+      }, 
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
+
+  public Command pickingUpAlgae() {
+    return new StartEndCommand(
+      () -> {
+        _leds.pickingUpAlgae();
+      }, 
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
+  
+  public Command elevatorOrArmIsMoving() {
+    return new StartEndCommand(
+      () -> {
+        _leds.elevatorOrArmIsMoving();
+      },
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
+
+  public Command robotHasClimbed() {
+    return new StartEndCommand(
+      () -> {
+        _leds.robotHasClimbed();
+      }, 
+      () -> {
+        _leds.reset();
+      },
+       _leds);
+  }
+  
+  public Command elevatorAndArmAtSetpoints() {
+    return new StartEndCommand(
+      () -> {
+        _leds.elevatorAndArmAtSetpoints();
       },
       () -> {
         _leds.reset();

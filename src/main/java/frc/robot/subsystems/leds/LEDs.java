@@ -29,7 +29,7 @@ public class LEDs extends SubsystemBase {
 
         BlinkGreen(new LEDColor(0, 255, 0), null, 3),
         
-        SolidGreen(new LEDColor(0, 255, 0), null, 0);
+        SolidGreen(new LEDColor(0, 255, 0), null, 0),
 
         BlinkDarkBlue(null, new StrobeAnimation(0, 0, 150, 1, 0.5, _numLEDs), 3),
 

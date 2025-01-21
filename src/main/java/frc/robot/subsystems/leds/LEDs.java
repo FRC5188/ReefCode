@@ -65,10 +65,6 @@ public class LEDs extends SubsystemBase {
         }
     }
 
-    public void reset() {
-        _alreadyRunning = false;
-    }
-
     public void runAnimation(LEDAnimation animation) {
         if (animation != _currentAnimation) {
             _currentAnimation = animation;
@@ -104,5 +100,9 @@ public class LEDs extends SubsystemBase {
             runAnimation(LEDAnimation.SolidDarkBlue);
             _alreadyRunning = false;
         }
+    }
+
+    public void reset() {
+        _alreadyRunning = false;
     }
 }

@@ -35,4 +35,15 @@ public class LEDsCommands {
       },
       _leds);
   }
+
+  public Command elevatorAndArmAtSetpoints() {
+    return new StartEndCommand(
+      () -> {
+        _leds.elevatorAndArmAtSetpoints();
+      },
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
 }

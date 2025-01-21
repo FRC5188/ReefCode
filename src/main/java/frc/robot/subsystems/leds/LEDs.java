@@ -33,7 +33,7 @@ public class LEDs extends SubsystemBase {
 
         BlinkDarkBlue(null, new StrobeAnimation(0, 0, 150, 1, 0.5, _numLEDs), 3),
 
-        SolidDarkBlue(new LEDColor(0, 0, 150), null, 0);
+        SolidDarkBlue(new LEDColor(0, 0, 150), null, 0),
 
         PartyMode(null, new RainbowAnimation(100, 0.5, _numLEDs), 3),
    

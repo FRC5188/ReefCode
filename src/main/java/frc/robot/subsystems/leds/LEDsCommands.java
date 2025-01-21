@@ -25,15 +25,15 @@ public class LEDsCommands {
          _leds);
   }
 
-    public Command pickingUpCoral() {
-      return new StartEndCommand(
-        () -> {
-          _leds.pickingUpCoral();
-        }, 
-        () -> {
-          _leds.reset();
-        },
-        _leds);
+  public Command pickingUpCoral() {
+    return new StartEndCommand(
+      () -> {
+        _leds.pickingUpCoral();
+      }, 
+      () -> {
+        _leds.reset();
+      },
+      _leds);
   }
 
   public Command pickingUpAlgae() {
@@ -41,6 +41,17 @@ public class LEDsCommands {
       () -> {
         _leds.pickingUpAlgae();
       }, 
+      () -> {
+        _leds.reset();
+      },
+      _leds);
+  }
+  
+  public Command elevatorOrArmIsMoving() {
+    return new StartEndCommand(
+      () -> {
+        _leds.elevatorOrArmIsMoving();
+      },
       () -> {
         _leds.reset();
       },
@@ -56,5 +67,16 @@ public class LEDsCommands {
         _leds.reset();
       },
        _leds);
+  }
+  
+  public Command elevatorAndArmAtSetpoints() {
+    return new StartEndCommand(
+      () -> {
+        _leds.elevatorAndArmAtSetpoints();
+      },
+      () -> {
+        _leds.reset();
+      },
+      _leds);
   }
 }

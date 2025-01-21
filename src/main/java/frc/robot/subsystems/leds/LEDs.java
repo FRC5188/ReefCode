@@ -100,6 +100,7 @@ public class LEDs extends SubsystemBase {
             runAnimation(LEDAnimation.SolidCoral);
             _alreadyRunning = false;
         }
+    }
 
     public void elevatorOrArmIsMoving() {
         if(!_alreadyRunning) {
@@ -113,6 +114,7 @@ public class LEDs extends SubsystemBase {
             runAnimation(LEDAnimation.SolidTeal);
              _alreadyRunning = false;
         }
+    }
 
     public void elevatorAndArmAtSetpoints() {
         if(!_alreadyRunning) {

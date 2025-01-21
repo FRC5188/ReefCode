@@ -31,7 +31,7 @@ public class LEDs extends SubsystemBase {
         
         // SolidGreen(new LEDColor(0, 255, 0), null, 0),
 
-        // BlinkDarkBlue(null, new StrobeAnimation(0, 0, 120, 1, 0.5, _numLEDs), 0),
+        BlinkDarkBlue(null, new StrobeAnimation(0, 0, 150, 1, 0.5, _numLEDs), 3),
 
         SolidDarkBlue(new LEDColor(0, 0, 150), null, 0);
 
@@ -91,6 +91,13 @@ public class LEDs extends SubsystemBase {
     public void intaking() {
         if(!_alreadyRunning) {
             runAnimation(LEDAnimation.BlinkGreen);
+            _alreadyRunning = false;
+        }
+    }
+
+    public void elevatorOrArmIsMoving() {
+        if(!_alreadyRunning) {
+            runAnimation(LEDAnimation.BlinkDarkBlue);
             _alreadyRunning = false;
         }
     }

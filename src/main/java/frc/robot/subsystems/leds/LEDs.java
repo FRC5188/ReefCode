@@ -95,6 +95,13 @@ public class LEDs extends SubsystemBase {
         }
     }
 
+    public void hasPiece() {
+        if(!_alreadyRunning) {
+            runAnimation(LEDAnimation.SolidGreen);
+            _alreadyRunning = false;
+        }
+    }
+
     public void pickingUpCoral() {
         if(!_alreadyRunning) {
             runAnimation(LEDAnimation.SolidCoral);

@@ -40,13 +40,13 @@ public class Elevator extends SubsystemBase {
 
   private static final double CALIBRATION_SPEED = -0.1;
   private static final double HARD_STOP_CURRENT_LIMIT = 30;
-  
+
   private static final double INCREMENT_CONSTANT = 1;
   private static final double DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.21; //0.08
-  private static final double ELEVATOR_MOTOR_KI = 0; //0.001
-  private static final double ELEVATOR_MOTOR_KD = 0; //0.002
+  private static final double ELEVATOR_MOTOR_KP = 0.21; // 0.08
+  private static final double ELEVATOR_MOTOR_KI = 0; // 0.001
+  private static final double ELEVATOR_MOTOR_KD = 0; // 0.002
   private static final double ELEVATOR_PID_VEL = 120;
   private static final double ELEVATOR_PID_ACC = 125;
 
@@ -56,6 +56,28 @@ public class Elevator extends SubsystemBase {
   private static final double ELEVATOR_MAX_ROTATIONS = 28.67;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
+
+  // In pounds
+  private static final double ELEVATOR_STAGE1_WEIGHT = 3.75;
+  private static final double ELEVATOR_STAGE2_WEIGHT = 0;
+
+  // In inches
+  private static final double SPOOL_DIAMETER = 1.6;
+
+  // In pound - inches
+  private static final double STALL_TORQUE = 62.75;
+
+  // In amps
+  private static final double STALL_CURRENT = 366;
+
+  // In Ohms
+  private static final double RESISTANCE = 0.0185;
+
+  private static final double GEAR_RATIO = 7.75;
+  private static final double NUMBER_OF_MOTORS = 2;
+
+  private static final double FEEDFORWARD_CONSTANT = ((ELEVATOR_STAGE1_WEIGHT + (2 * ELEVATOR_STAGE2_WEIGHT))
+      * SPOOL_DIAMETER * STALL_CURRENT * RESISTANCE) / (NUMBER_OF_MOTORS * GEAR_RATIO * STALL_TORQUE);
 
   private boolean _isCalibrated;
 
@@ -68,7 +90,8 @@ public class Elevator extends SubsystemBase {
     _io = io;
     _inputs = new ElevatorIOInputs();
 
-    _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD, new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
+    _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD,
+        new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
     _elevatorMotorPID.setTolerance(ELEVATOR_MOTOR_TOLERANCE);
     _elevatorMotorPID.setGoal(0.25);
   }

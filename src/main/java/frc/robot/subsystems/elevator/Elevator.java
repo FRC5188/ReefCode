@@ -22,12 +22,18 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.HardwareConstants.CAN;
+import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
 import frc.robot.subsystems.elevator.io.ElevatorIO;
 import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
+    L1(1),
+    L2(2),
+    L3(3),
+    L4(4),
+    Stow(5),
     Middle(7),
     Top(12);
 
@@ -151,5 +157,20 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/CurrentSetpoint", _elevatorMotorPID.getSetpoint().position);
 
     // Logger.recordOutput("Elevator/motorSpeed", _primaryMotor.get());
+  }
+
+  public boolean canMoveToPos(ElevatorPosition currentElevator, ArmPosition desiredArm) {
+    switch (currentElevator) {
+      case L1:
+      case L2:
+      case L3:
+        return (desiredArm != ArmPosition.L4_Score) || (desiredArm != ArmPosition.Loading);
+      case L4:
+        return desiredArm != ArmPosition.Loading;
+      case Stow:
+        return desiredArm != ArmPosition.L4_Score;
+      default:
+        return false;
+    }
   }
 }

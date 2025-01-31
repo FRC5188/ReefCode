@@ -22,14 +22,19 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.HardwareConstants.CAN;
+import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
 import frc.robot.subsystems.elevator.io.ElevatorIO;
 import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
-    Middle(7),
-    Top(12);
+    L1(1),
+    L2(2),
+    L3(3),
+    L4(4),
+    Stow(5);
+    
 
     public final double setpoint;
 
@@ -80,6 +85,7 @@ public class Elevator extends SubsystemBase {
       * SPOOL_DIAMETER * STALL_CURRENT * RESISTANCE) / (NUMBER_OF_MOTORS * GEAR_RATIO * STALL_TORQUE);
 
   private boolean _isCalibrated;
+  private ElevatorPosition _currentPos;
 
   private ProfiledPIDController _elevatorMotorPID;
 
@@ -107,6 +113,7 @@ public class Elevator extends SubsystemBase {
 
   public void setSetpoint(ElevatorPosition setpoint) {
     setSetpoint(setpoint.setpoint);
+    _currentPos = setpoint;
   }
 
   // Sets the setpoint of the PID
@@ -161,6 +168,10 @@ public class Elevator extends SubsystemBase {
     return _inputs._elevatorPosition * MOTOR_CONVERSION;
   }
 
+  public ElevatorPosition getCurrentPos() {
+    return _currentPos;
+  }
+
   @Override
   public void periodic() {
     _io.updateInputs(_inputs);
@@ -174,5 +185,20 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/CurrentSetpoint", _elevatorMotorPID.getSetpoint().position);
 
     // Logger.recordOutput("Elevator/motorSpeed", _primaryMotor.get());
+  }
+
+  public boolean canMoveToPos(ElevatorPosition currentElevator, ArmPosition desiredArm) {
+    switch (currentElevator) {
+      case L1:
+      case L2:
+      case L3:
+        return (desiredArm != ArmPosition.L4_Score) || (desiredArm != ArmPosition.Loading);
+      case L4:
+        return desiredArm != ArmPosition.Loading;
+      case Stow:
+        return desiredArm != ArmPosition.L4_Score;
+      default:
+        return false;
+    }
   }
 }

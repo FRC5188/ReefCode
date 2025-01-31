@@ -11,7 +11,8 @@ public class Arm extends SubsystemBase {
   public enum ArmPosition {
 
     Stow(40),
-    Loading(30);
+    Loading(30),
+    L4_Score(45);
 
     double angle;
     ArmPosition(double angle) {

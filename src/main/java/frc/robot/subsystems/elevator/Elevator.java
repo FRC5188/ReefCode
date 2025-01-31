@@ -33,9 +33,8 @@ public class Elevator extends SubsystemBase {
     L2(2),
     L3(3),
     L4(4),
-    Stow(5),
-    Middle(7),
-    Top(12);
+    Stow(5);
+    
 
     public final double setpoint;
 
@@ -64,6 +63,7 @@ public class Elevator extends SubsystemBase {
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
   private boolean _isCalibrated;
+  private ElevatorPosition _currentPos;
 
   private ProfiledPIDController _elevatorMotorPID;
 
@@ -90,6 +90,7 @@ public class Elevator extends SubsystemBase {
 
   public void setSetpoint(ElevatorPosition setpoint) {
     setSetpoint(setpoint.setpoint);
+    _currentPos = setpoint;
   }
 
   // Sets the setpoint of the PID
@@ -142,6 +143,10 @@ public class Elevator extends SubsystemBase {
   // Converts the motors position from weird units to normal people inches
   public double getCurrentPosInches() {
     return _inputs._elevatorPosition * MOTOR_CONVERSION;
+  }
+
+  public ElevatorPosition getCurrentPos() {
+    return _currentPos;
   }
 
   @Override

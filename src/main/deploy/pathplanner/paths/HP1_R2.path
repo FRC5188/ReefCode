@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.247,
+        "y": 6.779
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.4879523599452857,
+        "y": 6.712351967494925
+      },
+      "isLocked": false,
+      "linkedName": "HP1"
+    },
+    {
+      "anchor": {
+        "x": 2.673258196721312,
+        "y": 6.452510245901639
+      },
+      "prevControl": {
+        "x": 2.311791120569321,
+        "y": 6.587935044803319
+      },
+      "nextControl": {
+        "x": 2.9073671721106025,
+        "y": 6.364800567745939
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.7,
+        "y": 5.45
+      },
+      "prevControl": {
+        "x": 3.864246218182973,
+        "y": 5.261524060388093
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -59.5
+  },
+  "reversed": false,
+  "folder": "HP to Reef",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -53.8
+  },
+  "useDefaultConstraints": true
+}

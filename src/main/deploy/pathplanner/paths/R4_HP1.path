@@ -1,0 +1,91 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.1,
+        "y": 4.05
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.947382318427628,
+        "y": 4.5856687162071434
+      },
+      "isLocked": false,
+      "linkedName": "R4"
+    },
+    {
+      "anchor": {
+        "x": 5.629198413591059,
+        "y": 5.458108455275157
+      },
+      "prevControl": {
+        "x": 5.947227462297942,
+        "y": 5.1430120797868195
+      },
+      "nextControl": {
+        "x": 4.736796116505998,
+        "y": 6.34228155340034
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.1181067961176496,
+        "y": 6.376359223303252
+      },
+      "prevControl": {
+        "x": 3.487827573715305,
+        "y": 6.109813309370754
+      },
+      "nextControl": {
+        "x": 2.4581067023021,
+        "y": 6.852178649370358
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.247,
+        "y": 6.779
+      },
+      "prevControl": {
+        "x": 2.266705650839546,
+        "y": 7.380445551407007
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "HP1"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.464367816091949,
+      "rotationDegrees": -53.8
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -53.8
+  },
+  "reversed": false,
+  "folder": "Reef to HP",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

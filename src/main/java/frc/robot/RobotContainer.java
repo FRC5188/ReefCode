@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,6 +38,16 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   public RobotContainer() {
+    
+    // All AutoAligns for reef will align to Left position
+    
+    // NamedCommands.getCommand("L1"); // AutoAlignToReef + ScoreL1
+    // NamedCommands.getCommand("L2"); // AutoAlignToReef + ScoreL2
+    // NamedCommands.getCommand("L3"); // AutoAlignToReef + ScoreL3
+    // NamedCommands.getCommand("L4"); // AutoAlignToReef + ScoreL4
+
+    // NamedCommands.getCommand("Intake"); // AutoAlignToIntake + IntakeUntilHasPiece
+
     configureBindings();
   }
 

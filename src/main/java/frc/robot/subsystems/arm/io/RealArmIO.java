@@ -14,6 +14,8 @@ public class RealArmIO implements ArmIO {
     public double POS_AT_90 = 0.0;
     public double POS_AT_0 = 0.0;
     public double ENCODER_CONVERSION = (POS_AT_90 - POS_AT_0) * 90;
+    
+    private double INTAKE_ROTATION_CONVERSION = 1; 
 
     private SparkFlex _armMotor;
     private DigitalInput _lightSensor;
@@ -36,6 +38,7 @@ public class RealArmIO implements ArmIO {
         inputs._intakeMotorVelocityRotationsPerMin = _intakeMotor.get();
         inputs._intakeMotorCurrent = _intakeMotor.getOutputCurrent();
         inputs._intakeMotorVoltage = _intakeMotor.getAppliedOutput() * _armMotor.getBusVoltage();
+        inputs._intakeMotorPositionRotations = _intakeMotor.getEncoder().getPosition() * INTAKE_ROTATION_CONVERSION; 
         
         inputs._armEncoderPositionDegrees = _armEncoder.getPosition() * ENCODER_CONVERSION;
     }
@@ -47,4 +50,9 @@ public class RealArmIO implements ArmIO {
     public void setIntakeSpeed(double speed) {
         _intakeMotor.set(speed);
     }
+
+    public void resetIntakeEncoders() {
+        _intakeMotor.getEncoder().setPosition(0);
+    }
+
 }

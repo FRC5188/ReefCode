@@ -11,7 +11,7 @@ public interface ArmIO {
 
         public double _armEncoderPositionDegrees = 0.0;
 
-        public double _intakeMotorPositionDegrees = 0.0;
+        public double _intakeMotorPositionRotations = 0.0;
         public double _intakeMotorVelocityRotationsPerMin = 0.0;
         public double _intakeMotorCurrent = 0.0;
         public double _intakeMotorVoltage = 0.0;
@@ -24,4 +24,7 @@ public interface ArmIO {
     public default void setIntakeMotorSpeed(double speed) {}
 
     public default void setArmMotorSpeed(double speed) {}
+
+    public default void resetIntakeEncoders() {}
+
 }

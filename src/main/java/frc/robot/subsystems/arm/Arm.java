@@ -48,7 +48,15 @@ public class Arm extends SubsystemBase {
   public void setIntakeSpeed(double speed) {
     _io.setIntakeMotorSpeed(speed);
   }
+
+  public void resetIntakeEncoders() {
+      _io.resetIntakeEncoders();
+  }
   
+  public boolean intakeAtDesiredRotations() {
+    return _inputs._intakeMotorPositionRotations >= 2;
+  }
+
   public boolean hasPiece() {
     boolean current = _inputs._lightSensorState;
     boolean hasPiece = _prevLightSensorVal && !current;

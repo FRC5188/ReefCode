@@ -15,38 +15,55 @@ public class ArmCommands {
 
     public Command spit() {
         return new StartEndCommand(
-        () -> {
-            _arm.setIntakeSpeed(0.5);
-        },
-        () -> {
-            _arm.setIntakeSpeed(0);
-        },
-        _arm).withTimeout(1);
+                () -> {
+                    _arm.setIntakeSpeed(0.5);
+                },
+                () -> {
+                    _arm.setIntakeSpeed(0);
+                },
+                _arm).withTimeout(1);
     }
-  
+
     public Command setArmPosition(ArmPosition setpoint) {
+        if (setpoint == ArmPosition.L4_Score) {
+            return new InstantCommand(
+                () -> {
+                    _arm.setArmSetpoint(setpoint);
+                },
+                _arm).alongWith(intakeForNumberOfRotations());
+        }
         return new InstantCommand(
-            ()->{
-                _arm.setArmSetpoint(setpoint);
-            },
-            _arm);
+                () -> {
+                    _arm.setArmSetpoint(setpoint);
+                },
+                _arm);
     }
 
     public Command intake() {
         return new StartEndCommand(
-            () -> {
-                _arm.setIntakeSpeed(0.5);
-            }, 
-            () -> {
-                _arm.setIntakeSpeed(0);
-            },
-            _arm).until(() -> _arm.hasPiece());
+                () -> {
+                    _arm.setIntakeSpeed(0.5);
+                },
+                () -> {
+                    _arm.setIntakeSpeed(0);
+                },
+                _arm).until(() -> _arm.hasPiece());
     }
 
     public Command runArmPID() {
         return Commands.run(() -> {
             _arm.runArmPID();
-        } );
+        });
+    }
+
+    public Command intakeForNumberOfRotations() {
+        return new StartEndCommand(() -> {
+            _arm.resetIntakeEncoders();
+            _arm.setIntakeSpeed(-0.3);
+        },
+        () -> {
+            _arm.setIntakeSpeed(0);
+        },
+        _arm).until(() -> _arm.intakeAtDesiredRotations());
     }
 }
-

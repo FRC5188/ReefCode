@@ -4,7 +4,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 
 public class MultiSubsystemCommands {
@@ -36,18 +38,21 @@ public class MultiSubsystemCommands {
 
     private Elevator _elevator;
     private Arm _arm;
-
-    public MultiSubsystemCommands(Elevator elevator, Arm arm) {
+    private ElevatorCommands _elevatorCommands;
+    private ArmCommands _armCommands;
+    
+    public MultiSubsystemCommands(Elevator elevator, Arm arm, ElevatorCommands elevatorCommands, ArmCommands armCommands) {
         _elevator = elevator;
         _arm = arm;
+        _elevatorCommands = elevatorCommands;
+        _armCommands = armCommands;
     }
 
     public Command setOverallSetpoint(OverallPosition setpoint) {
-        return new InstantCommand(
-            () -> {
-             _elevator.setSetpoint(setpoint.getElevatorPosition());
-             _arm.setArmSetpoint(setpoint.getArmPosition());
-            }, _elevator, _arm).unless(() -> !_elevator.canMoveToPos(_elevator.getCurrentPos(), setpoint.getArmPosition()));
+        return 
+            _elevatorCommands.setElevatorSetpoint(setpoint.getElevatorPosition())
+            .alongWith(_armCommands.setArmPosition(setpoint.getArmPosition()))
+            .unless(() -> !_elevator.canMoveToPos(_elevator.getCurrentPos(), setpoint.getArmPosition()));
     }
     
 }

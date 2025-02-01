@@ -18,11 +18,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.io.RealArmIO;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.Telemetry;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
@@ -30,8 +32,10 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Overal
 public class RobotContainer {
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
+  private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
+  private final ArmCommands armCommands = new ArmCommands(armSubsystem);
 
-  private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem, armSubsystem);
+  private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem, armSubsystem, elevatorCommands, armCommands);
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max

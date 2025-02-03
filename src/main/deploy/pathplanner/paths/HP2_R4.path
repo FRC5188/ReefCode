@@ -12,7 +12,7 @@
         "y": 0.27841135001952744
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HP2"
     },
     {
       "anchor": {
@@ -36,12 +36,12 @@
         "y": 4.05
       },
       "prevControl": {
-        "x": 5.6048140985787684,
-        "y": 3.073614299244804
+        "x": 6.396,
+        "y": 3.1572499999999994
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "R4"
     }
   ],
   "rotationTargets": [

@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class ArmCommands {
     private Arm _arm;
@@ -65,5 +66,9 @@ public class ArmCommands {
             _arm.setIntakeSpeed(0);
         },
         _arm).until(() -> _arm.intakeAtDesiredRotations());
+    }
+
+    public Command waitUntilAtSetpoint() {
+        return new WaitUntilCommand(_arm::armAtSetpoint);
     }
 }

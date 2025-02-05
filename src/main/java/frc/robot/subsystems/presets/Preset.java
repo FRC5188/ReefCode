@@ -12,16 +12,21 @@ public class Preset {
 
     private OverallPosition _level = OverallPosition.Stow;
     private ReefSide _side = ReefSide.Right;
-    private boolean _isPresetValid = false;
+    private boolean _isLevelValid = false;
+    private boolean _isSideValid = false;
 
-    private void setPreset(OverallPosition level, ReefSide side) {
+    private void setPresetLevel(OverallPosition level) {
         if (level == OverallPosition.Stow || level == OverallPosition.Loading || level == OverallPosition.L4_Score) {
             throw new RuntimeException("Invalid Preset Level/Position");
         }
 
         _level = level;
+        _isLevelValid = true;
+    }
+
+    private void setPresetSide(ReefSide side) {
         _side = side;
-        _isPresetValid = true;
+        _isSideValid = true;
     }
 
     public OverallPosition getLevel() {
@@ -33,16 +38,24 @@ public class Preset {
     }
 
     public boolean isPresetValid() {
-        return _isPresetValid;
+        return _isLevelValid && _isSideValid;
     }
 
-    public Command setPresetCommand(OverallPosition level, ReefSide side) {
+    public Command setPresetLevelCommand(OverallPosition level) {
         return new InstantCommand(
-                () -> setPreset(level, side));
+                () -> setPresetLevel(level));
+    }
+
+    public Command setPresetSideCommand(ReefSide side) {
+        return new InstantCommand(
+                () -> setPresetSide(side));
     }
 
     public Command resetPreset() {
         return new InstantCommand(
-                () -> _isPresetValid = false);
+                () -> {
+                    _isLevelValid = false;
+                    _isSideValid = false;
+                });
     }
 }

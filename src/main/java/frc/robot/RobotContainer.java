@@ -116,6 +116,10 @@ public class RobotContainer {
  
     drivetrain.registerTelemetry(logger::telemeterize);
 
+    // Elevator sys id routines
+    button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
+    button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
+
     L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
     L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
     StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));

@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.HardwareConstants.CAN;
 import frc.robot.HardwareConstants.DIO;
@@ -41,6 +42,7 @@ public class RealArmIO implements ArmIO {
         inputs._intakeMotorPositionRotations = _intakeMotor.getEncoder().getPosition() * INTAKE_ROTATION_CONVERSION; 
         
         inputs._armEncoderPositionDegrees = _armEncoder.getPosition() * ENCODER_CONVERSION;
+        inputs._armEncoderVelocity = _armEncoder.getVelocity();
     }
 
     public void setArmMotorSpeed(double speed) {
@@ -55,4 +57,7 @@ public class RealArmIO implements ArmIO {
         _intakeMotor.getEncoder().setPosition(0);
     }
 
+    public void setArmMotorVoltage(Voltage voltage) {
+        _armMotor.setVoltage(voltage);
+    }
 }

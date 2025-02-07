@@ -114,6 +114,9 @@ public class RobotContainer {
     button6.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
     button8.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
+    // Elevator sys id routines
+    button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
+    button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
   }
 
   public Command getAutonomousCommand() {

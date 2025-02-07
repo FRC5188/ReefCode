@@ -5,6 +5,11 @@
 
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotation;
+import static edu.wpi.first.units.Units.Volt;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -20,7 +25,18 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.HardwareConstants.CAN;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
@@ -34,7 +50,6 @@ public class Elevator extends SubsystemBase {
     L3(3),
     L4(4),
     Stow(5);
-    
 
     public final double setpoint;
 
@@ -92,6 +107,9 @@ public class Elevator extends SubsystemBase {
   private ElevatorIO _io;
   private ElevatorIOInputs _inputs;
 
+  SysIdRoutine routine = new SysIdRoutine(new Config(),
+      new SysIdRoutine.Mechanism(this::setElevatorVoltage, this::populateLog, this));
+
   public Elevator(ElevatorIO io) {
     _io = io;
     _inputs = new ElevatorIOInputs();
@@ -109,6 +127,10 @@ public class Elevator extends SubsystemBase {
 
   public void stopMotors() {
     _io.setElevatorSpeed(0);
+  }
+
+  public void setElevatorVoltage(Voltage voltage) {
+    _io.setElevatorVoltage(voltage);
   }
 
   public void setSetpoint(ElevatorPosition setpoint) {
@@ -172,6 +194,37 @@ public class Elevator extends SubsystemBase {
     return _currentPos;
   }
 
+  public boolean canMoveToPos(ElevatorPosition currentElevator, ArmPosition desiredArm) {
+    switch (currentElevator) {
+      case L1:
+      case L2:
+      case L3:
+        return (desiredArm != ArmPosition.L4_Score) || (desiredArm != ArmPosition.Loading);
+      case L4:
+        return desiredArm != ArmPosition.Loading;
+      case Stow:
+        return desiredArm != ArmPosition.L4_Score;
+      default:
+        return false;
+    }
+  }
+
+  public void populateLog(SysIdRoutineLog log) {
+    log.motor("elevator_primary")
+        .voltage(Voltage.ofBaseUnits(_inputs._elevatorMotorVoltage, Volt))
+        .linearPosition(Distance.ofBaseUnits(Units.inchesToMeters(getCurrentPosInches()), Meters))
+        .linearVelocity(
+            LinearVelocity.ofBaseUnits(_inputs._elevatorVelocity * SPOOL_DIAMETER * Math.PI / 60, MetersPerSecond));
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return routine.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return routine.dynamic(direction);
+  }
+
   @Override
   public void periodic() {
     _io.updateInputs(_inputs);
@@ -187,18 +240,4 @@ public class Elevator extends SubsystemBase {
     // Logger.recordOutput("Elevator/motorSpeed", _primaryMotor.get());
   }
 
-  public boolean canMoveToPos(ElevatorPosition currentElevator, ArmPosition desiredArm) {
-    switch (currentElevator) {
-      case L1:
-      case L2:
-      case L3:
-        return (desiredArm != ArmPosition.L4_Score) || (desiredArm != ArmPosition.Loading);
-      case L4:
-        return desiredArm != ArmPosition.Loading;
-      case Stow:
-        return desiredArm != ArmPosition.L4_Score;
-      default:
-        return false;
-    }
-  }
 }

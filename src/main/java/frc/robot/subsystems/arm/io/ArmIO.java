@@ -2,6 +2,8 @@ package frc.robot.subsystems.arm.io;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.units.measure.Voltage;
+
 public interface ArmIO {
     @AutoLog
     public static class ArmIOInputs {
@@ -10,6 +12,7 @@ public interface ArmIO {
         public double _armMotorSpeed = 0.0;
 
         public double _armEncoderPositionDegrees = 0.0;
+        public double _armEncoderVelocity = 0.0;
 
         public double _intakeMotorPositionRotations = 0.0;
         public double _intakeMotorVelocityRotationsPerMin = 0.0;
@@ -26,5 +29,7 @@ public interface ArmIO {
     public default void setArmMotorSpeed(double speed) {}
 
     public default void resetIntakeEncoders() {}
+
+    public default void setArmMotorVoltage(Voltage voltage) {}
 
 }

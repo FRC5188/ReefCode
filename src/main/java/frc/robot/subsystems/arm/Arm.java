@@ -3,6 +3,8 @@ package frc.robot.subsystems.arm;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volt;
+import java.util.function.BooleanSupplier;
+
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -18,12 +20,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.arm.io.ArmIO;
 import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-
     Stow(40),
     Loading(30),
     L4_Score(45);
@@ -34,6 +36,8 @@ public class Arm extends SubsystemBase {
       this.angle = angle;
     }
   }
+
+  public final Trigger _hasPiece = new Trigger(() -> hasPiece());
 
   private ArmIO _io;
   private ArmIOInputs _inputs;

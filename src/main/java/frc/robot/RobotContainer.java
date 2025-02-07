@@ -28,6 +28,7 @@ import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
+import frc.robot.subsystems.presets.Preset;
 
 public class RobotContainer {
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
@@ -35,7 +36,11 @@ public class RobotContainer {
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
 
-  private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem, armSubsystem, elevatorCommands, armCommands);
+  private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
+      armSubsystem, elevatorCommands, armCommands);
+
+  /** I am single :( */
+  private final Preset preset = new Preset();
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
@@ -49,32 +54,36 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final CommandXboxController joystick = new CommandXboxController(0);
- 
+
   private final GenericHID buttonbox1 = new GenericHID(1);
-  private final JoystickButton button1 = new JoystickButton(buttonbox1, 1);
-  private final JoystickButton button2 = new JoystickButton(buttonbox1, 2);
-  private final JoystickButton button3 = new JoystickButton(buttonbox1, 3);
-  private final JoystickButton button4 = new JoystickButton(buttonbox1, 4);
-  private final JoystickButton button5 = new JoystickButton(buttonbox1, 5);
-  private final JoystickButton button6 = new JoystickButton(buttonbox1, 6);
+  private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
+  private final JoystickButton L2Button = new JoystickButton(buttonbox1, 2);
+  private final JoystickButton StowButton = new JoystickButton(buttonbox1, 3);
+  private final JoystickButton L3Button = new JoystickButton(buttonbox1, 4);
+  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 5);
+  private final JoystickButton LoadingButton = new JoystickButton(buttonbox1, 6);
   private final JoystickButton button7 = new JoystickButton(buttonbox1, 7);
-  private final JoystickButton button8 = new JoystickButton(buttonbox1, 8);
+  private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
   private final JoystickButton button9 = new JoystickButton(buttonbox1, 9);
+
+  private final GenericHID buttonbox2 = new GenericHID(2);
+  private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   public RobotContainer() {
-    
+
     // All AutoAligns for reef will align to Left position
-    
+
     // NamedCommands.getCommand("L1"); // AutoAlignToReef + ScoreL1
     // NamedCommands.getCommand("L2"); // AutoAlignToReef + ScoreL2
     // NamedCommands.getCommand("L3"); // AutoAlignToReef + ScoreL3
     // NamedCommands.getCommand("L4"); // AutoAlignToReef + ScoreL4
 
-    // NamedCommands.getCommand("Intake"); // AutoAlignToIntake + IntakeUntilHasPiece
+    // NamedCommands.getCommand("Intake"); // AutoAlignToIntake +
+    // IntakeUntilHasPiece
 
     configureBindings();
   }
@@ -104,19 +113,33 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+ 
     drivetrain.registerTelemetry(logger::telemeterize);
-
-    button1.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
-    button2.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    button3.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
-    button4.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
-    button5.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    button6.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
-    button8.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     // Elevator sys id routines
     button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
     button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
+
+    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
+    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
+    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
+    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
+    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
+    LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
+    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+    
+    // Runs the preset to score unless the preset is invalid.
+    joystick.rightBumper().onTrue(
+        multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(() -> !preset.isPresetValid()));
+
+    // Resets the preset when we don't have a piece.
+    armSubsystem._hasPiece.onFalse(preset.resetPreset());
+
+    // Sets the level preset
+    presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
+    presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
+    presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
+    presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
   }
 
   public Command getAutonomousCommand() {

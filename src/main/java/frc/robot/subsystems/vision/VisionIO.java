@@ -1,3 +1,6 @@
+// Code modified from AdvantageKit Vision Template (v4.0.1):
+// https://github.com/Mechanical-Advantage/AdvantageKit/releases
+//
 // Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //

@@ -31,7 +31,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setArmSetpoint(setpoint);
                 },
-                _arm).alongWith(intakeForNumberOfRotations());
+                _arm).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {

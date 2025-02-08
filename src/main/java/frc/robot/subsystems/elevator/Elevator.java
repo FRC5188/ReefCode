@@ -45,11 +45,11 @@ import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
-    L1(1),
-    L2(2),
-    L3(3),
-    L4(4),
-    Stow(5);
+    L1(5),
+    L2(10),
+    L3(15),
+    L4(20),
+    Stow(0.25);
 
     public final double setpoint;
 
@@ -59,12 +59,12 @@ public class Elevator extends SubsystemBase {
   }
 
   private static final double CALIBRATION_SPEED = -0.1;
-  private static final double HARD_STOP_CURRENT_LIMIT = 30;
+  private static final double HARD_STOP_CURRENT_LIMIT = 50;
 
   private static final double INCREMENT_CONSTANT = 1;
   private static final double DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.21; // 0.08
+  private static final double ELEVATOR_MOTOR_KP = 0.13; // 0.08
   private static final double ELEVATOR_MOTOR_KI = 0; // 0.001
   private static final double ELEVATOR_MOTOR_KD = 0; // 0.002
   private static final double ELEVATOR_PID_VEL = 120;
@@ -72,8 +72,8 @@ public class Elevator extends SubsystemBase {
 
   private static final double ELEVATOR_MOTOR_TOLERANCE = 0.0;
 
-  private static final double ELEVATOR_MAX_INCHES = 14.0;
-  private static final double ELEVATOR_MAX_ROTATIONS = 28.67;
+  private static final double ELEVATOR_MAX_INCHES = 47.5;
+  private static final double ELEVATOR_MAX_ROTATIONS = 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
@@ -187,7 +187,7 @@ public class Elevator extends SubsystemBase {
 
   // Converts the motors position from weird units to normal people inches
   public double getCurrentPosInches() {
-    return _inputs._elevatorPosition * MOTOR_CONVERSION;
+    return (_inputs._elevatorPosition * MOTOR_CONVERSION);
   }
 
   public ElevatorPosition getCurrentPos() {

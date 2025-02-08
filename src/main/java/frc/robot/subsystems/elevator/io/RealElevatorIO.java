@@ -24,13 +24,14 @@ public class RealElevatorIO implements ElevatorIO {
         _secondaryMotor = new SparkFlex(CAN.SECONDARY_ELEVATOR_ID, MotorType.kBrushless);
 
         SparkFlexConfig primaryConfig = new SparkFlexConfig();
-        primaryConfig.inverted(true);
-        primaryConfig.idleMode(IdleMode.kCoast);
-        _primaryMotor.configure(primaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        primaryConfig.inverted(false);
+        primaryConfig.idleMode(IdleMode.kBrake);
+        _primaryMotor.configure(primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkFlexConfig secondaryConfig = new SparkFlexConfig();
         secondaryConfig.follow(CAN.PRIMARY_ELEVATOR_ID);
-        _secondaryMotor.configure(secondaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        secondaryConfig.idleMode(IdleMode.kBrake);
+        _secondaryMotor.configure(secondaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void updateInputs(ElevatorIOInputs inputs) {

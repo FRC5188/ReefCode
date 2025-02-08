@@ -13,6 +13,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -23,8 +24,10 @@ import frc.robot.subsystems.arm.io.RealArmIO;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.Telemetry;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
+import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
@@ -68,6 +71,8 @@ public class RobotContainer {
 
   private final GenericHID buttonbox2 = new GenericHID(2);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
+  private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
+  private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -120,17 +125,22 @@ public class RobotContainer {
     button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
     button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
 
-    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
-    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
-    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
-    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
-    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+    L1Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L1));
+    L2Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L2));
+    L3Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L3));
+    L4Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L4));
+    StowButton.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
+    // L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
+    // L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
+    // StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
+    // L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
+    // L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
+    // LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
+    // L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
     
     // Runs the preset to score unless the preset is invalid.
-    joystick.rightBumper().onTrue(
-        multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(() -> !preset.isPresetValid()));
+    // joystick.rightBumper().onTrue(
+    //     multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(() -> !preset.isPresetValid()));
 
     // Resets the preset when we don't have a piece.
     armSubsystem._hasPiece.onFalse(preset.resetPreset());
@@ -140,9 +150,26 @@ public class RobotContainer {
     presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
     presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
     presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
+
+    incrementButton.onTrue(elevatorCommands.incrementElevatorPosition());
+    decrementButton.onTrue(elevatorCommands.decrementElevatorPosition());
   }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
+  }
+
+  public void calibrateAndStartPID() {
+    Command PIDCommand = elevatorCommands.runElevatorPID();
+    if (elevatorSubsystem.isCalibrated()) {
+      elevatorCommands.runElevatorPID();
+      if (!CommandScheduler.getInstance().isScheduled(PIDCommand)) {
+        CommandScheduler.getInstance().schedule(PIDCommand);
+      }
+    }
+    else {
+      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(PIDCommand);
+      CommandScheduler.getInstance().schedule(calibCommand);
+    }
   }
 }

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -29,12 +30,16 @@ import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 public class RobotContainer {
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
+  private final Vision vision;
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -74,6 +79,11 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   public RobotContainer() {
+
+    vision = new Vision(
+      drivetrain::addVisionMeasurement, 
+      new VisionIOPhotonVision(camera0Name, robotToCamera0),
+      new VisionIOPhotonVision(camera1Name, robotToCamera1));
 
     // All AutoAligns for reef will align to Left position
 

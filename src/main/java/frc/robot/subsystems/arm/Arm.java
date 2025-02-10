@@ -59,7 +59,6 @@ public class Arm extends SubsystemBase {
     _inputs = new ArmIOInputs();
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
-
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {

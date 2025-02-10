@@ -67,7 +67,7 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.schedule();
     }
 
-    m_robotContainer.calibrateAndStartPID();
+    m_robotContainer.calibrateAndStartPIDs();
   }
 
   @Override
@@ -83,7 +83,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.calibrateAndStartPID();
+    m_robotContainer.calibrateAndStartPIDs();
   }
 
   @Override

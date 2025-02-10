@@ -19,7 +19,7 @@ public class RealArmIO implements ArmIO {
 
     public double POS_AT_90 = 0.0;
     public double POS_AT_0 = 0.0;
-    public double ENCODER_CONVERSION = (POS_AT_90 - POS_AT_0) * 90;
+    public double ENCODER_CONVERSION = 1; //(POS_AT_90 - POS_AT_0) * 90;
     
     private double INTAKE_ROTATION_CONVERSION = 1; 
 

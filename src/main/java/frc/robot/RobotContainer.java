@@ -39,6 +39,10 @@ public class RobotContainer {
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
 
+  // PID commands: we only want one of them so start/stop works correctly
+  Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
+  Command armPIDCommand = armCommands.runArmPID();
+
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
 
@@ -159,17 +163,22 @@ public class RobotContainer {
     return Commands.print("No autonomous command configured");
   }
 
-  public void calibrateAndStartPID() {
-    Command PIDCommand = elevatorCommands.runElevatorPID();
+  public void calibrateAndStartPIDs() {
+    // Start elevator pid
     if (elevatorSubsystem.isCalibrated()) {
       elevatorCommands.runElevatorPID();
-      if (!CommandScheduler.getInstance().isScheduled(PIDCommand)) {
-        CommandScheduler.getInstance().schedule(PIDCommand);
+      if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
+        CommandScheduler.getInstance().schedule(elevatorPIDCommand);
       }
     }
     else {
-      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(PIDCommand);
+      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
       CommandScheduler.getInstance().schedule(calibCommand);
+    }
+
+    // Start arm pid
+    if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
+      CommandScheduler.getInstance().schedule(armPIDCommand);
     }
   }
 }

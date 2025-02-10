@@ -24,11 +24,16 @@ import edu.wpi.first.math.geometry.Transform3d;
 public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "photoncamera_5";
-  public static String camera1Name = "photoncamera_6";
+  
+  // New cameras for 2025 season are 5,6,7,8
+  
+  //public static String camera0Name = "photoncamera_5";
+  //public static String camera1Name = "photoncamera_6";
+  public static String camera0Name = "photoncamera_7";
+  public static String camera1Name = "photoncamera_8";
   //public static String camera2Name = "photonvision_3";
   //public static String camera3Name = "photonvision_4";
 

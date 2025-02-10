@@ -26,6 +26,9 @@ public class ArmCommands {
     }
 
     public Command setArmPosition(ArmPosition setpoint) {
+
+        return new InstantCommand();
+        /* 
         if (setpoint == ArmPosition.L4_Score) {
             return new InstantCommand(
                 () -> {
@@ -37,7 +40,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setArmSetpoint(setpoint);
                 },
-                _arm);
+                _arm); */
     }
 
     public Command intake() {

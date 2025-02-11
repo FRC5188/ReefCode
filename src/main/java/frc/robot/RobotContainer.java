@@ -20,15 +20,16 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
-import frc.robot.subsystems.arm.io.RealArmIO;
+import frc.robot.subsystems.arm.RealArmIO;
+import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.Telemetry;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
+import frc.robot.subsystems.elevator.RealElevatorIO;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
-import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
@@ -38,10 +39,6 @@ public class RobotContainer {
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
-
-  // PID commands: we only want one of them so start/stop works correctly
-  Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
-  Command armPIDCommand = armCommands.runArmPID();
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -122,18 +119,17 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
- 
     drivetrain.registerTelemetry(logger::telemeterize);
 
     // Elevator sys id routines
     button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
     button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
 
-    L1Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L1));
-    L2Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L2));
-    L3Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L3));
-    L4Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L4));
-    StowButton.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
+    L1Button.onTrue(armCommands.setArmPosition(ArmPosition.Stow));
+    L2Button.onTrue(armCommands.setArmPosition(ArmPosition.Loading));
+    L3Button.onTrue(armCommands.setArmPosition(ArmPosition.L4_Score));
+    // L4Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L4));
+    // StowButton.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
     // L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
     // L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
     // StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
@@ -141,10 +137,11 @@ public class RobotContainer {
     // L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
     // LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
     // L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
-    
+
     // Runs the preset to score unless the preset is invalid.
     // joystick.rightBumper().onTrue(
-    //     multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(() -> !preset.isPresetValid()));
+    // multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(()
+    // -> !preset.isPresetValid()));
 
     // Resets the preset when we don't have a piece.
     armSubsystem._hasPiece.onFalse(preset.resetPreset());
@@ -164,14 +161,17 @@ public class RobotContainer {
   }
 
   public void calibrateAndStartPIDs() {
+    // PID commands: we only want one of them so start/stop works correctly
+    Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
+    Command armPIDCommand = armCommands.runArmPID();
     // Start elevator pid
     if (elevatorSubsystem.isCalibrated()) {
       elevatorCommands.runElevatorPID();
       if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
         CommandScheduler.getInstance().schedule(elevatorPIDCommand);
+        CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
       }
-    }
-    else {
+    } else {
       Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
       CommandScheduler.getInstance().schedule(calibCommand);
     }
@@ -179,6 +179,7 @@ public class RobotContainer {
     // Start arm pid
     if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
       CommandScheduler.getInstance().schedule(armPIDCommand);
+      CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
     }
   }
 }

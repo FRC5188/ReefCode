@@ -39,9 +39,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.HardwareConstants.CAN;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
-import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
-import frc.robot.subsystems.elevator.io.ElevatorIO;
-import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
+import frc.robot.subsystems.arm.ArmIO.ArmIOInputs;
+import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
@@ -105,14 +104,14 @@ public class Elevator extends SubsystemBase {
   private ProfiledPIDController _elevatorMotorPID;
 
   private ElevatorIO _io;
-  private ElevatorIOInputs _inputs;
+  private ElevatorIOInputsAutoLogged _inputs;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
       new SysIdRoutine.Mechanism(this::setElevatorVoltage, this::populateLog, this));
 
   public Elevator(ElevatorIO io) {
     _io = io;
-    _inputs = new ElevatorIOInputs();
+    _inputs = new ElevatorIOInputsAutoLogged();
 
     _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD,
         new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
@@ -228,6 +227,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     _io.updateInputs(_inputs);
+    Logger.processInputs("Elevator", _inputs);
 
     // This method will be called once per scheduler run
     Logger.recordOutput("Elevator/currentPos", getCurrentPosInches());

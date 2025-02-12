@@ -100,8 +100,7 @@ public class RobotContainer {
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
-        armCommands.setArmPosition(ArmPosition.Loading)
-        .andThen(armCommands.intake()));
+        multiSubsystemCommands.intake());
 
     configureBindings();
   }

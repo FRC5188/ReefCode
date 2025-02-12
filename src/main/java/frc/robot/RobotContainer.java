@@ -83,7 +83,10 @@ public class RobotContainer {
     vision = new Vision(
       drivetrain::addVisionMeasurement, 
       new VisionIOPhotonVision(camera0Name, robotToCamera0),
-      new VisionIOPhotonVision(camera1Name, robotToCamera1));
+      new VisionIOPhotonVision(camera1Name, robotToCamera1),
+      new VisionIOPhotonVision(camera2Name, robotToCamera2),
+      new VisionIOPhotonVision(camera3Name, robotToCamera3)
+      );
 
     // All AutoAligns for reef will align to Left position
 

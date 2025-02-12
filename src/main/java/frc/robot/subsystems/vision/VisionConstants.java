@@ -30,18 +30,24 @@ public class VisionConstants {
   
   // New cameras for 2025 season are 5,6,7,8
   
-  //public static String camera0Name = "photoncamera_5";
-  //public static String camera1Name = "photoncamera_6";
-  public static String camera0Name = "photoncamera_7";
-  public static String camera1Name = "photoncamera_8";
-  //public static String camera2Name = "photonvision_3";
-  //public static String camera3Name = "photonvision_4";
+  public static String camera0Name = "photoncamera_5";
+  public static String camera1Name = "photoncamera_6";
+  public static String camera2Name = "photoncamera_7";
+  public static String camera3Name = "photoncamera_8";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
+
+  // [TODO: SET VALUES] Should be on back of robot
   public static Transform3d robotToCamera0 =
-      new Transform3d(0.0, -3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
+      new Transform3d(0.0, -3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, Math.PI));
   public static Transform3d robotToCamera1 =
+      new Transform3d(0.0, 3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, Math.PI));
+
+  // On front of robot, centered
+  public static Transform3d robotToCamera2 =
+      new Transform3d(0.0, -3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
+  public static Transform3d robotToCamera3 =
       new Transform3d(0.0, 3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
 
   // Basic filtering thresholds
@@ -58,11 +64,13 @@ public class VisionConstants {
   public static double[] cameraStdDevFactors =
       new double[] {
         1.0, // Camera 0
-        1.0 // Camera 1
+        1.0, // Camera 1
+        1.0, // Camera 2
+        1.0  // Camera 3
       };
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor =
-      Double.POSITIVE_INFINITY; // No rotation data available
+      Double.POSITIVE_INFINITY; // Ignore rotation data 
 }

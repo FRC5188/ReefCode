@@ -93,12 +93,5 @@ public class MultiSubsystemCommands {
                 .andThen(_armCommands.intake())
                 .andThen(setOverallSetpoint(OverallPosition.Stow));
     }
-
-    public Command intake() {
-        return setOverallSetpoint(OverallPosition.Loading)
-                .andThen(waitForOverallMechanism())
-                .andThen(_armCommands.intake())
-                .andThen(setOverallSetpoint(OverallPosition.Stow));
-    }
 }
     

@@ -14,7 +14,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.subsystems.drive;
+package frc.robot.subsystems.drive.io;
 
 import static frc.robot.util.PhoenixUtil.*;
 
@@ -43,6 +43,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.PhoenixOdometryThread;
+import frc.robot.subsystems.drive.TunerConstants;
+
 import java.util.Queue;
 
 /**

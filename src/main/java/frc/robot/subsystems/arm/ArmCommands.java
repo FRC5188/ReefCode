@@ -17,10 +17,11 @@ public class ArmCommands {
     public Command spit() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    _arm.spit();
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
+                    _arm.clearHasGamepiece();
                 },
                 _arm).withTimeout(1);
     }
@@ -43,12 +44,23 @@ public class ArmCommands {
     public Command intake() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    _arm.setIntakeSpeed(0.45);
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
                 },
                 _arm).until(() -> _arm.hasPiece());
+    }
+
+    public Command moveGamepieceToLightSensor() {
+        return new StartEndCommand(
+            () -> {
+                _arm.setIntakeSpeed(-0.3);
+            },
+            () -> {
+                _arm.setIntakeSpeed(0);
+            },
+            _arm).until(() -> _arm.lightSensorSeesGamepiece());       
     }
 
     public Command runArmPID() {

@@ -52,7 +52,7 @@ public class MultiSubsystemCommands {
     public Command setOverallSetpoint(OverallPosition setpoint) {
         return _elevatorCommands.setElevatorSetpoint(setpoint.getElevatorPosition())
                 .alongWith(_armCommands.setArmPosition(setpoint.getArmPosition()))
-                .unless(() -> !_elevator.canMoveToPos(_elevator.getCurrentPos(), setpoint.getArmPosition()));
+                .unless(() -> !_elevator.canMoveToPos(_elevator.getCurrentPos(), setpoint.getElevatorPosition(), _arm.getCurrentPos(), setpoint.getArmPosition()));
     }
 
     public Command waitForOverallMechanism() {
@@ -81,5 +81,13 @@ public class MultiSubsystemCommands {
                 .andThen(waitForOverallMechanism())
                 .andThen(score(setpoint))
                 .andThen(setOverallSetpoint(OverallPosition.Stow));
+    }
+
+    public Command loadGamepiece() {
+        return setOverallSetpoint(OverallPosition.Loading)
+                .andThen(waitForOverallMechanism())
+                .andThen(_armCommands.intake())
+                .andThen(setOverallSetpoint(OverallPosition.Stow))
+                .andThen(_armCommands.moveGamepieceToLightSensor());
     }
 }

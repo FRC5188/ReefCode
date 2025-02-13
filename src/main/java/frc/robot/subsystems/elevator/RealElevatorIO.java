@@ -25,12 +25,12 @@ public class RealElevatorIO implements ElevatorIO {
 
         SparkFlexConfig primaryConfig = new SparkFlexConfig();
         primaryConfig.inverted(false);
-        primaryConfig.idleMode(IdleMode.kBrake);
+        primaryConfig.idleMode(IdleMode.kCoast);
         _primaryMotor.configure(primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkFlexConfig secondaryConfig = new SparkFlexConfig();
         secondaryConfig.follow(CAN.PRIMARY_ELEVATOR_ID);
-        secondaryConfig.idleMode(IdleMode.kBrake);
+        secondaryConfig.idleMode(IdleMode.kCoast);
         _secondaryMotor.configure(secondaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -43,7 +43,7 @@ public class RealElevatorIO implements ElevatorIO {
     }
 
     public void setElevatorSpeed(double speed) {
-        _primaryMotor.set(speed);
+         _primaryMotor.set(speed);
     }
 
     public void setElevatorVoltage(Voltage voltage) {

@@ -28,7 +28,7 @@ public class Arm extends SubsystemBase {
   public enum ArmPosition {
     Stow(80),
     Loading(120),
-    L4_Score(45);
+    L4_Score(60);
 
     double angle;
 
@@ -42,6 +42,9 @@ public class Arm extends SubsystemBase {
   private ArmIO _io;
   private ArmIOInputsAutoLogged _inputs;
   private boolean _prevLightSensorVal;
+  private boolean _hasGamepiece;
+  private ArmPosition _currentPos;
+  private ArmPosition _desiredPos;
 
   private ProfiledPIDController _armPidController;
 
@@ -68,15 +71,27 @@ public class Arm extends SubsystemBase {
     _inputs = new ArmIOInputsAutoLogged();
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
+    _armPidController.setTolerance(7);
+    _currentPos = ArmPosition.Stow;
+    _desiredPos = ArmPosition.Stow;
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
     _armPidController.setGoal(setpoint.angle);
+    _desiredPos = setpoint;
   }
 
   public void setIntakeSpeed(double speed) {
     _io.setIntakeMotorSpeed(speed);
+  }
+
+  public void spit() {
+    setIntakeSpeed(0.5);
+  }
+
+  public void clearHasGamepiece() {
+    _hasGamepiece = false;
   }
 
   public void setArmVoltage(Voltage voltage) {
@@ -88,18 +103,29 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean intakeAtDesiredRotations() {
-    return _inputs._intakeMotorPositionRotations >= 2;
+    return _inputs._intakeMotorPositionRotations <= -2;
   }
 
   public boolean hasPiece() {
     boolean current = _inputs._lightSensorState;
     boolean hasPiece = _prevLightSensorVal && !current;
     _prevLightSensorVal = current;
-    return hasPiece;
+    if (hasPiece) _hasGamepiece = true;
+    return _hasGamepiece;
+  }
+
+  public boolean lightSensorSeesGamepiece() {
+    return _inputs._lightSensorState;
   }
 
   public boolean armAtSetpoint() {
-    return _armPidController.atGoal();
+    boolean atSetpoint = _armPidController.atGoal();
+    if (atSetpoint) _currentPos = _desiredPos;
+    return atSetpoint;
+  }
+
+  public ArmPosition getCurrentPos() {
+    return _currentPos;
   }
 
   public void runArmPID() {
@@ -130,5 +156,9 @@ public class Arm extends SubsystemBase {
     Logger.processInputs("Arm", _inputs);
 
     Logger.recordOutput("Arm/desiredPos", _armPidController.getSetpoint().position);
+    Logger.recordOutput("Arm/hasPiece", hasPiece());
+    Logger.recordOutput("Arm/atSetpoint", armAtSetpoint());
+    Logger.recordOutput("Arm/currentPosEnum", _currentPos);
+    Logger.recordOutput("Arm/desiredPosEnum", _desiredPos);
   }
 }

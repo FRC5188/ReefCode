@@ -45,10 +45,10 @@ import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
     L1(5),
-    L2(10),
-    L3(15),
-    L4(20),
-    Stow(0.25);
+    L2(12),
+    L3(25.5),
+    L4(48),
+    Stow(0.5);
 
     public final double setpoint;
 
@@ -69,9 +69,7 @@ public class Elevator extends SubsystemBase {
   private static final double ELEVATOR_PID_VEL = 120;
   private static final double ELEVATOR_PID_ACC = 125;
 
-  private static final double ELEVATOR_MOTOR_TOLERANCE = 0.0;
-
-  private static final double ELEVATOR_MAX_INCHES = 47.5;
+  private static final double ELEVATOR_MAX_INCHES = 48;
   private static final double ELEVATOR_MAX_ROTATIONS = 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
@@ -100,6 +98,7 @@ public class Elevator extends SubsystemBase {
 
   private boolean _isCalibrated;
   private ElevatorPosition _currentPos;
+  private ElevatorPosition _desiredPos;
 
   private ProfiledPIDController _elevatorMotorPID;
 
@@ -115,8 +114,10 @@ public class Elevator extends SubsystemBase {
 
     _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD,
         new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
-    _elevatorMotorPID.setTolerance(ELEVATOR_MOTOR_TOLERANCE);
-    _elevatorMotorPID.setGoal(0.25);
+    _elevatorMotorPID.setTolerance(0.5);
+
+    _currentPos = ElevatorPosition.Stow;
+    _desiredPos = ElevatorPosition.Stow;
   }
 
   // Runs the motors down at the calibration speed
@@ -134,7 +135,7 @@ public class Elevator extends SubsystemBase {
 
   public void setSetpoint(ElevatorPosition setpoint) {
     setSetpoint(setpoint.setpoint);
-    _currentPos = setpoint;
+    _desiredPos = setpoint;
   }
 
   // Sets the setpoint of the PID
@@ -147,7 +148,10 @@ public class Elevator extends SubsystemBase {
 
   // Checks if it is at the setpoint
   public boolean isAtSetpoint() {
-    return _elevatorMotorPID.atSetpoint();
+    boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 0.5;
+    if (atSetpoint)
+      _currentPos = _desiredPos;
+    return atSetpoint;
   }
 
   // Increases elevator position
@@ -193,19 +197,47 @@ public class Elevator extends SubsystemBase {
     return _currentPos;
   }
 
-  public boolean canMoveToPos(ElevatorPosition currentElevator, ArmPosition desiredArm) {
+  public boolean canMoveToPos(ElevatorPosition currentElevator, ElevatorPosition desiredElevator,
+      ArmPosition currentArm, ArmPosition desiredArm) {
+    boolean canMoveArm = false;
+    boolean canMoveElevator = false;
+
     switch (currentElevator) {
       case L1:
       case L2:
       case L3:
-        return (desiredArm != ArmPosition.L4_Score) || (desiredArm != ArmPosition.Loading);
+        canMoveArm = (desiredArm != ArmPosition.L4_Score) && (desiredArm != ArmPosition.Loading);
+        break;
       case L4:
-        return desiredArm != ArmPosition.Loading;
+        canMoveArm = (desiredArm != ArmPosition.Loading);
+        break;
       case Stow:
-        return desiredArm != ArmPosition.L4_Score;
+        canMoveArm = (desiredArm != ArmPosition.L4_Score);
+        break;
       default:
-        return false;
+        canMoveArm = false;
+        break;
     }
+
+    switch (desiredElevator) {
+      case L1:
+      case L2:
+      case L3:
+        canMoveElevator = (currentArm != ArmPosition.L4_Score) && (currentArm != ArmPosition.Loading);
+        break;
+      case L4:
+        canMoveElevator = (currentArm != ArmPosition.Loading);
+        break;
+      case Stow:
+        canMoveElevator = (currentArm != ArmPosition.L4_Score);
+        break;
+      default:
+        canMoveElevator = false;
+        break;
+    }
+    System.out.println("Arm: " + canMoveArm + " Elevator: " + canMoveElevator);
+
+    return canMoveArm && canMoveElevator;
   }
 
   public void populateLog(SysIdRoutineLog log) {
@@ -236,8 +268,9 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/Current", _inputs._elevatorMotorCurrent);
     Logger.recordOutput("Elevator/motorSpeed", _inputs._elevatorSpeed);
     Logger.recordOutput("Elevator/CurrentSetpoint", _elevatorMotorPID.getSetpoint().position);
-
-    // Logger.recordOutput("Elevator/motorSpeed", _primaryMotor.get());
+    Logger.recordOutput("Elevator/atSetpoint", isAtSetpoint());
+    Logger.recordOutput("Elevator/currentPosEnum", _currentPos);
+    Logger.recordOutput("Elevator/desiredPosEnum", _desiredPos);
   }
 
 }

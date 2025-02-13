@@ -49,7 +49,7 @@ public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
                                                                                     // angular velocity
-
+ 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -66,9 +66,9 @@ public class RobotContainer {
   private final JoystickButton L3Button = new JoystickButton(buttonbox1, 4);
   private final JoystickButton L4Button = new JoystickButton(buttonbox1, 5);
   private final JoystickButton LoadingButton = new JoystickButton(buttonbox1, 6);
-  private final JoystickButton button7 = new JoystickButton(buttonbox1, 7);
+  private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
   private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
-  private final JoystickButton button9 = new JoystickButton(buttonbox1, 9);
+  private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
 
   private final GenericHID buttonbox2 = new GenericHID(2);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
@@ -122,21 +122,16 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
 
     // Elevator sys id routines
-    button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
-    button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
+    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());
+    spitButton.onTrue(armCommands.spit());
 
-    L1Button.onTrue(armCommands.setArmPosition(ArmPosition.Stow));
-    L2Button.onTrue(armCommands.setArmPosition(ArmPosition.Loading));
-    L3Button.onTrue(armCommands.setArmPosition(ArmPosition.L4_Score));
-    // L4Button.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.L4));
-    // StowButton.onTrue(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
-    // L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
-    // L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    // StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
-    // L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
-    // L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    // LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
-    // L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
+    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
+    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
+    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
+    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
+    LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
+    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     // Runs the preset to score unless the preset is invalid.
     // joystick.rightBumper().onTrue(
@@ -169,7 +164,6 @@ public class RobotContainer {
       elevatorCommands.runElevatorPID();
       if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
         CommandScheduler.getInstance().schedule(elevatorPIDCommand);
-        CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
       }
     } else {
       Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
@@ -179,7 +173,10 @@ public class RobotContainer {
     // Start arm pid
     if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
       CommandScheduler.getInstance().schedule(armPIDCommand);
-      CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
     }
+
+    // Set initial positions
+    CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
+    CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
   }
 }

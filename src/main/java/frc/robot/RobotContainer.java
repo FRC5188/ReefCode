@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.lang.invoke.VarHandle.AccessMode;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -19,12 +21,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
+import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.RealArmIO;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.Telemetry;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
+import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
@@ -76,14 +80,27 @@ public class RobotContainer {
   public RobotContainer() {
 
     // All AutoAligns for reef will align to Left position
+    //TODO: Add AutoAligns to all the commands.
 
-    // NamedCommands.getCommand("L1"); // AutoAlignToReef + ScoreL1
-    // NamedCommands.getCommand("L2"); // AutoAlignToReef + ScoreL2
-    // NamedCommands.getCommand("L3"); // AutoAlignToReef + ScoreL3
-    // NamedCommands.getCommand("L4"); // AutoAlignToReef + ScoreL4
+    // AutoAlignToReef + ScoreL1 (Move to L1, score)
+    NamedCommands.registerCommand("L1",
+        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L1));
+    
+    // AutoAlignToReef + ScoreL2 (Move to L2, score)
+    NamedCommands.registerCommand("L2",
+        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L2)); 
 
-    // NamedCommands.getCommand("Intake"); // AutoAlignToIntake +
-    // IntakeUntilHasPiece
+    // AutoAlignToReef + ScoreL3 (Move to L3, score)
+    NamedCommands.registerCommand("L3",
+        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L3));
+    
+    // AutoAlignToReef + Move to L4 + Score
+    NamedCommands.registerCommand("L4",
+        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
+
+    // AutoAlign to Intake + Intake
+    NamedCommands.registerCommand("Intake",
+        multiSubsystemCommands.intake());
 
     configureBindings();
   }
@@ -113,7 +130,6 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
- 
     drivetrain.registerTelemetry(logger::telemeterize);
 
     // Elevator sys id routines
@@ -127,7 +143,7 @@ public class RobotContainer {
     L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
     LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
     L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
-    
+
     // Runs the preset to score unless the preset is invalid.
     joystick.rightBumper().onTrue(
         multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(() -> !preset.isPresetValid()));

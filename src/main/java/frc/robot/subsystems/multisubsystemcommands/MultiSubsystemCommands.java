@@ -84,7 +84,21 @@ public class MultiSubsystemCommands {
         return setOverallSetpoint(setpoint)
                 .andThen(waitForOverallMechanism())
                 .andThen(score(setpoint))
+                .andThen(setOverallSetpoint(OverallPosition.Stow)); */
+    }
+
+    public Command intake() {
+        return setOverallSetpoint(OverallPosition.Loading)
+                .andThen(waitForOverallMechanism())
+                .andThen(_armCommands.intake())
                 .andThen(setOverallSetpoint(OverallPosition.Stow));
-    */
-                }
+    }
+
+    public Command intake() {
+        return setOverallSetpoint(OverallPosition.Loading)
+                .andThen(waitForOverallMechanism())
+                .andThen(_armCommands.intake())
+                .andThen(setOverallSetpoint(OverallPosition.Stow));
+    }
 }
+    

@@ -30,31 +30,30 @@ public class VisionConstants {
   
   // New cameras for 2025 season are 5,6,7,8
   
-  public static String camera0Name = "photoncamera_5";
-  public static String camera1Name = "photoncamera_6";
-  public static String camera2Name = "photoncamera_7";
-  public static String camera3Name = "photoncamera_8";
+  public static String camera5Name = "photoncamera_5";
+  public static String camera6Name = "photoncamera_6";
+  public static String camera7Name = "photoncamera_7";
+  public static String camera8Name = "photoncamera_8";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
 
-  // [TODO: SET VALUES] Should be on back of robot
   // Note: 0.0254 multiplier converts inches to meters
 
   // Camera 5
-  public static Transform3d robotToCamera0 =
-      new Transform3d(-14.0*0.0254, -11.25*0.0254, 10.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
+  public static Transform3d robotToCamera5 =
+      new Transform3d(-13.75*0.0254, 11.25*0.0254, 9.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
   // Camera 6
-  public static Transform3d robotToCamera1 =
-      new Transform3d(-14.0*0.0254, 11.25*0.0254, 10.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
+  public static Transform3d robotToCamera6 =
+      new Transform3d(-13.75*0.0254, -11.25*0.0254, 9.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
 
 
   // Camera 7
-  public static Transform3d robotToCamera2 =
-      new Transform3d(0.5*0.0254, 4*0.0254, 9*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
+  public static Transform3d robotToCamera7 =
+      new Transform3d(13.75*0.0254, -4*0.0254, 8.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
   // Camera 8
-  public static Transform3d robotToCamera3 =
-      new Transform3d(0.5*0.0254, 4*0.0254, 9*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
+  public static Transform3d robotToCamera8 =
+      new Transform3d(13.75*0.0254, 4*0.0254, 8.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -69,10 +68,10 @@ public class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0, // Camera 1
-        1.0, // Camera 2
-        1.0  // Camera 3
+        1.0, // Camera 5
+        1.0, // Camera 6
+        1.0, // Camera 7
+        1.0  // Camera 8
       };
 
   // Multipliers to apply for MegaTag 2 observations

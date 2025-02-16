@@ -110,10 +110,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                new VisionIOPhotonVision(camera1Name, robotToCamera1),
-                new VisionIOPhotonVision(camera2Name, robotToCamera2),
-                new VisionIOPhotonVision(camera3Name, robotToCamera3)
+                new VisionIOPhotonVision(camera5Name, robotToCamera5),
+                new VisionIOPhotonVision(camera6Name, robotToCamera6),
+                new VisionIOPhotonVision(camera7Name, robotToCamera7),
+                new VisionIOPhotonVision(camera8Name, robotToCamera8)
                 );   
         break;
 
@@ -130,10 +130,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                new VisionIOPhotonVision(camera1Name, robotToCamera1),
-                new VisionIOPhotonVision(camera2Name, robotToCamera2),
-                new VisionIOPhotonVision(camera3Name, robotToCamera3)
+                new VisionIOPhotonVision(camera5Name, robotToCamera5),
+                new VisionIOPhotonVision(camera6Name, robotToCamera6),
+                new VisionIOPhotonVision(camera7Name, robotToCamera7),
+                new VisionIOPhotonVision(camera8Name, robotToCamera8)
                 );   
         break;
 

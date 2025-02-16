@@ -29,6 +29,8 @@ import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.RealElevatorIO;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
@@ -37,8 +39,11 @@ import frc.robot.subsystems.presets.Preset;
 public class RobotContainer {
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
+  private final LEDs LEDSubsystem = new LEDs();
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
+  private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
+
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -121,8 +126,7 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    // Elevator sys id routines
-    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());
+    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
     L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
@@ -134,12 +138,12 @@ public class RobotContainer {
     L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     // Runs the preset to score unless the preset is invalid.
-    // joystick.rightBumper().onTrue(
-    // multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(()
-    // -> !preset.isPresetValid()));
+    joystick.rightBumper().onTrue(
+    multiSubsystemCommands.scoreGamepieceAtPosition(() -> preset.getLevel()).unless(()
+    -> !preset.isPresetValid()));
 
     // Resets the preset when we don't have a piece.
-    armSubsystem._hasPiece.onFalse(preset.resetPreset());
+    armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
 
     // Sets the level preset
     presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
@@ -178,5 +182,17 @@ public class RobotContainer {
     // Set initial positions
     CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
     CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
+  }
+
+  public void startIdleAnimations() {
+    Command disabled1 = LEDCommands.disabledAnimation1();
+    if (!CommandScheduler.getInstance().isScheduled(disabled1))
+      CommandScheduler.getInstance().schedule(disabled1);
+  }
+
+  public void startEnabledLEDs() {
+    Command initialLEDs = LEDCommands.pickingUpCoral();
+    if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
+      CommandScheduler.getInstance().schedule(initialLEDs);
   }
 }

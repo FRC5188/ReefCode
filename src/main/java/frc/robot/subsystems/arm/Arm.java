@@ -28,7 +28,7 @@ public class Arm extends SubsystemBase {
   public enum ArmPosition {
     Stow(80),
     Loading(120),
-    L4_Score(60);
+    L4_Score(45);
 
     double angle;
 
@@ -48,20 +48,20 @@ public class Arm extends SubsystemBase {
 
   private ProfiledPIDController _armPidController;
 
-  private static final double KP = 0.08;
-  private static final double KI = 0;
+  private static final double KP = 0.09;
+  private static final double KI = 0.01;
   private static final double KD = 0;
-  private static final double PROFILE_VEL = 140;
-  private static final double PROFILE_ACC = 125;
+  private static final double PROFILE_VEL = 160;
+  private static final double PROFILE_ACC = 145;
 
-  private static final double ARM_WEIGHT_KG = 4;
+  private static final double ARM_WEIGHT_N = 3.5 * 9.81;
   private static final double ARM_STALL_TORQUE_NM = 3.6;
   private static final double ARM_STALL_CURRENT = 211;
   private static final double ARM_KT = ARM_STALL_TORQUE_NM / ARM_STALL_CURRENT;
   private static final double ARM_RESISTANCE = 0.057;
   private static final double ARM_MOMENT_METERS = 0.3928;
   private static final double ARM_GEARING = 17;
-  private static final double ARM_FEEDFORWARD_COEFF = (ARM_WEIGHT_KG * ARM_MOMENT_METERS * ARM_RESISTANCE) / (ARM_KT * ARM_GEARING);
+  private static final double ARM_FEEDFORWARD_COEFF = 0.53;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
       new SysIdRoutine.Mechanism(this::setArmVoltage, this::populateLog, this));
@@ -72,8 +72,6 @@ public class Arm extends SubsystemBase {
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
     _armPidController.setTolerance(7);
-    _currentPos = ArmPosition.Stow;
-    _desiredPos = ArmPosition.Stow;
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
@@ -129,8 +127,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void runArmPID() {
-    double out = _armPidController.calculate(_inputs._armEncoderPositionDegrees) + (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
-    Logger.recordOutput("Arm/motorSpeed", out);
+    double out = (_armPidController.calculate(_inputs._armEncoderPositionDegrees) + ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
     _io.setArmMotorVoltage(Voltage.ofBaseUnits(out, Volt));
   }
 

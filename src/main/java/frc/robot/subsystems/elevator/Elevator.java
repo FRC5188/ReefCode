@@ -45,7 +45,7 @@ import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
     L1(5),
-    L2(12),
+    L2(9),
     L3(25.5),
     L4(48),
     Stow(0.5);
@@ -63,38 +63,34 @@ public class Elevator extends SubsystemBase {
   private static final double INCREMENT_CONSTANT = 1;
   private static final double DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.13; // 0.08
-  private static final double ELEVATOR_MOTOR_KI = 0; // 0.001
-  private static final double ELEVATOR_MOTOR_KD = 0; // 0.002
-  private static final double ELEVATOR_PID_VEL = 120;
-  private static final double ELEVATOR_PID_ACC = 125;
+  private static final double ELEVATOR_MOTOR_KP = 0.75;
+  private static final double ELEVATOR_MOTOR_KI = 0.15; 
+  private static final double ELEVATOR_MOTOR_KD = 0;
+  private static final double ELEVATOR_PID_VEL = 220;
+  private static final double ELEVATOR_PID_ACC = 215;
 
   private static final double ELEVATOR_MAX_INCHES = 48;
   private static final double ELEVATOR_MAX_ROTATIONS = 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
-  // In pounds
-  private static final double ELEVATOR_STAGE1_WEIGHT = 3.75;
-  private static final double ELEVATOR_STAGE2_WEIGHT = 0;
+  // In newtons
+  private static final double ELEVATOR_STAGE1_WEIGHT_N = 2.053 * 9.81;
+  private static final double ELEVATOR_STAGE2_WEIGHT_N = 7.554 * 9.81;
+  private static final double ELEVATOR_TOTAL_WEIGHT_N = ELEVATOR_STAGE1_WEIGHT_N + (ELEVATOR_STAGE2_WEIGHT_N);
 
-  // In inches
-  private static final double SPOOL_DIAMETER = 1.6;
+  // In m
+  private static final double SPOOL_DIAMETER = 0.0527;
 
-  // In pound - inches
-  private static final double STALL_TORQUE = 62.75;
-
-  // In amps
-  private static final double STALL_CURRENT = 366;
-
-  // In Ohms
-  private static final double RESISTANCE = 0.0185;
-
+  private static final double ELEVATOR_STALL_TORQUE_LB_IN = 3.6;
+  private static final double ELEVATOR_STALL_CURRENT = 211;
+  private static final double ELEVATOR_KT = ELEVATOR_STALL_TORQUE_LB_IN / ELEVATOR_STALL_CURRENT;
   private static final double GEAR_RATIO = 7.75;
   private static final double NUMBER_OF_MOTORS = 2;
+  private static final double EFFECTIVE_KT = ELEVATOR_KT * NUMBER_OF_MOTORS * GEAR_RATIO;
+  private static final double ELEVATOR_RESISTANCE = 0.057;
 
-  private static final double FEEDFORWARD_CONSTANT = ((ELEVATOR_STAGE1_WEIGHT + (2 * ELEVATOR_STAGE2_WEIGHT))
-      * SPOOL_DIAMETER * STALL_CURRENT * RESISTANCE) / (NUMBER_OF_MOTORS * GEAR_RATIO * STALL_TORQUE);
+  private static final double FEEDFORWARD_CONSTANT = ((ELEVATOR_TOTAL_WEIGHT_N * SPOOL_DIAMETER * ELEVATOR_RESISTANCE) / (EFFECTIVE_KT)) - 0.65;
 
   private boolean _isCalibrated;
   private ElevatorPosition _currentPos;
@@ -142,8 +138,8 @@ public class Elevator extends SubsystemBase {
   public void setSetpoint(double setpoint) {
     if (setpoint < 0.25 || setpoint > ELEVATOR_MAX_INCHES)
       return;
-    _elevatorMotorPID.setGoal(setpoint);
     _elevatorMotorPID.reset(getCurrentPosInches());
+    _elevatorMotorPID.setGoal(setpoint);
   }
 
   // Checks if it is at the setpoint
@@ -177,7 +173,8 @@ public class Elevator extends SubsystemBase {
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-    _io.setElevatorSpeed(_elevatorMotorPID.calculate(getCurrentPosInches()));
+  // _io.setElevatorSpeed();
+    _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
   }
 
   public boolean isCalibrated() {
@@ -190,7 +187,7 @@ public class Elevator extends SubsystemBase {
 
   // Converts the motors position from weird units to normal people inches
   public double getCurrentPosInches() {
-    return (_inputs._elevatorPosition * MOTOR_CONVERSION);
+    return (_inputs._elevatorPosition * MOTOR_CONVERSION) - 0.25;
   }
 
   public ElevatorPosition getCurrentPos() {

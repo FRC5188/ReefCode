@@ -17,13 +17,16 @@ public class ArmCommands {
     public Command spit() {
         return new StartEndCommand(
                 () -> {
+                    if (_arm.getCurrentPos() == ArmPosition.L4_Score) 
+                        _arm.setArmSetpoint(ArmPosition.Stow);
                     _arm.spit();
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
                 },
-                _arm).withTimeout(1);
+                _arm).withTimeout(0.5);
+
     }
 
     public Command setArmPosition(ArmPosition setpoint) {

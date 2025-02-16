@@ -42,10 +42,10 @@ public class VisionConstants {
 
   // Camera 5
   public static Transform3d robotToCamera5 =
-      new Transform3d(-13.75*0.0254, 11.25*0.0254, 9.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
+      new Transform3d(-13.75*0.0254, -11.25*0.0254, 9.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
   // Camera 6
   public static Transform3d robotToCamera6 =
-      new Transform3d(-13.75*0.0254, -11.25*0.0254, 9.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
+      new Transform3d(-13.75*0.0254, 11.25*0.0254, 9.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
 
 
   // Camera 7

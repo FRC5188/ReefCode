@@ -97,4 +97,11 @@ public class MultiSubsystemCommands {
                 .andThen(setOverallSetpoint(OverallPosition.Stow))
                 .andThen(_armCommands.moveGamepieceToLightSensor());
     }
+
+    public Command intake() {
+        return setOverallSetpoint(OverallPosition.Loading)
+                .andThen(waitForOverallMechanism())
+                .andThen(_armCommands.intake())
+                .andThen(setOverallSetpoint(OverallPosition.Stow));
+    }
 }

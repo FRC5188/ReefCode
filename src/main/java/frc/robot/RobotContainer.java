@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,12 +50,12 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 public class RobotContainer {
   private final Drive drive;
-  private final CommandXboxController controller = new CommandXboxController(0);
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
   private final Vision vision;
+  private final CommandXboxController joystick = new CommandXboxController(0);
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -74,8 +75,6 @@ public class RobotContainer {
   //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
-  private final CommandXboxController joystick = new CommandXboxController(0);
 
   private final GenericHID buttonbox1 = new GenericHID(1);
   private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
@@ -109,11 +108,13 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         
         vision =
-                new Vision(
-                  drive::addVisionMeasurement,
-                  new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                  new VisionIOPhotonVision(camera1Name, robotToCamera1));   
-
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(camera0Name, robotToCamera0),
+                new VisionIOPhotonVision(camera1Name, robotToCamera1),
+                new VisionIOPhotonVision(camera2Name, robotToCamera2),
+                new VisionIOPhotonVision(camera3Name, robotToCamera3)
+                );   
         break;
 
       case SIM:
@@ -129,8 +130,11 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+                new VisionIOPhotonVision(camera0Name, robotToCamera0),
+                new VisionIOPhotonVision(camera1Name, robotToCamera1),
+                new VisionIOPhotonVision(camera2Name, robotToCamera2),
+                new VisionIOPhotonVision(camera3Name, robotToCamera3)
+                );   
         break;
 
       default:
@@ -143,7 +147,13 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = 
+            new Vision(
+                drive::addVisionMeasurement, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {});
         break;
     }
 
@@ -180,11 +190,10 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -joystick.getLeftY(),
+            () -> -joystick.getLeftX(),
+            () -> -joystick.getRightX()));
 
-    
     // drivetrain.setDefaultCommand(
     //     // Drivetrain will execute this command periodically
     //     drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
@@ -204,7 +213,19 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
-    // reset the field-centric heading on left bumper press
+
+    // Reset gyro to 0° when left bumper button is pressed
+    joystick
+        .leftBumper()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    drive.setPose(
+                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                        drive)
+                        .ignoringDisable(true)); 
+
+    // // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
  
     // drive.registerTelemetry(logger::telemeterize);

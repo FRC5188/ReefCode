@@ -24,7 +24,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
   // Camera names, must match names configured on coprocessor
   
@@ -39,16 +39,22 @@ public class VisionConstants {
   // (Not used by Limelight, configure in web UI instead)
 
   // [TODO: SET VALUES] Should be on back of robot
-  public static Transform3d robotToCamera0 =
-      new Transform3d(0.0, -3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, Math.PI));
-  public static Transform3d robotToCamera1 =
-      new Transform3d(0.0, 3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, Math.PI));
+  // Note: 0.0254 multiplier converts inches to meters
 
-  // On front of robot, centered
+  // Camera 5
+  public static Transform3d robotToCamera0 =
+      new Transform3d(-14.0*0.0254, -11.25*0.0254, 10.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
+  // Camera 6
+  public static Transform3d robotToCamera1 =
+      new Transform3d(-14.0*0.0254, 11.25*0.0254, 10.25*0.0254, new Rotation3d(0.0, 30.0/360.0*2.0*Math.PI, Math.PI));
+
+
+  // Camera 7
   public static Transform3d robotToCamera2 =
-      new Transform3d(0.0, -3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
+      new Transform3d(0.5*0.0254, 4*0.0254, 9*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
+  // Camera 8
   public static Transform3d robotToCamera3 =
-      new Transform3d(0.0, 3.25*0.0254, 9.5*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
+      new Transform3d(0.5*0.0254, 4*0.0254, 9*0.0254, new Rotation3d(0.0, 20.0/360.0*2.0*Math.PI, 0));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

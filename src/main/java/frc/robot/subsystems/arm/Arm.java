@@ -49,7 +49,7 @@ public class Arm extends SubsystemBase {
   private ProfiledPIDController _armPidController;
 
   private static final double KP = 0.09;
-  private static final double KI = 0.01;
+  private static final double KI = 0;//0.01;
   private static final double KD = 0;
   private static final double PROFILE_VEL = 160;
   private static final double PROFILE_ACC = 145;
@@ -72,9 +72,14 @@ public class Arm extends SubsystemBase {
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
     _armPidController.setTolerance(7);
+
+    _currentPos = ArmPosition.Stow;
+    _desiredPos = ArmPosition.Stow;
+    _armPidController.setGoal(ArmPosition.Stow.angle);
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
+    System.out.println("SETTING POS");
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
     _armPidController.setGoal(setpoint.angle);
     _desiredPos = setpoint;
@@ -83,6 +88,7 @@ public class Arm extends SubsystemBase {
   public void setIntakeSpeed(double speed) {
     _io.setIntakeMotorSpeed(speed);
   }
+
 
   public void spit() {
     setIntakeSpeed(0.5);

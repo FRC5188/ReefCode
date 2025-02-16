@@ -119,7 +119,7 @@ public class LEDs extends SubsystemBase {
 
     public void elevatorOrArmIsMoving() {
         if (!_alreadyRunning) {
-            runAnimation(LEDAnimation.BlinkDarkBlue);
+            runAnimation(LEDAnimation.SolidDarkBlue);
             _alreadyRunning = false;
         }
     }
@@ -145,6 +145,13 @@ public class LEDs extends SubsystemBase {
         }
     }
 
+    public void disabledAnimation1() {
+        if (!_alreadyRunning) {
+            runAnimation(LEDAnimation.PartyMode);
+            _alreadyRunning = false;            
+        }
+    }
+
     public void reset() {
         _candle.clearAnimation(0);
         _alreadyRunning = false;
@@ -152,6 +159,7 @@ public class LEDs extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Logger.recordOutput("LEDs/alreadyRunning", _alreadyRunning);
         Logger.recordOutput("LEDs/CurrentAnimation", _currentAnimation.toString());
     }
 }

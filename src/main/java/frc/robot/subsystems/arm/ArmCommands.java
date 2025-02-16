@@ -17,12 +17,16 @@ public class ArmCommands {
     public Command spit() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    if (_arm.getCurrentPos() == ArmPosition.L4_Score) 
+                        _arm.setArmSetpoint(ArmPosition.Stow);
+                    _arm.spit();
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
+                    _arm.clearHasGamepiece();
                 },
-                _arm).withTimeout(1);
+                _arm).withTimeout(0.5);
+
     }
 
     public Command setArmPosition(ArmPosition setpoint) {
@@ -34,7 +38,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setArmSetpoint(setpoint);
                 },
-                _arm).alongWith(intakeForNumberOfRotations());
+                _arm).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {
@@ -46,12 +50,23 @@ public class ArmCommands {
     public Command intake() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    _arm.setIntakeSpeed(0.45);
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
                 },
                 _arm).until(() -> _arm.hasPiece());
+    }
+
+    public Command moveGamepieceToLightSensor() {
+        return new StartEndCommand(
+            () -> {
+                _arm.setIntakeSpeed(-0.3);
+            },
+            () -> {
+                _arm.setIntakeSpeed(0);
+            },
+            _arm).until(() -> _arm.lightSensorSeesGamepiece());       
     }
 
     public Command runArmPID() {

@@ -39,17 +39,16 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.HardwareConstants.CAN;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
-import frc.robot.subsystems.arm.io.ArmIO.ArmIOInputs;
-import frc.robot.subsystems.elevator.io.ElevatorIO;
-import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
+import frc.robot.subsystems.arm.ArmIO.ArmIOInputs;
+import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
-    L1(1),
-    L2(2),
-    L3(3),
-    L4(4),
-    Stow(5);
+    L1(5),
+    L2(9),
+    L3(25.5),
+    L4(48),
+    Stow(0.5);
 
     public final double setpoint;
 
@@ -59,65 +58,62 @@ public class Elevator extends SubsystemBase {
   }
 
   private static final double CALIBRATION_SPEED = -0.1;
-  private static final double HARD_STOP_CURRENT_LIMIT = 30;
+  private static final double HARD_STOP_CURRENT_LIMIT = 50;
 
   private static final double INCREMENT_CONSTANT = 1;
   private static final double DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.21; // 0.08
-  private static final double ELEVATOR_MOTOR_KI = 0; // 0.001
-  private static final double ELEVATOR_MOTOR_KD = 0; // 0.002
-  private static final double ELEVATOR_PID_VEL = 120;
-  private static final double ELEVATOR_PID_ACC = 125;
+  private static final double ELEVATOR_MOTOR_KP = 0.75;
+  private static final double ELEVATOR_MOTOR_KI = 0.15; 
+  private static final double ELEVATOR_MOTOR_KD = 0;
+  private static final double ELEVATOR_PID_VEL = 220;
+  private static final double ELEVATOR_PID_ACC = 215;
 
-  private static final double ELEVATOR_MOTOR_TOLERANCE = 0.0;
-
-  private static final double ELEVATOR_MAX_INCHES = 14.0;
-  private static final double ELEVATOR_MAX_ROTATIONS = 28.67;
+  private static final double ELEVATOR_MAX_INCHES = 48;
+  private static final double ELEVATOR_MAX_ROTATIONS = 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
-  // In pounds
-  private static final double ELEVATOR_STAGE1_WEIGHT = 3.75;
-  private static final double ELEVATOR_STAGE2_WEIGHT = 0;
+  // In newtons
+  private static final double ELEVATOR_STAGE1_WEIGHT_N = 2.053 * 9.81;
+  private static final double ELEVATOR_STAGE2_WEIGHT_N = 7.554 * 9.81;
+  private static final double ELEVATOR_TOTAL_WEIGHT_N = ELEVATOR_STAGE1_WEIGHT_N + (ELEVATOR_STAGE2_WEIGHT_N);
 
-  // In inches
-  private static final double SPOOL_DIAMETER = 1.6;
+  // In m
+  private static final double SPOOL_DIAMETER = 0.0527;
 
-  // In pound - inches
-  private static final double STALL_TORQUE = 62.75;
-
-  // In amps
-  private static final double STALL_CURRENT = 366;
-
-  // In Ohms
-  private static final double RESISTANCE = 0.0185;
-
+  private static final double ELEVATOR_STALL_TORQUE_LB_IN = 3.6;
+  private static final double ELEVATOR_STALL_CURRENT = 211;
+  private static final double ELEVATOR_KT = ELEVATOR_STALL_TORQUE_LB_IN / ELEVATOR_STALL_CURRENT;
   private static final double GEAR_RATIO = 7.75;
   private static final double NUMBER_OF_MOTORS = 2;
+  private static final double EFFECTIVE_KT = ELEVATOR_KT * NUMBER_OF_MOTORS * GEAR_RATIO;
+  private static final double ELEVATOR_RESISTANCE = 0.057;
 
-  private static final double FEEDFORWARD_CONSTANT = ((ELEVATOR_STAGE1_WEIGHT + (2 * ELEVATOR_STAGE2_WEIGHT))
-      * SPOOL_DIAMETER * STALL_CURRENT * RESISTANCE) / (NUMBER_OF_MOTORS * GEAR_RATIO * STALL_TORQUE);
+  private static final double FEEDFORWARD_CONSTANT = ((ELEVATOR_TOTAL_WEIGHT_N * SPOOL_DIAMETER * ELEVATOR_RESISTANCE) / (EFFECTIVE_KT)) - 0.65;
 
   private boolean _isCalibrated;
   private ElevatorPosition _currentPos;
+  private ElevatorPosition _desiredPos;
 
   private ProfiledPIDController _elevatorMotorPID;
 
   private ElevatorIO _io;
-  private ElevatorIOInputs _inputs;
+  private ElevatorIOInputsAutoLogged _inputs;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
       new SysIdRoutine.Mechanism(this::setElevatorVoltage, this::populateLog, this));
 
   public Elevator(ElevatorIO io) {
     _io = io;
-    _inputs = new ElevatorIOInputs();
+    _inputs = new ElevatorIOInputsAutoLogged();
 
     _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD,
         new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
-    _elevatorMotorPID.setTolerance(ELEVATOR_MOTOR_TOLERANCE);
-    _elevatorMotorPID.setGoal(0.25);
+    _elevatorMotorPID.setTolerance(0.5);
+
+    _currentPos = ElevatorPosition.Stow;
+    _desiredPos = ElevatorPosition.Stow;
   }
 
   // Runs the motors down at the calibration speed
@@ -135,20 +131,23 @@ public class Elevator extends SubsystemBase {
 
   public void setSetpoint(ElevatorPosition setpoint) {
     setSetpoint(setpoint.setpoint);
-    _currentPos = setpoint;
+    _desiredPos = setpoint;
   }
 
   // Sets the setpoint of the PID
   public void setSetpoint(double setpoint) {
     if (setpoint < 0.25 || setpoint > ELEVATOR_MAX_INCHES)
       return;
-    _elevatorMotorPID.setGoal(setpoint);
     _elevatorMotorPID.reset(getCurrentPosInches());
+    _elevatorMotorPID.setGoal(setpoint);
   }
 
   // Checks if it is at the setpoint
   public boolean isAtSetpoint() {
-    return _elevatorMotorPID.atSetpoint();
+    boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 0.5;
+    if (atSetpoint)
+      _currentPos = _desiredPos;
+    return atSetpoint;
   }
 
   // Increases elevator position
@@ -174,7 +173,8 @@ public class Elevator extends SubsystemBase {
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-    _io.setElevatorSpeed(_elevatorMotorPID.calculate(getCurrentPosInches()));
+  // _io.setElevatorSpeed();
+    _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
   }
 
   public boolean isCalibrated() {
@@ -187,26 +187,54 @@ public class Elevator extends SubsystemBase {
 
   // Converts the motors position from weird units to normal people inches
   public double getCurrentPosInches() {
-    return _inputs._elevatorPosition * MOTOR_CONVERSION;
+    return (_inputs._elevatorPosition * MOTOR_CONVERSION) - 0.25;
   }
 
   public ElevatorPosition getCurrentPos() {
     return _currentPos;
   }
 
-  public boolean canMoveToPos(ElevatorPosition currentElevator, ArmPosition desiredArm) {
+  public boolean canMoveToPos(ElevatorPosition currentElevator, ElevatorPosition desiredElevator,
+      ArmPosition currentArm, ArmPosition desiredArm) {
+    boolean canMoveArm = false;
+    boolean canMoveElevator = false;
+
     switch (currentElevator) {
       case L1:
       case L2:
       case L3:
-        return (desiredArm != ArmPosition.L4_Score) || (desiredArm != ArmPosition.Loading);
+        canMoveArm = (desiredArm != ArmPosition.L4_Score) && (desiredArm != ArmPosition.Loading);
+        break;
       case L4:
-        return desiredArm != ArmPosition.Loading;
+        canMoveArm = (desiredArm != ArmPosition.Loading);
+        break;
       case Stow:
-        return desiredArm != ArmPosition.L4_Score;
+        canMoveArm = (desiredArm != ArmPosition.L4_Score);
+        break;
       default:
-        return false;
+        canMoveArm = false;
+        break;
     }
+
+    switch (desiredElevator) {
+      case L1:
+      case L2:
+      case L3:
+        canMoveElevator = (currentArm != ArmPosition.L4_Score) && (currentArm != ArmPosition.Loading);
+        break;
+      case L4:
+        canMoveElevator = (currentArm != ArmPosition.Loading);
+        break;
+      case Stow:
+        canMoveElevator = (currentArm != ArmPosition.L4_Score);
+        break;
+      default:
+        canMoveElevator = false;
+        break;
+    }
+    System.out.println("Arm: " + canMoveArm + " Elevator: " + canMoveElevator);
+
+    return canMoveArm && canMoveElevator;
   }
 
   public void populateLog(SysIdRoutineLog log) {
@@ -228,6 +256,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     _io.updateInputs(_inputs);
+    Logger.processInputs("Elevator", _inputs);
 
     // This method will be called once per scheduler run
     Logger.recordOutput("Elevator/currentPos", getCurrentPosInches());
@@ -236,8 +265,9 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/Current", _inputs._elevatorMotorCurrent);
     Logger.recordOutput("Elevator/motorSpeed", _inputs._elevatorSpeed);
     Logger.recordOutput("Elevator/CurrentSetpoint", _elevatorMotorPID.getSetpoint().position);
-
-    // Logger.recordOutput("Elevator/motorSpeed", _primaryMotor.get());
+    Logger.recordOutput("Elevator/atSetpoint", isAtSetpoint());
+    Logger.recordOutput("Elevator/currentPosEnum", _currentPos);
+    Logger.recordOutput("Elevator/desiredPosEnum", _desiredPos);
   }
 
 }

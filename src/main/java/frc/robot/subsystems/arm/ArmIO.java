@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm.io;
+package frc.robot.subsystems.arm;
 
 import org.littletonrobotics.junction.AutoLog;
 

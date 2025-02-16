@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -46,15 +47,22 @@ import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 public class RobotContainer {
   private final Drive drive;
-  private final CommandXboxController controller = new CommandXboxController(0);
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final LEDs LEDSubsystem = new LEDs();
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
+  private final Vision vision;
+  private final CommandXboxController joystick = new CommandXboxController(0);
   private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
 
@@ -76,8 +84,6 @@ public class RobotContainer {
   //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
-  private final CommandXboxController joystick = new CommandXboxController(0);
 
   private final GenericHID buttonbox1 = new GenericHID(1);
   private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
@@ -112,12 +118,14 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         
-        // vision =
-        //         new Vision(
-        //           drive::addVisionMeasurement,
-        //           new VisionIOPhotonVision(camera0Name, robotToCamera0),
-        //           new VisionIOPhotonVision(camera1Name, robotToCamera1));   
-
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(camera5Name, robotToCamera5),
+                new VisionIOPhotonVision(camera6Name, robotToCamera6),
+                new VisionIOPhotonVision(camera7Name, robotToCamera7),
+                new VisionIOPhotonVision(camera8Name, robotToCamera8)
+                );   
         break;
 
       case SIM:
@@ -130,11 +138,14 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-        //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(camera5Name, robotToCamera5),
+                new VisionIOPhotonVision(camera6Name, robotToCamera6),
+                new VisionIOPhotonVision(camera7Name, robotToCamera7),
+                new VisionIOPhotonVision(camera8Name, robotToCamera8)
+                );   
         break;
 
       default:
@@ -147,10 +158,15 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = 
+            new Vision(
+                drive::addVisionMeasurement, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {});
         break;
     }
-    
 
     // All AutoAligns for reef will align to Left position
     //TODO: Add AutoAligns to all the commands.
@@ -185,11 +201,10 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> joystick.getLeftY(),
+            () -> joystick.getLeftX(),
+            () -> -joystick.getRightX()));
 
-    
     // drivetrain.setDefaultCommand(
     //     // Drivetrain will execute this command periodically
     //     drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
@@ -209,7 +224,19 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
-    // reset the field-centric heading on left bumper press
+
+    // Reset gyro to 0° when left bumper button is pressed
+    joystick
+        .leftBumper()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    drive.setPose(
+                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.PI))),
+                        drive)
+                        .ignoringDisable(true)); 
+
+    // // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
  
     // drive.registerTelemetry(logger::telemeterize);

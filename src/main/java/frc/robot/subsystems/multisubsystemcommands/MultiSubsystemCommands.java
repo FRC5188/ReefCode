@@ -80,6 +80,10 @@ public class MultiSubsystemCommands {
     }
 
     public Command scoreGamepieceAtPosition(OverallPosition setpoint) {
+        
+        return new InstantCommand();
+
+        /*
         if (setpoint == OverallPosition.Stow || setpoint == OverallPosition.Loading
                 || setpoint == OverallPosition.L4_Score) {
             throw new RuntimeException("scoreGamepieceAtPosition cannot run to stow,loading,or L4_score");
@@ -87,7 +91,7 @@ public class MultiSubsystemCommands {
         return setOverallSetpoint(setpoint)
                 .andThen(waitForOverallMechanism())
                 .andThen(score(setpoint))
-                .andThen(setOverallSetpoint(OverallPosition.Stow));
+                .andThen(setOverallSetpoint(OverallPosition.Stow)); */
     }
 
     public Command loadGamepiece() {
@@ -105,3 +109,4 @@ public class MultiSubsystemCommands {
                 .andThen(setOverallSetpoint(OverallPosition.Stow));
     }
 }
+    

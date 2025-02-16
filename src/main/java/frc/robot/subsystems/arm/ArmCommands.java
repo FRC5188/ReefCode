@@ -41,7 +41,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setArmSetpoint(setpoint);
                 },
-                _arm);
+                _arm); 
     }
 
     public Command intake() {

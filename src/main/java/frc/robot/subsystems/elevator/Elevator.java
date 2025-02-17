@@ -46,7 +46,7 @@ public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
     L1(5),
     L2(9),
-    L3(25.5),
+    L3(26.5),
     L4(48),
     Stow(0.5);
 
@@ -64,7 +64,7 @@ public class Elevator extends SubsystemBase {
   private static final double DECREMENT_CONSTANT = 1;
 
   private static final double ELEVATOR_MOTOR_KP = 0.75;
-  private static final double ELEVATOR_MOTOR_KI = 0.15; 
+  private static final double ELEVATOR_MOTOR_KI = 0; //0.15; 
   private static final double ELEVATOR_MOTOR_KD = 0;
   private static final double ELEVATOR_PID_VEL = 220;
   private static final double ELEVATOR_PID_ACC = 215;

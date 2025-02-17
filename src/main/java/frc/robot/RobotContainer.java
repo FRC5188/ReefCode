@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -48,8 +49,8 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Overal
 import frc.robot.subsystems.presets.Preset;
 
 public class RobotContainer {
-  private final Drive drive;
-  private final CommandXboxController controller = new CommandXboxController(0);
+  // private final Drive drive;
+  // private final CommandXboxController controller = new CommandXboxController(0);
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final LEDs LEDSubsystem = new LEDs();
@@ -71,9 +72,9 @@ public class RobotContainer {
                                                                                     // angular velocity
  
   /* Setting up bindings for necessary control of the swerve drive platform */
-  // private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-  //     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-  //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -95,22 +96,24 @@ public class RobotContainer {
   private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
 
-  // public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
+
+  private double speedMultiplier = 1;
 
   public RobotContainer() {
 
     switch (HardwareConstants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(),
+        //         new ModuleIOTalonFX(TunerConstants.FrontLeft),
+        //         new ModuleIOTalonFX(TunerConstants.FrontRight),
+        //         new ModuleIOTalonFX(TunerConstants.BackLeft),
+        //         new ModuleIOTalonFX(TunerConstants.BackRight));
         
         // vision =
         //         new Vision(
@@ -122,13 +125,13 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
+        // drive =
+        //     new Drive(
+        //         new GyroIO() {},
+        //         new ModuleIOSim(TunerConstants.FrontLeft),
+        //         new ModuleIOSim(TunerConstants.FrontRight),
+        //         new ModuleIOSim(TunerConstants.BackLeft),
+        //         new ModuleIOSim(TunerConstants.BackRight));
 
         // vision =
         //     new Vision(
@@ -139,13 +142,13 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+        // drive =
+        //     new Drive(
+        //         new GyroIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {},
+        //         new ModuleIO() {});
 
         // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
@@ -182,37 +185,37 @@ public class RobotContainer {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
     
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+    // drive.setDefaultCommand(
+    //     DriveCommands.joystickDrive(
+    //         drive,
+    //         () -> -controller.getLeftY(),
+    //         () -> -controller.getLeftX(),
+    //         () -> -controller.getRightX()));
 
     
-    // drivetrain.setDefaultCommand(
-    //     // Drivetrain will execute this command periodically
-    //     drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-    //                                                                                        // negative Y (forward)
-    //         .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-    //         .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-    //     ));
+    drivetrain.setDefaultCommand(
+        // Drivetrain will execute this command periodically
+        drivetrain.applyRequest(() -> drive.withVelocityX(joystick.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with
+                                                                                           // negative Y (forward)
+            .withVelocityY(joystick.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
+            .withRotationalRate(-joystick.getRightX() * MaxAngularRate * speedMultiplier) // Drive counterclockwise with negative X (left)
+        ));
 
-    // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    // joystick.b().whileTrue(drivetrain
-    //     .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
+    joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    joystick.b().whileTrue(drivetrain
+        .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
-    joystick.back().and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
-    joystick.back().and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
-    joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-    joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+    // joystick.back().and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
+    // joystick.back().and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
+    // joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+    // joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
+    joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
  
-    // drive.registerTelemetry(logger::telemeterize);
+    drivetrain.registerTelemetry(logger::telemeterize);
 
     intakeButton.onTrue(multiSubsystemCommands.loadGamepiece().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
@@ -282,5 +285,21 @@ public class RobotContainer {
     Command initialLEDs = LEDCommands.pickingUpCoral();
     if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
       CommandScheduler.getInstance().schedule(initialLEDs);
+  }
+  Command mult = new Command() {
+    @Override
+    public void execute() {
+      speedMultiplier = (joystick.getLeftTriggerAxis() * (0.6)) + 0.4;
+    }
+
+    @Override 
+    public boolean isFinished() {
+      return false;
+    }
+  };
+
+  public void setDrivetrainSpeedMultiplier() {
+    if (!CommandScheduler.getInstance().isScheduled(mult))
+      CommandScheduler.getInstance().schedule(mult);
   }
 }

@@ -70,6 +70,7 @@ public class Robot extends LoggedRobot {
 
     m_robotContainer.calibrateAndStartPIDs();
     m_robotContainer.startEnabledLEDs();
+    m_robotContainer.setDrivetrainSpeedMultiplier();
   }
 
   @Override
@@ -87,6 +88,7 @@ public class Robot extends LoggedRobot {
     }
     m_robotContainer.calibrateAndStartPIDs();
     m_robotContainer.startEnabledLEDs();
+    m_robotContainer.setDrivetrainSpeedMultiplier();
   }
 
   @Override

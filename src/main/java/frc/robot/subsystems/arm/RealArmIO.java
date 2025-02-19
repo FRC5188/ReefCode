@@ -26,12 +26,12 @@ public class RealArmIO implements ArmIO {
 
     private SparkFlex _armMotor;
     private DigitalInput _lightSensor;
-    private SparkMax _intakeMotor;
+    private SparkFlex _intakeMotor;
     private SparkAbsoluteEncoder _armEncoder;
 
     public RealArmIO() {
         _armMotor = new SparkFlex(CAN.ARM_MTR_ID, MotorType.kBrushless);
-        _intakeMotor = new SparkMax(CAN.INTAKE_MTR_ID, MotorType.kBrushless);
+        _intakeMotor = new SparkFlex(CAN.INTAKE_MTR_ID, MotorType.kBrushless);
         _lightSensor = new DigitalInput(DIO.LIGHT_SENSOR_CHANNEL);
         _armEncoder = _armMotor.getAbsoluteEncoder();
 

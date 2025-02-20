@@ -201,8 +201,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> joystick.getLeftY(),
-            () -> joystick.getLeftX(),
+            () -> -joystick.getLeftY(),
+            () -> -joystick.getLeftX(),
             () -> -joystick.getRightX()));
 
     // drivetrain.setDefaultCommand(
@@ -232,7 +232,7 @@ public class RobotContainer {
             Commands.runOnce(
                 () ->
                     drive.setPose(
-                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.PI))),
+                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                         drive)
                         .ignoringDisable(true)); 
 

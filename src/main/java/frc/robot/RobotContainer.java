@@ -23,6 +23,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberCommands;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.RealClimberIO;
 import frc.robot.subsystems.arm.RealArmIO;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -50,6 +54,7 @@ import frc.robot.subsystems.presets.Preset;
 public class RobotContainer {
   private final Drive drive;
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController climbercontroller = new CommandXboxController(1);
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final LEDs LEDSubsystem = new LEDs();
@@ -57,6 +62,8 @@ public class RobotContainer {
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
   private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
+  private final Climber climber = new Climber(new RealClimberIO());
+  private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -78,6 +85,7 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController climberstick = new CommandXboxController(1);
 
   private final GenericHID buttonbox1 = new GenericHID(1);
   private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
@@ -189,6 +197,10 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
+    climber.setDefaultCommand(
+      ClimberCommands.runClimber(
+        () -> -climbercontroller.getLeftY()));
+
     
     // drivetrain.setDefaultCommand(
     //     // Drivetrain will execute this command periodically
@@ -208,6 +220,8 @@ public class RobotContainer {
     joystick.back().and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
     joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+
+    //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand())
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));

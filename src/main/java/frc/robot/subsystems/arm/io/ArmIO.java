@@ -22,4 +22,6 @@ public interface ArmIO {
     public default void setIntakeMotorSpeed(double speed) {}
 
     public default void setArmMotorSpeed(double speed) {}
+
+    public default void setFeederMotorSpeed(double speed) {}
 }

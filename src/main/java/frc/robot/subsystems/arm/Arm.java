@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.arm.ArmIOInputsAutoLogged;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
@@ -45,6 +46,7 @@ public class Arm extends SubsystemBase {
   private boolean _hasGamepiece;
   private ArmPosition _currentPos;
   private ArmPosition _desiredPos;
+  private MultiSubsystemCommands.GamepieceMode _currentMode;
 
   private ProfiledPIDController _armPidController;
 

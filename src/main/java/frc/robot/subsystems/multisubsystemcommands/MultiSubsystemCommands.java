@@ -39,6 +39,11 @@ public class MultiSubsystemCommands {
         }
     }
 
+    public enum GamepieceMode {
+        ALGAE,
+        CORAL;
+    }
+
     private Elevator _elevator;
     private Arm _arm;
     private ElevatorCommands _elevatorCommands;

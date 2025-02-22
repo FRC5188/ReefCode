@@ -182,49 +182,6 @@ public class Elevator extends SubsystemBase {
     return _currentPos;
   }
 
-  public boolean canMoveToPos(ElevatorPosition currentElevator, ElevatorPosition desiredElevator,
-      ArmPosition currentArm, ArmPosition desiredArm) {
-    boolean canMoveArm = false;
-    boolean canMoveElevator = false;
-
-    switch (currentElevator) {
-      case L1:
-      case L2:
-      case L3:
-        canMoveArm = (desiredArm != ArmPosition.L4_Score) && (desiredArm != ArmPosition.Loading);
-        break;
-      case L4:
-        canMoveArm = (desiredArm != ArmPosition.Loading);
-        break;
-      case Stow:
-        canMoveArm = (desiredArm != ArmPosition.L4_Score);
-        break;
-      default:
-        canMoveArm = false;
-        break;
-    }
-
-    switch (desiredElevator) {
-      case L1:
-      case L2:
-      case L3:
-        canMoveElevator = (currentArm != ArmPosition.L4_Score) && (currentArm != ArmPosition.Loading);
-        break;
-      case L4:
-        canMoveElevator = (currentArm != ArmPosition.Loading);
-        break;
-      case Stow:
-        canMoveElevator = (currentArm != ArmPosition.L4_Score);
-        break;
-      default:
-        canMoveElevator = false;
-        break;
-    }
-    System.out.println("Arm: " + canMoveArm + " Elevator: " + canMoveElevator);
-
-    return canMoveArm && canMoveElevator;
-  }
-
   public GamepieceMode getCurrentMode() {
     return _currentMode;
   }

@@ -24,8 +24,11 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
     Stow(80),
+    Loading_Coral(120),
+    Loading_Algae(50),
     Loading(120),
-    L4_Score(45);
+    L4_Score(45),
+    Algae_Score(60);
 
     double angle;
 
@@ -40,6 +43,7 @@ public class Arm extends SubsystemBase {
   private ArmIOInputsAutoLogged _inputs;
   private boolean _prevLightSensorVal;
   private boolean _hasGamepiece;
+  private int _intakeSpikeCounter;
   private ArmPosition _currentPos;
   private ArmPosition _desiredPos;
   private MultiSubsystemCommands.GamepieceMode _currentMode;
@@ -75,6 +79,9 @@ public class Arm extends SubsystemBase {
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
+    if (setpoint == ArmPosition.Loading)
+      setpoint = (_currentMode == GamepieceMode.ALGAE) ? ArmPosition.Loading_Algae : ArmPosition.Loading_Coral;
+
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
     _armPidController.setGoal(setpoint.angle);
     _desiredPos = setpoint;
@@ -115,11 +122,18 @@ public class Arm extends SubsystemBase {
       hasPiece = _prevLightSensorVal && !currentState;
       _prevLightSensorVal = currentState;
     } else {
-      hasPiece = _inputs._intakeMotorCurrent >= HAS_ALGAE_CURRENT;
+      if (_inputs._intakeMotorCurrent >= HAS_ALGAE_CURRENT) {
+        _intakeSpikeCounter++;
+      }
+      hasPiece = _intakeSpikeCounter >= 5;
     }
-    
+
     return hasPiece;
-}
+  }
+
+  public void resetIntakeSpikeCounter() {
+    _intakeSpikeCounter = 0;
+  }
 
   public boolean lightSensorSeesGamepiece() {
     return _inputs._lightSensorState;
@@ -127,7 +141,8 @@ public class Arm extends SubsystemBase {
 
   public boolean armAtSetpoint() {
     boolean atSetpoint = _armPidController.atGoal();
-    if (atSetpoint) _currentPos = _desiredPos;
+    if (atSetpoint)
+      _currentPos = _desiredPos;
     return atSetpoint;
   }
 
@@ -136,7 +151,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void runArmPID() {
-    double out = (_armPidController.calculate(_inputs._armEncoderPositionDegrees) + ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
+    double out = (_armPidController.calculate(_inputs._armEncoderPositionDegrees)
+        + ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
     _io.setArmMotorVoltage(Voltage.ofBaseUnits(out, Volt));
   }
 
@@ -163,7 +179,7 @@ public class Arm extends SubsystemBase {
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return routine.dynamic(direction);
   }
-  
+
   @Override
   public void periodic() {
     _io.updateInputs(_inputs);

@@ -39,6 +39,11 @@ public class MultiSubsystemCommands {
         }
     }
 
+    public enum GamepieceMode {
+        ALGAE,
+        CORAL;
+    }
+
     private Elevator _elevator;
     private Arm _arm;
     private ElevatorCommands _elevatorCommands;
@@ -56,6 +61,14 @@ public class MultiSubsystemCommands {
         return _elevatorCommands.setElevatorSetpoint(setpoint.getElevatorPosition())
                 .alongWith(_armCommands.setArmPosition(setpoint.getArmPosition()))
                 .unless(() -> !_elevator.canMoveToPos(_elevator.getCurrentPos(), setpoint.getElevatorPosition(), _arm.getCurrentPos(), setpoint.getArmPosition()));
+    }
+
+    public Command setGamepieceMode(GamepieceMode mode) {
+        return new InstantCommand(
+            () -> {
+                _elevator.setCurrentMode(mode);
+                _arm.setCurrentMode(mode);
+            }, _elevator, _arm);
     }
 
     public Command waitForOverallMechanism() {

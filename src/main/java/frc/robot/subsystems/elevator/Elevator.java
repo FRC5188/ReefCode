@@ -7,40 +7,25 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Volt;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.VelocityUnit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import frc.robot.HardwareConstants.CAN;
+
 import frc.robot.subsystems.arm.Arm.ArmPosition;
-import frc.robot.subsystems.arm.ArmIO.ArmIOInputs;
-import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
@@ -95,11 +80,14 @@ public class Elevator extends SubsystemBase {
   private boolean _isCalibrated;
   private ElevatorPosition _currentPos;
   private ElevatorPosition _desiredPos;
+  private MultiSubsystemCommands.GamepieceMode _currentMode;
 
   private ProfiledPIDController _elevatorMotorPID;
 
   private ElevatorIO _io;
   private ElevatorIOInputsAutoLogged _inputs;
+
+  
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
       new SysIdRoutine.Mechanism(this::setElevatorVoltage, this::populateLog, this));
@@ -235,6 +223,14 @@ public class Elevator extends SubsystemBase {
     System.out.println("Arm: " + canMoveArm + " Elevator: " + canMoveElevator);
 
     return canMoveArm && canMoveElevator;
+  }
+
+  public GamepieceMode getCurrentMode() {
+    return _currentMode;
+  }
+
+  public void setCurrentMode(GamepieceMode mode) {
+    _currentMode = mode;
   }
 
   public void populateLog(SysIdRoutineLog log) {

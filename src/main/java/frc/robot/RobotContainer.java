@@ -6,13 +6,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.invoke.VarHandle.AccessMode;
-
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,9 +19,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberCommands;
+import frc.robot.subsystems.climber.RealClimberIO;
 import frc.robot.subsystems.arm.RealArmIO;
-import frc.robot.subsystems.arm.Arm.ArmPosition;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.Telemetry;
@@ -42,14 +39,12 @@ import frc.robot.subsystems.elevator.RealElevatorIO;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
-import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
 
 public class RobotContainer {
   private final Drive drive;
-  private final CommandXboxController controller = new CommandXboxController(0);
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final LEDs LEDSubsystem = new LEDs();
@@ -57,6 +52,8 @@ public class RobotContainer {
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
   private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
+  private final Climber climber = new Climber(new RealClimberIO());
+  private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -78,6 +75,7 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController climberstick = new CommandXboxController(1);
 
   private final GenericHID buttonbox1 = new GenericHID(1);
   private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
@@ -185,9 +183,13 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -joystick.getLeftY(),
+            () -> -joystick.getLeftX(),
+            () -> -joystick.getRightX()));
+
+    climber.setDefaultCommand(
+      ClimberCommands.runClimber(
+        () -> -climberstick.getLeftY()));
 
     
     // drivetrain.setDefaultCommand(
@@ -208,6 +210,8 @@ public class RobotContainer {
     joystick.back().and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
     joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+
+    //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand())
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));

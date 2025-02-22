@@ -134,9 +134,8 @@ public class Arm extends SubsystemBase {
     return _currentMode;
   }
 
-  public GamepieceMode setCurrentMode(GamepieceMode mode) {
+  public void setCurrentMode(GamepieceMode mode) {
     _currentMode = mode;
-    return _currentMode;
   }
 
   public void populateLog(SysIdRoutineLog log) {

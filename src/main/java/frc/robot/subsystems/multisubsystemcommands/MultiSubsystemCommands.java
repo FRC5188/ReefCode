@@ -63,6 +63,14 @@ public class MultiSubsystemCommands {
                 .unless(() -> !_elevator.canMoveToPos(_elevator.getCurrentPos(), setpoint.getElevatorPosition(), _arm.getCurrentPos(), setpoint.getArmPosition()));
     }
 
+    public Command setGamepieceMode(GamepieceMode mode) {
+        return new InstantCommand(
+            () -> {
+                _elevator.setCurrentMode(mode);
+                _arm.setCurrentMode(mode);
+            }, _elevator, _arm);
+    }
+
     public Command waitForOverallMechanism() {
         return _elevatorCommands.waitUntilAtSetpoint()
                 .alongWith(_armCommands.waitUntilAtSetpoint());

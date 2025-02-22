@@ -84,6 +84,10 @@ public class Arm extends SubsystemBase {
     _io.setIntakeMotorSpeed(speed);
   }
 
+  public void setFeederSpeed(double speed) {
+    _io.setFeederMotorSpeed(speed);
+  }
+
   public void spit() {
     setIntakeSpeed(0.5);
   }

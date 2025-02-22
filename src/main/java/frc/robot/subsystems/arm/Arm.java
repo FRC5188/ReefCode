@@ -83,6 +83,10 @@ public class Arm extends SubsystemBase {
     _io.setIntakeMotorSpeed(speed);
   }
 
+  public void setFeederSpeed(double speed) {
+    _io.setFeederMotorSpeed(speed);
+  }
+
   public void spit() {
     setIntakeSpeed(0.5);
   }
@@ -153,7 +157,7 @@ public class Arm extends SubsystemBase {
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return routine.dynamic(direction);
   }
-
+  
   @Override
   public void periodic() {
     _io.updateInputs(_inputs);

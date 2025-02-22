@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -25,6 +26,7 @@ public class RealArmIO implements ArmIO {
     private DigitalInput _lightSensor;
     private SparkFlex _intakeMotor;
     private SparkAbsoluteEncoder _armEncoder;
+    private SparkMax _feederMotor;
 
     public RealArmIO() {
         _armMotor = new SparkFlex(CAN.ARM_MTR_ID, MotorType.kBrushless);
@@ -44,6 +46,10 @@ public class RealArmIO implements ArmIO {
         inputs._armMotorCurrent = _armMotor.getOutputCurrent();
         inputs._armMotorVoltage = _armMotor.getAppliedOutput() * _armMotor.getBusVoltage();
 
+        inputs._feederMotorSpeed = _feederMotor.get();
+        inputs._feederMotorCurrent = _feederMotor.getOutputCurrent();
+        inputs._feederMotorVoltage = _feederMotor.getAppliedOutput() * _feederMotor.getBusVoltage();
+
         inputs._lightSensorState = !_lightSensor.get();
         inputs._intakeMotorVelocityRotationsPerMin = _intakeMotor.get();
         inputs._intakeMotorCurrent = _intakeMotor.getOutputCurrent();
@@ -62,11 +68,19 @@ public class RealArmIO implements ArmIO {
         _intakeMotor.set(speed);
     }
 
+    public void setFeederMotorSpeed(double speed){
+        _feederMotor.set(speed);
+        
+    }
     public void resetIntakeEncoders() {
         _intakeMotor.getEncoder().setPosition(0);
     }
 
     public void setArmMotorVoltage(Voltage voltage) {
         _armMotor.setVoltage(voltage);
+    }
+
+    public void setFeederMotorVoltage(Voltage voltage) {
+        _feederMotor.setVoltage(voltage);
     }
 }

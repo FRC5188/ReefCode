@@ -23,17 +23,20 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(80),
-    Loading_Coral(120),
-    Loading_Algae(50),
-    Loading(120),
-    L4_Score(45),
-    Algae_Score(60);
+    Stow(80, 80),
+    Loading(120, 50),
+    L4_Score(45, 45),
+    Algae_Score(60, 60);
 
-    double angle;
+    double algaeAngle, coralAngle;
 
-    ArmPosition(double angle) {
-      this.angle = angle;
+    ArmPosition(double coralAngle, double algaeAngle) {
+      this.coralAngle = coralAngle;
+      this.algaeAngle = algaeAngle;
+    }
+
+    double getAngle(GamepieceMode mode) {
+      return (mode == GamepieceMode.ALGAE) ? this.algaeAngle : this.coralAngle;
     }
   }
 
@@ -79,11 +82,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
-    if (setpoint == ArmPosition.Loading)
-      setpoint = (_currentMode == GamepieceMode.ALGAE) ? ArmPosition.Loading_Algae : ArmPosition.Loading_Coral;
-
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
-    _armPidController.setGoal(setpoint.angle);
+    _armPidController.setGoal(setpoint.getAngle(_currentMode));
     _desiredPos = setpoint;
   }
 

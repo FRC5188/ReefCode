@@ -23,22 +23,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
-import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
-    L1(5),
-    L2(9),
-    L3(25.5),
-    L4(48),
-    Stow(0.5);
+    L1(5, 5),
+    L2(9, 12),
+    L3(25.5, 30),
+    L4(48, 48),
+    Stow(0.5, 0.5);
 
-    public final double setpoint;
+    private final double coralSetpoint, algaeSetpoint;
 
-    private ElevatorPosition(double setpoint) {
-      this.setpoint = setpoint;
+    private ElevatorPosition(double coralSetpoint, double algaeSetpoint) {
+      this.coralSetpoint = coralSetpoint;
+      this.algaeSetpoint = algaeSetpoint;
+    }
+
+    double getSetpoint(GamepieceMode mode) {
+      return (mode == GamepieceMode.ALGAE) ? this.algaeSetpoint : this.coralSetpoint;
     }
   }
 
@@ -118,7 +122,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setSetpoint(ElevatorPosition setpoint) {
-    setSetpoint(setpoint.setpoint);
+    setSetpoint(setpoint.getSetpoint(_currentMode));
     _desiredPos = setpoint;
   }
 

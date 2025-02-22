@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.arm.ArmIOInputsAutoLogged;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 
@@ -52,6 +51,8 @@ public class Arm extends SubsystemBase {
   private static final double KD = 0;
   private static final double PROFILE_VEL = 160;
   private static final double PROFILE_ACC = 145;
+
+  private static final double HAS_ALGAE_CURRENT = 2;
 
   private static final double ARM_WEIGHT_N = 3.5 * 9.81;
   private static final double ARM_STALL_TORQUE_NM = 3.6;
@@ -108,12 +109,17 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean hasPiece() {
-    boolean current = _inputs._lightSensorState;
-    boolean hasPiece = _prevLightSensorVal && !current;
-    _prevLightSensorVal = current;
-    if (hasPiece) _hasGamepiece = true;
-    return _hasGamepiece;
-  }
+    boolean hasPiece;
+    if (_currentMode == GamepieceMode.CORAL) {
+      boolean currentState = _inputs._lightSensorState;
+      hasPiece = _prevLightSensorVal && !currentState;
+      _prevLightSensorVal = currentState;
+    } else {
+      hasPiece = _inputs._intakeMotorCurrent >= HAS_ALGAE_CURRENT;
+    }
+    
+    return hasPiece;
+}
 
   public boolean lightSensorSeesGamepiece() {
     return _inputs._lightSensorState;

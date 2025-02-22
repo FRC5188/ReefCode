@@ -171,7 +171,7 @@ public class RobotContainer {
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
-        multiSubsystemCommands.intake());
+        multiSubsystemCommands.loadGamepiece());
 
     configureBindings();
   }

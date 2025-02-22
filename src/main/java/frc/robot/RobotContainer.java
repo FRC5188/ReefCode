@@ -6,13 +6,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.invoke.VarHandle.AccessMode;
-
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -25,11 +21,8 @@ import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberCommands;
-import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.RealClimberIO;
 import frc.robot.subsystems.arm.RealArmIO;
-import frc.robot.subsystems.arm.Arm.ArmPosition;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.Telemetry;
@@ -46,15 +39,12 @@ import frc.robot.subsystems.elevator.RealElevatorIO;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
-import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
 
 public class RobotContainer {
   private final Drive drive;
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandXboxController climbercontroller = new CommandXboxController(1);
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
   private final LEDs LEDSubsystem = new LEDs();
@@ -193,13 +183,13 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -joystick.getLeftY(),
+            () -> -joystick.getLeftX(),
+            () -> -joystick.getRightX()));
 
     climber.setDefaultCommand(
       ClimberCommands.runClimber(
-        () -> -climbercontroller.getLeftY()));
+        () -> -climberstick.getLeftY()));
 
     
     // drivetrain.setDefaultCommand(

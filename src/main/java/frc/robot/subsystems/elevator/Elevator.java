@@ -190,6 +190,10 @@ public class Elevator extends SubsystemBase {
     _currentMode = mode;
   }
 
+  public double getElevatorMaxHeight() {
+    return ELEVATOR_MAX_INCHES;
+  }
+
   public void populateLog(SysIdRoutineLog log) {
     log.motor("elevator_primary")
         .voltage(Voltage.ofBaseUnits(_inputs._elevatorMotorVoltage, Volt))

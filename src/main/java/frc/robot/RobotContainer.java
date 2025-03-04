@@ -185,7 +185,7 @@ public class RobotContainer {
             drive,
             () -> -joystick.getLeftY(),
             () -> -joystick.getLeftX(),
-            () -> -joystick.getRightX()));
+            () -> joystick.getRightX()));
 
     climber.setDefaultCommand(
       ClimberCommands.runClimber(

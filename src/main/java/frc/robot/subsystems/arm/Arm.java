@@ -23,7 +23,7 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(80),
+    Stow(25),
     Loading_Coral(120),
     Loading_Algae(50),
     Loading(120),

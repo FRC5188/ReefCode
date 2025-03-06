@@ -23,11 +23,11 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(25),
-    Loading_Coral(120),
+    Stow(12),
+    Loading_Coral(52), // was 120
     Loading_Algae(50),
-    Loading(120),
-    L4_Score(45),
+    Loading(52),
+    L4_Score(-5), // was 45
     Algae_Score(60);
 
     double angle;
@@ -46,7 +46,7 @@ public class Arm extends SubsystemBase {
   private int _intakeSpikeCounter;
   private ArmPosition _currentPos;
   private ArmPosition _desiredPos;
-  private MultiSubsystemCommands.GamepieceMode _currentMode;
+  private MultiSubsystemCommands.GamepieceMode _currentMode = GamepieceMode.CORAL;
 
   private ProfiledPIDController _armPidController;
 

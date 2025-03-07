@@ -47,10 +47,13 @@ public class ArmCommands {
     public Command intake() {
         return new StartEndCommand(
                 () -> {
+                    _arm.resetIntakeSpikeCounter();
                     _arm.setIntakeSpeed(0.45);
+                    _arm.setFeederSpeed(0.45);
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
+                    _arm.setFeederSpeed(0);
                 },
                 _arm).until(() -> _arm.hasPiece());
     }

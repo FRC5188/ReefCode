@@ -6,9 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.invoke.VarHandle.AccessMode;
-
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -24,9 +21,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberCommands;
+import frc.robot.subsystems.climber.RealClimberIO;
 import frc.robot.subsystems.arm.RealArmIO;
-import frc.robot.subsystems.arm.Arm.ArmPosition;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.Telemetry;
@@ -42,7 +40,6 @@ import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.RealElevatorIO;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsCommands;
-import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
@@ -62,9 +59,10 @@ public class RobotContainer {
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
   private final Vision vision;
-  private final CommandXboxController joystick = new CommandXboxController(0);
   private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
+  private final Climber climber = new Climber(new RealClimberIO());
+  private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -84,6 +82,9 @@ public class RobotContainer {
   //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+  private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController climberstick = new CommandXboxController(1);
 
   private final GenericHID buttonbox1 = new GenericHID(1);
   private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
@@ -189,7 +190,7 @@ public class RobotContainer {
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
-        multiSubsystemCommands.intake());
+        multiSubsystemCommands.loadGamepiece());
 
     configureBindings();
   }
@@ -205,6 +206,11 @@ public class RobotContainer {
             () -> -joystick.getLeftX(),
             () -> -joystick.getRightX()));
 
+    climber.setDefaultCommand(
+      ClimberCommands.runClimber(
+      () -> -climberstick.getLeftY()));
+
+    
     // drivetrain.setDefaultCommand(
     //     // Drivetrain will execute this command periodically
     //     drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
@@ -223,6 +229,10 @@ public class RobotContainer {
     joystick.back().and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
     joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+
+    //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand())
+
+    //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand())
 
 
     // Reset gyro to 0° when left bumper button is pressed

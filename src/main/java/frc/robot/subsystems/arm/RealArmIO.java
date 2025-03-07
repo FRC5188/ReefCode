@@ -1,16 +1,14 @@
 package frc.robot.subsystems.arm;
 
-import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.Idle;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.HardwareConstants.CAN;
@@ -26,12 +24,14 @@ public class RealArmIO implements ArmIO {
 
     private SparkFlex _armMotor;
     private DigitalInput _lightSensor;
-    private SparkMax _intakeMotor;
+    private SparkFlex _intakeMotor;
     private SparkAbsoluteEncoder _armEncoder;
+    private SparkMax _feederMotor;
 
     public RealArmIO() {
         _armMotor = new SparkFlex(CAN.ARM_MTR_ID, MotorType.kBrushless);
-        _intakeMotor = new SparkMax(CAN.INTAKE_MTR_ID, MotorType.kBrushless);
+        _intakeMotor = new SparkFlex(CAN.INTAKE_MTR_ID, MotorType.kBrushless);
+        _feederMotor = new SparkMax(CAN.FEEDER_MTR_ID, MotorType.kBrushless);
         _lightSensor = new DigitalInput(DIO.LIGHT_SENSOR_CHANNEL);
         _armEncoder = _armMotor.getAbsoluteEncoder();
 
@@ -46,6 +46,10 @@ public class RealArmIO implements ArmIO {
         inputs._armMotorSpeed = _armMotor.get();
         inputs._armMotorCurrent = _armMotor.getOutputCurrent();
         inputs._armMotorVoltage = _armMotor.getAppliedOutput() * _armMotor.getBusVoltage();
+
+        inputs._feederMotorSpeed = _feederMotor.get();
+        inputs._feederMotorCurrent = _feederMotor.getOutputCurrent();
+        inputs._feederMotorVoltage = _feederMotor.getAppliedOutput() * _feederMotor.getBusVoltage();
 
         inputs._lightSensorState = !_lightSensor.get();
         inputs._intakeMotorVelocityRotationsPerMin = _intakeMotor.get();
@@ -65,11 +69,19 @@ public class RealArmIO implements ArmIO {
         _intakeMotor.set(speed);
     }
 
+    public void setFeederMotorSpeed(double speed){
+        _feederMotor.set(speed);
+        
+    }
     public void resetIntakeEncoders() {
         _intakeMotor.getEncoder().setPosition(0);
     }
 
     public void setArmMotorVoltage(Voltage voltage) {
         _armMotor.setVoltage(voltage);
+    }
+
+    public void setFeederMotorVoltage(Voltage voltage) {
+        _feederMotor.setVoltage(voltage);
     }
 }

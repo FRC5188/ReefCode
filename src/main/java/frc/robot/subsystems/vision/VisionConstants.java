@@ -56,7 +56,7 @@ public class VisionConstants {
   // Front Left
   // Camera 8
   public static Transform3d robotToCamera8 =
-      new Transform3d(14.125*0.0254, 8.5*0.0254, 7.75*0.0254, new Rotation3d(0.0, 0, 0));
+      new Transform3d(14.125*0.0254, 11.5*0.0254, 8.25*0.0254, new Rotation3d(0, (-10/360.0)*2*Math.PI, 0));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

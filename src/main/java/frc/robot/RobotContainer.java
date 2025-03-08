@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import java.lang.invoke.VarHandle.AccessMode;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -44,6 +45,8 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.FieldConstants.ReefSide;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
@@ -90,6 +93,7 @@ public class RobotContainer {
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
 
   // public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  private double speedMultiplier = 0.9;
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -179,7 +183,16 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake",
         multiSubsystemCommands.intake());
 
+
     configureBindings();
+  }
+
+  private Command joystickApproach(Supplier<Pose2d> approachPose)
+  {
+      return DriveCommands.joystickApproach(
+          drive,
+          () -> -joystick.getLeftY() * speedMultiplier,
+          approachPose);
   }
 
   private void configureBindings() {
@@ -212,7 +225,26 @@ public class RobotContainer {
     joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
     joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
+    // Driver Right Bumper: Approach Nearest Right-Side Reef Branch
+    joystick.rightBumper()
+            .whileTrue(
+                joystickApproach(
+                    () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.RIGHT)));
 
+        // Driver Left Bumper: Approach Nearest Left-Side Reef Branch
+    joystick.leftBumper()
+            .whileTrue(
+                joystickApproach(
+                    () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
+
+    /* 
+     // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
+     joystick.rightBumper()
+        .whileTrue(
+            joystickApproach(() -> FieldConstants.getNearestReefFace(drive.getPose())));
+
+    */
+    
     // Reset gyro to 0° when left bumper button is pressed
     joystick
         .leftBumper()
@@ -241,9 +273,12 @@ public class RobotContainer {
     LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
     L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
+    
     // Runs the preset to score unless the preset is invalid.
+    /* 
     joystick.rightBumper().onTrue(
         multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(() -> !preset.isPresetValid()));
+    */
 
     // Resets the preset when we don't have a piece.
     armSubsystem._hasPiece.onFalse(preset.resetPreset());

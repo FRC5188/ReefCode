@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public class HardwareConstants {
 
-    public static final Mode simMode = Mode.REPLAY;
+    public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
     public static enum Mode {
@@ -35,4 +35,7 @@ public class HardwareConstants {
         // Add digitial I/O ports used here
         public static final int LIGHT_SENSOR_CHANNEL = 0;
     }
+
+    // Use LoggedTunableNumbers
+    public static final boolean tuningMode = true;
 }

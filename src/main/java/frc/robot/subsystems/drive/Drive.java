@@ -109,11 +109,8 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
-
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
-
-  private Alliance _alliance;
 
   public Drive(
       GyroIO gyroIO,
@@ -169,15 +166,6 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    /*
-    * Periodically try to apply the operator perspective.
-    * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
-    * This allows us to correct the perspective in case the robot code restarts mid-match.
-    * Otherwise, only check and apply the operator perspective if the DS is disabled.
-    * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
-    */
-
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -383,13 +371,5 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
-  }
-
-  // Notice: Despite its name, this method was not intended to be offensive. -KtH 2025-03-03
-  public boolean getFlipped() {
-    if (DriverStation.getAlliance().isPresent()){
-      _alliance = DriverStation.getAlliance().get();
-    }
-    return _alliance == Alliance.Red;
   }
 }

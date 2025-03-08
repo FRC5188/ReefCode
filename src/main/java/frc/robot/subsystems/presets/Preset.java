@@ -10,7 +10,7 @@ public class Preset {
         Right;
     }
 
-    private OverallPosition _level = OverallPosition.L1;
+    private OverallPosition _level = OverallPosition.Stow;
     private ReefSide _side = ReefSide.Right;
     private boolean _isLevelValid = false;
     private boolean _isSideValid = false;

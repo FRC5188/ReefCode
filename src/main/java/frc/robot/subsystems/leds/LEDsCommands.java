@@ -14,7 +14,6 @@ public class LEDsCommands {
     _leds = leds;
   }
 
-  //Runs when intake button is pushed
   public Command intaking() {
       return new StartEndCommand(
         () -> {
@@ -26,7 +25,6 @@ public class LEDsCommands {
          _leds);
   }
 
-  //Runs when we have just acquired a piece
   public Command hasPiece() {
     return new StartEndCommand(
       () -> {
@@ -35,10 +33,9 @@ public class LEDsCommands {
       () -> {
         _leds.reset();
       },
-      _leds).withTimeout(3);
+      _leds);
   }
   
-  // Runs when we have no gamepiece and we are toggled to pick up coral
   public Command pickingUpCoral() {
     return new StartEndCommand(
       () -> {
@@ -50,7 +47,6 @@ public class LEDsCommands {
       _leds);
   }
 
-  // Runs when we have no gamepiece and we are toggled to pick up coral
   public Command pickingUpAlgae() {
     return new StartEndCommand(
       () -> {
@@ -62,7 +58,6 @@ public class LEDsCommands {
       _leds);
   }
   
-  //We have a piece and hasPiece animation has already run
   public Command elevatorOrArmIsMoving() {
     return new StartEndCommand(
       () -> {
@@ -74,7 +69,6 @@ public class LEDsCommands {
       _leds);
   }
 
-  //Runs when robot has finished climbing
   public Command robotHasClimbed() {
     return new StartEndCommand(
       () -> {
@@ -85,21 +79,15 @@ public class LEDsCommands {
       },
        _leds);
   }
-
-  public Command disabledAnimation1() {
+  
+  public Command elevatorAndArmAtSetpoints() {
     return new StartEndCommand(
       () -> {
-        _leds.disabledAnimation1();
-      }, 
+        _leds.elevatorAndArmAtSetpoints();
+      },
       () -> {
         _leds.reset();
       },
-       _leds) {
-        @Override
-        public boolean runsWhenDisabled() {
-          return true;
-        }
-       };
+      _leds);
   }
-
 }

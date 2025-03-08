@@ -237,6 +237,8 @@ public class RobotContainer {
                 joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
 
+    
+
     /* 
      // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
      joystick.rightBumper()
@@ -244,10 +246,9 @@ public class RobotContainer {
             joystickApproach(() -> FieldConstants.getNearestReefFace(drive.getPose())));
 
     */
-    
-    // Reset gyro to 0° when left bumper button is pressed
-    joystick
-        .leftBumper()
+
+    // Reset gyro to 0° when Y button is pressed
+    joystick.y()
         .onTrue(
             Commands.runOnce(
                 () ->

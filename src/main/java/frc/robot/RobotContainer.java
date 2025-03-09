@@ -9,7 +9,10 @@ import static edu.wpi.first.units.Units.*;
 import java.lang.invoke.VarHandle.AccessMode;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -17,6 +20,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -92,6 +96,8 @@ public class RobotContainer {
 
   private final GenericHID buttonbox2 = new GenericHID(2);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
+
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   // public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private double speedMultiplier = 0.9;
@@ -182,6 +188,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake",
         multiSubsystemCommands.intake());
 
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // hide the joystick missing warnings
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -292,7 +300,9 @@ public class RobotContainer {
     presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
   }
 
+
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoChooser.get();
   }
+  
 }

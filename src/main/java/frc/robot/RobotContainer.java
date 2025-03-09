@@ -137,12 +137,22 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
+        /* We should be using this VisionIOPhotonVisionSim here but it's running too slow and 
+           causing the a loop overrun.  
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera7Name, robotToCamera7),
-                new VisionIOPhotonVision(camera8Name, robotToCamera8)
-                );   
+                new VisionIOPhotonVisionSim(camera7Name, robotToCamera7, drive::getPose),
+                new VisionIOPhotonVisionSim(camera8Name, robotToCamera8, drive::getPose)
+                );   */
+        vision = 
+            new Vision(
+                drive::addVisionMeasurement, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {});
+
         break;
 
       default:
@@ -303,6 +313,10 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public Drive getDrive() {
+    return drive;
   }
   
 }

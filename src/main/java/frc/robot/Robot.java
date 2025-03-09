@@ -146,6 +146,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    System.out.println(m_autonomousCommand);
+
 
     System.out.println("!!!!!!!!!!Autonomous init!!!!!!!!!!!");
     if (m_autonomousCommand != null) {
@@ -155,6 +157,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    
   }
 
   @Override

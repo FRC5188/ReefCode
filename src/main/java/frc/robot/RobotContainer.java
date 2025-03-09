@@ -53,15 +53,15 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 public class RobotContainer {
   private final Drive drive;
-  private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
-  private final Arm armSubsystem = new Arm(new RealArmIO());
-  private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
-  private final ArmCommands armCommands = new ArmCommands(armSubsystem);
+//   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
+//   private final Arm armSubsystem = new Arm(new RealArmIO());
+//   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
+//   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
   private final Vision vision;
   private final CommandXboxController joystick = new CommandXboxController(0);
 
-  private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
-      armSubsystem, elevatorCommands, armCommands);
+//   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
+//       armSubsystem, elevatorCommands, armCommands);
 
   /** I am single :( 
    * hi zoe :3
@@ -163,24 +163,24 @@ public class RobotContainer {
     //TODO: Add AutoAligns to all the commands.
 
     // AutoAlignToReef + ScoreL1 (Move to L1, score)
-    NamedCommands.registerCommand("L1",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L1));
+    // NamedCommands.registerCommand("L1",
+    //     multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L1));
     
-    // AutoAlignToReef + ScoreL2 (Move to L2, score)
-    NamedCommands.registerCommand("L2",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L2)); 
+    // // AutoAlignToReef + ScoreL2 (Move to L2, score)
+    // NamedCommands.registerCommand("L2",
+    //     multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L2)); 
 
-    // AutoAlignToReef + ScoreL3 (Move to L3, score)
-    NamedCommands.registerCommand("L3",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L3));
+    // // AutoAlignToReef + ScoreL3 (Move to L3, score)
+    // NamedCommands.registerCommand("L3",
+    //     multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L3));
     
-    // AutoAlignToReef + Move to L4 + Score
-    NamedCommands.registerCommand("L4",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
+    // // AutoAlignToReef + Move to L4 + Score
+    // NamedCommands.registerCommand("L4",
+    //     multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
 
-    // AutoAlign to Intake + Intake
-    NamedCommands.registerCommand("Intake",
-        multiSubsystemCommands.intake());
+    // // AutoAlign to Intake + Intake
+    // NamedCommands.registerCommand("Intake",
+    //     multiSubsystemCommands.intake());
 
 
     // hide the joystick missing warnings
@@ -263,17 +263,17 @@ public class RobotContainer {
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    // Elevator sys id routines
-    button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
-    button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
+    // // Elevator sys id routines
+    // button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
+    // button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
 
-    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
-    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
-    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
-    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
-    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+    // L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
+    // L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
+    // StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
+    // L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
+    // L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
+    // LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
+    // L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     
     // Runs the preset to score unless the preset is invalid.
@@ -283,7 +283,7 @@ public class RobotContainer {
     */
 
     // Resets the preset when we don't have a piece.
-    armSubsystem._hasPiece.onFalse(preset.resetPreset());
+    // armSubsystem._hasPiece.onFalse(preset.resetPreset());
 
     // Sets the level preset
     presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));

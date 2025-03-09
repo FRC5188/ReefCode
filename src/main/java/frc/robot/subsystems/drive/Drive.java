@@ -54,7 +54,6 @@ import frc.robot.HardwareConstants.Mode;
 import frc.robot.subsystems.drive.io.GyroIO;
 import frc.robot.subsystems.drive.io.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.drive.io.ModuleIO;
-import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -141,7 +140,6 @@ public class Drive extends SubsystemBase {
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
           Logger.recordOutput(

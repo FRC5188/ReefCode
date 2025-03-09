@@ -26,9 +26,14 @@ public class Robot extends LoggedRobot {
 
     switch (HardwareConstants.currentMode) {
       case REAL:
+      /*
+       * If you are really tight on ram you can comment out the logwriter
+       * for the robot with the V1 rio. Keeo the publisher so you can view
+       * the live data on advantage scope.
+       */
         Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
-        new PowerDistribution(CAN.PDH_ID, ModuleType.kRev);
+        // new PowerDistribution(CAN.PDH_ID, ModuleType.kRev);
         break;
 
       case SIM:
@@ -46,7 +51,28 @@ public class Robot extends LoggedRobot {
 
     Logger.recordMetadata("ProjectName", "ReefCode"); // Set a metadata value
 
-    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
+
+    /*********************************************************
+     * 
+     * README README README README README README
+     * 
+     * Commenting out the start logger function will save you enough
+     * ram for the robot code to run. If you add leds, cimbers, etc, 
+     * then you may need to save additional ram. The proposed solution
+     * is to add a boolen similar to the isreal and isSim flags to check
+     * if this is the v1 or v2 bot. If it is v1 with the roborio one, 
+     * then dont start the logger or start leds, etc.
+     * 
+     * 
+     * NOTE: adding the climber and elevator and intake back to the code was enough
+     * to put it over the ram limit. so either more boolean checks will be needed
+     * to enable and disable features or we need to trim down our code to use less
+     * ram.
+     * 
+     * Garrett
+     * 
+     ***********************************************************/
+    // Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
                     // be added.
                       
     m_robotContainer = new RobotContainer();

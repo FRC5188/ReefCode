@@ -23,22 +23,58 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
-    Logger.recordMetadata("ProjectName", "ReefCode"); // Set a metadata value
 
-    if (isReal()) {
-      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-      new PowerDistribution(CAN.PDH_ID, ModuleType.kRev); // Enables power distribution logging
-    } else {
-      setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    switch (HardwareConstants.currentMode) {
+      case REAL:
+      /*
+       * If you are really tight on ram you can comment out the logwriter
+       * for the robot with the V1 rio. Keeo the publisher so you can view
+       * the live data on advantage scope.
+       */
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        // new PowerDistribution(CAN.PDH_ID, ModuleType.kRev);
+        break;
+
+      case SIM:
+        System.out.println("SIM!!!");
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+        break;
     }
 
-    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
+    Logger.recordMetadata("ProjectName", "ReefCode"); // Set a metadata value
+
+
+    /*********************************************************
+     * 
+     * README README README README README README
+     * 
+     * Commenting out the start logger function will save you enough
+     * ram for the robot code to run. If you add leds, cimbers, etc, 
+     * then you may need to save additional ram. The proposed solution
+     * is to add a boolen similar to the isreal and isSim flags to check
+     * if this is the v1 or v2 bot. If it is v1 with the roborio one, 
+     * then dont start the logger or start leds, etc.
+     * 
+     * 
+     * NOTE: adding the climber and elevator and intake back to the code was enough
+     * to put it over the ram limit. so either more boolean checks will be needed
+     * to enable and disable features or we need to trim down our code to use less
+     * ram.
+     * 
+     * Garrett
+     * 
+     ***********************************************************/
+    // Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
                     // be added.
-                    
+                      
     m_robotContainer = new RobotContainer();
   }
 
@@ -49,7 +85,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    m_robotContainer.startIdleAnimations();
   }
 
   @Override
@@ -67,9 +102,6 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-
-    m_robotContainer.calibrateAndStartPIDs();
-    m_robotContainer.startEnabledLEDs();
   }
 
   @Override
@@ -85,8 +117,6 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.calibrateAndStartPIDs();
-    m_robotContainer.startEnabledLEDs();
   }
 
   @Override

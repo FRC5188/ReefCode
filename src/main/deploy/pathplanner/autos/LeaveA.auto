@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "A_R2"
+            "pathName": "LeaveA"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "StartToReef",
+  "folder": "LeaveStart",
   "choreoAuto": false
 }

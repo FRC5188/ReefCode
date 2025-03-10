@@ -9,7 +9,11 @@
     "Reef to HP",
     "Start to Reef"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "LeaveStart",
+    "StartToReef",
+    "Test"
+  ],
   "defaultMaxVel": 5.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

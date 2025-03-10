@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 3.2040620895951974,
-        "y": 0.2784113500195273
+        "y": 0.27841135001952744
       },
       "isLocked": false,
       "linkedName": "HP2"
@@ -54,7 +54,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 5.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

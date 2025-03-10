@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.elevator.io.ElevatorIO;
+import frc.robot.subsystems.elevator.io.ElevatorIOInputsAutoLogged;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 
@@ -54,28 +56,12 @@ public class Elevator extends SubsystemBase {
   private static final double ELEVATOR_PID_VEL = 220;
   private static final double ELEVATOR_PID_ACC = 215;
 
-  private static final double ELEVATOR_MAX_INCHES = 48;
-  private static final double ELEVATOR_MAX_ROTATIONS = 36.4;
+  private static final double ELEVATOR_MAX_INCHES = 52; //48;
+  private static final double ELEVATOR_MAX_ROTATIONS = -87; // 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
-  // In newtons
-  private static final double ELEVATOR_STAGE1_WEIGHT_N = 2.053 * 9.81;
-  private static final double ELEVATOR_STAGE2_WEIGHT_N = 7.554 * 9.81;
-  private static final double ELEVATOR_TOTAL_WEIGHT_N = ELEVATOR_STAGE1_WEIGHT_N + (ELEVATOR_STAGE2_WEIGHT_N);
-
-  // In m
-  private static final double SPOOL_DIAMETER = 0.0527;
-
-  private static final double ELEVATOR_STALL_TORQUE_LB_IN = 3.6;
-  private static final double ELEVATOR_STALL_CURRENT = 211;
-  private static final double ELEVATOR_KT = ELEVATOR_STALL_TORQUE_LB_IN / ELEVATOR_STALL_CURRENT;
-  private static final double GEAR_RATIO = 7.75;
-  private static final double NUMBER_OF_MOTORS = 2;
-  private static final double EFFECTIVE_KT = ELEVATOR_KT * NUMBER_OF_MOTORS * GEAR_RATIO;
-  private static final double ELEVATOR_RESISTANCE = 0.057;
-
-  private static final double FEEDFORWARD_CONSTANT = ((ELEVATOR_TOTAL_WEIGHT_N * SPOOL_DIAMETER * ELEVATOR_RESISTANCE) / (EFFECTIVE_KT)) - 0.65;
+  private static final double FEEDFORWARD_CONSTANT = 0.4;
 
   private boolean _isCalibrated;
   private ElevatorPosition _currentPos;
@@ -86,11 +72,6 @@ public class Elevator extends SubsystemBase {
 
   private ElevatorIO _io;
   private ElevatorIOInputsAutoLogged _inputs;
-
-  
-
-  SysIdRoutine routine = new SysIdRoutine(new Config(),
-      new SysIdRoutine.Mechanism(this::setElevatorVoltage, this::populateLog, this));
 
   public Elevator(ElevatorIO io) {
     _io = io;
@@ -161,8 +142,7 @@ public class Elevator extends SubsystemBase {
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-  // _io.setElevatorSpeed();
-    _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
+    // _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
   }
 
   public boolean isCalibrated() {
@@ -192,22 +172,6 @@ public class Elevator extends SubsystemBase {
 
   public double getElevatorMaxHeight() {
     return ELEVATOR_MAX_INCHES;
-  }
-
-  public void populateLog(SysIdRoutineLog log) {
-    log.motor("elevator_primary")
-        .voltage(Voltage.ofBaseUnits(_inputs._elevatorMotorVoltage, Volt))
-        .linearPosition(Distance.ofBaseUnits(Units.inchesToMeters(getCurrentPosInches()), Meters))
-        .linearVelocity(
-            LinearVelocity.ofBaseUnits(_inputs._elevatorVelocity * SPOOL_DIAMETER * Math.PI / 60, MetersPerSecond));
-  }
-
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return routine.quasistatic(direction);
-  }
-
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return routine.dynamic(direction);
   }
 
   @Override

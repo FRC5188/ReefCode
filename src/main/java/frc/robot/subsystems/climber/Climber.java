@@ -3,6 +3,8 @@ package frc.robot.subsystems.climber;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.climber.io.ClimberIO;
+import frc.robot.subsystems.climber.io.ClimberIOInputsAutoLogged;
 
 public class Climber extends SubsystemBase {
 

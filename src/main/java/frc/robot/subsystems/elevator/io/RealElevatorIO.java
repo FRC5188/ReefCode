@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.elevator.io;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -11,8 +11,6 @@ import edu.wpi.first.units.measure.Voltage;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import frc.robot.HardwareConstants.CAN;
-import frc.robot.subsystems.arm.ArmIO;
-import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 
 public class RealElevatorIO implements ElevatorIO {
     private SparkFlex _primaryMotor;

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm;
+package frc.robot.subsystems.arm.io;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -31,6 +31,7 @@ public class RealArmIO implements ArmIO {
     public RealArmIO() {
         _armMotor = new SparkFlex(CAN.ARM_MTR_ID, MotorType.kBrushless);
         _intakeMotor = new SparkFlex(CAN.INTAKE_MTR_ID, MotorType.kBrushless);
+        _feederMotor = new SparkMax(CAN.FEEDER_MTR_ID, MotorType.kBrushless);
         _lightSensor = new DigitalInput(DIO.LIGHT_SENSOR_CHANNEL);
         _armEncoder = _armMotor.getAbsoluteEncoder();
 
@@ -61,15 +62,15 @@ public class RealArmIO implements ArmIO {
     }
 
     public void setArmMotorSpeed(double speed) {
-        _armMotor.set(speed);
+        // _armMotor.set(speed);
     }
 
     public void setIntakeMotorSpeed(double speed) {
-        _intakeMotor.set(speed);
+        // _intakeMotor.set(speed);
     }
 
     public void setFeederMotorSpeed(double speed){
-        _feederMotor.set(speed);
+        // _feederMotor.set(speed);
         
     }
     public void resetIntakeEncoders() {
@@ -77,10 +78,10 @@ public class RealArmIO implements ArmIO {
     }
 
     public void setArmMotorVoltage(Voltage voltage) {
-        _armMotor.setVoltage(voltage);
+        // _armMotor.setVoltage(voltage);
     }
 
     public void setFeederMotorVoltage(Voltage voltage) {
-        _feederMotor.setVoltage(voltage);
+        // _feederMotor.setVoltage(voltage);
     }
 }

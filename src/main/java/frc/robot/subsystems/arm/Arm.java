@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.arm.io.ArmIO;
+import frc.robot.subsystems.arm.io.ArmIOInputsAutoLogged;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 
@@ -58,13 +60,6 @@ public class Arm extends SubsystemBase {
 
   private static final double HAS_ALGAE_CURRENT = 2;
 
-  private static final double ARM_WEIGHT_N = 3.5 * 9.81;
-  private static final double ARM_STALL_TORQUE_NM = 3.6;
-  private static final double ARM_STALL_CURRENT = 211;
-  private static final double ARM_KT = ARM_STALL_TORQUE_NM / ARM_STALL_CURRENT;
-  private static final double ARM_RESISTANCE = 0.057;
-  private static final double ARM_MOMENT_METERS = 0.3928;
-  private static final double ARM_GEARING = 17;
   private static final double ARM_FEEDFORWARD_COEFF = 0.53;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
@@ -128,7 +123,9 @@ public class Arm extends SubsystemBase {
       hasPiece = _intakeSpikeCounter >= 5;
     }
 
-    return hasPiece;
+    if (hasPiece) _hasGamepiece = true;
+
+    return _hasGamepiece;
   }
 
   public void resetIntakeSpikeCounter() {

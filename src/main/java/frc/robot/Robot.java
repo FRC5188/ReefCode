@@ -81,6 +81,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
   }
 
   @Override
@@ -151,14 +152,13 @@ public class Robot extends LoggedRobot {
 
     System.out.println("!!!!!!!!!!Autonomous init!!!!!!!!!!!");
     if (m_autonomousCommand != null) {
+      System.out.println("FOUND A COMMAND");
       m_autonomousCommand.schedule();
     }
   }
 
   @Override
-  public void autonomousPeriodic() {
-    
-  }
+  public void autonomousPeriodic() {} 
 
   @Override
   public void autonomousExit() {

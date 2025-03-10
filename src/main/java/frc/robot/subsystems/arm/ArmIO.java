@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm.io;
+package frc.robot.subsystems.arm;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -10,6 +10,10 @@ public interface ArmIO {
         public double _armMotorCurrent = 0.0;
         public double _armMotorVoltage = 0.0;
         public double _armMotorSpeed = 0.0;
+
+        public double _feederMotorCurrent = 0.0;
+        public double _feederMotorVoltage = 0.0;
+        public double _feederMotorSpeed = 0.0;
 
         public double _armEncoderPositionDegrees = 0.0;
         public double _armEncoderVelocity = 0.0;
@@ -32,4 +36,5 @@ public interface ArmIO {
 
     public default void setArmMotorVoltage(Voltage voltage) {}
 
+    public default void setFeederMotorSpeed(double speed) {}
 }

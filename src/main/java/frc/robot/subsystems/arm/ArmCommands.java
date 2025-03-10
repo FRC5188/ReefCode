@@ -17,41 +17,56 @@ public class ArmCommands {
     public Command spit() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    if (_arm.getCurrentPos() == ArmPosition.L4_Score) 
+                        _arm.setArmSetpoint(ArmPosition.Stow);
+                    _arm.spit();
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
+                    _arm.clearHasGamepiece();
                 },
-                _arm).withTimeout(1);
+                _arm).withTimeout(0.5);
+
     }
 
     public Command setArmPosition(ArmPosition setpoint) {
-
-        return new InstantCommand();
-        /* 
         if (setpoint == ArmPosition.L4_Score) {
             return new InstantCommand(
                 () -> {
                     _arm.setArmSetpoint(setpoint);
                 },
-                _arm).alongWith(intakeForNumberOfRotations());
+                _arm).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {
                     _arm.setArmSetpoint(setpoint);
                 },
-                _arm); */
+                _arm);
     }
 
     public Command intake() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    _arm.resetIntakeSpikeCounter();
+                    _arm.setIntakeSpeed(0.45);
+                    _arm.setFeederSpeed(0.45);
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
+                    _arm.setFeederSpeed(0);
                 },
                 _arm).until(() -> _arm.hasPiece());
+    }
+
+    public Command moveGamepieceToLightSensor() {
+        return new StartEndCommand(
+            () -> {
+                _arm.setIntakeSpeed(-0.3);
+            },
+            () -> {
+                _arm.setIntakeSpeed(0);
+            },
+            _arm).until(() -> _arm.lightSensorSeesGamepiece());       
     }
 
     public Command runArmPID() {

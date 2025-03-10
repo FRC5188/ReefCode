@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.elevator.io;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -11,8 +11,8 @@ import edu.wpi.first.units.measure.Voltage;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import frc.robot.HardwareConstants.CAN;
-import frc.robot.subsystems.arm.ArmIO;
-import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
+import frc.robot.subsystems.arm.io.ArmIO;
+import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
 
 public class RealElevatorIO implements ElevatorIO {
     private SparkFlex _primaryMotor;
@@ -24,14 +24,13 @@ public class RealElevatorIO implements ElevatorIO {
         _secondaryMotor = new SparkFlex(CAN.SECONDARY_ELEVATOR_ID, MotorType.kBrushless);
 
         SparkFlexConfig primaryConfig = new SparkFlexConfig();
-        primaryConfig.inverted(false);
-        primaryConfig.idleMode(IdleMode.kBrake);
-        _primaryMotor.configure(primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        primaryConfig.inverted(true);
+        primaryConfig.idleMode(IdleMode.kCoast);
+        _primaryMotor.configure(primaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkFlexConfig secondaryConfig = new SparkFlexConfig();
         secondaryConfig.follow(CAN.PRIMARY_ELEVATOR_ID);
-        secondaryConfig.idleMode(IdleMode.kBrake);
-        _secondaryMotor.configure(secondaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        _secondaryMotor.configure(secondaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void updateInputs(ElevatorIOInputs inputs) {
@@ -43,7 +42,7 @@ public class RealElevatorIO implements ElevatorIO {
     }
 
     public void setElevatorSpeed(double speed) {
-         _primaryMotor.set(speed);
+        _primaryMotor.set(speed);
     }
 
     public void setElevatorVoltage(Voltage voltage) {

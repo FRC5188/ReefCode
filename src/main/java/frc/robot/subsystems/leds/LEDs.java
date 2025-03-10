@@ -6,11 +6,9 @@ import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.HardwareConstants;
 import frc.robot.HardwareConstants.CAN;
-import frc.robot.subsystems.elevator.Elevator;
 
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
@@ -22,11 +20,9 @@ import com.ctre.phoenix.led.Animation;
 public class LEDs extends SubsystemBase {
 
     CANdle _candle = new CANdle(CAN.CANDLE_ID);
-    static int _numLEDs = 60; //leds/height * currentheight 
+    static int _numLEDs = 8;
     boolean _alreadyRunning = false;
     LEDAnimation _currentAnimation = LEDAnimation.None;
-
-    Elevator _elevator;
 
     public enum LEDAnimation {
         None(null, null, 0),
@@ -47,9 +43,7 @@ public class LEDs extends SubsystemBase {
 
         SolidTeal(new LEDColor(0, 225, 174), null, 0),
 
-        SolidCoral(new LEDColor(255, 80, 15), null, 0),
-
-        SolidRed(new LEDColor(255, 0, 0), null, 0);
+        SolidCoral(new LEDColor(255, 80, 15), null, 0);
 
         LEDColor _color;
         Animation _animation;
@@ -87,11 +81,6 @@ public class LEDs extends SubsystemBase {
                 _candle.clearAnimation(0);
                 _candle.setLEDs(0, 0, 0);
                 _candle.animate(animation.getAnimation());
-            } else if (animation == LEDAnimation.SolidRed) {
-                _candle.clearAnimation(0);
-                LEDColor color = animation.getColor();
-                _candle.setLEDs(color.getR(), color.getG(), color.getB(),0, 0, 
-                (int) Math.round(_numLEDs/_elevator.getElevatorMaxHeight() * _elevator.getCurrentPosInches()));
             } else if (animation.getAnimation() == null) {
                 LEDColor color = animation.getColor();
                 _candle.clearAnimation(0);
@@ -130,7 +119,7 @@ public class LEDs extends SubsystemBase {
 
     public void elevatorOrArmIsMoving() {
         if (!_alreadyRunning) {
-            runAnimation(LEDAnimation.SolidDarkBlue);
+            runAnimation(LEDAnimation.BlinkDarkBlue);
             _alreadyRunning = false;
         }
     }
@@ -156,13 +145,6 @@ public class LEDs extends SubsystemBase {
         }
     }
 
-    public void disabledAnimation1() {
-        if (!_alreadyRunning) {
-            runAnimation(LEDAnimation.PartyMode);
-            _alreadyRunning = false;            
-        }
-    }
-
     public void reset() {
         _candle.clearAnimation(0);
         _alreadyRunning = false;
@@ -170,7 +152,6 @@ public class LEDs extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("LEDs/alreadyRunning", _alreadyRunning);
         Logger.recordOutput("LEDs/CurrentAnimation", _currentAnimation.toString());
     }
 }

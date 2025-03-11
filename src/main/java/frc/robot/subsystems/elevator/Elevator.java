@@ -45,23 +45,23 @@ public class Elevator extends SubsystemBase {
   }
 
   private static final double CALIBRATION_SPEED = -0.1;
-  private static final double HARD_STOP_CURRENT_LIMIT = 50;
+  private static final double HARD_STOP_CURRENT_LIMIT = 37;
 
   private static final double INCREMENT_CONSTANT = 1;
   private static final double DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.75;
-  private static final double ELEVATOR_MOTOR_KI = 0.15; 
+  private static final double ELEVATOR_MOTOR_KP = 0.8; //0.75;
+  private static final double ELEVATOR_MOTOR_KI = 0;//0.15; 
   private static final double ELEVATOR_MOTOR_KD = 0;
   private static final double ELEVATOR_PID_VEL = 220;
   private static final double ELEVATOR_PID_ACC = 215;
 
   private static final double ELEVATOR_MAX_INCHES = 52; //48;
-  private static final double ELEVATOR_MAX_ROTATIONS = -87; // 36.4;
+  private static final double ELEVATOR_MAX_ROTATIONS = 87; // 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
-  private static final double FEEDFORWARD_CONSTANT = 0.4;
+  private static final double FEEDFORWARD_CONSTANT = 0.225;
 
   private boolean _isCalibrated;
   private ElevatorPosition _currentPos;
@@ -142,7 +142,7 @@ public class Elevator extends SubsystemBase {
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-    // _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
+    _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
   }
 
   public boolean isCalibrated() {
@@ -189,6 +189,7 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/atSetpoint", isAtSetpoint());
     Logger.recordOutput("Elevator/currentPosEnum", _currentPos);
     Logger.recordOutput("Elevator/desiredPosEnum", _desiredPos);
+    Logger.recordOutput("Elevator/currentGamepieceMode", _currentMode);
   }
 
 }

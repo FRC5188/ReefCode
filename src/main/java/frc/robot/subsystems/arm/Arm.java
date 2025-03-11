@@ -27,7 +27,7 @@ public class Arm extends SubsystemBase {
   public enum ArmPosition {
     Stow(80),
     Loading_Coral(120),
-    Loading_Algae(50),
+    Loading_Algae(60),
     Loading(120),
     L4_Score(45),
     Algae_Score(60);
@@ -52,15 +52,15 @@ public class Arm extends SubsystemBase {
 
   private ProfiledPIDController _armPidController;
 
-  private static final double KP = 0.09;
-  private static final double KI = 0.01;
+  private static final double KP = 0.01;//0.09;
+  private static final double KI = 0; //0.01;
   private static final double KD = 0;
   private static final double PROFILE_VEL = 160;
   private static final double PROFILE_ACC = 145;
 
   private static final double HAS_ALGAE_CURRENT = 2;
 
-  private static final double ARM_FEEDFORWARD_COEFF = 0.53;
+  private static final double ARM_FEEDFORWARD_COEFF = 0.4;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
       new SysIdRoutine.Mechanism(this::setArmVoltage, this::populateLog, this));
@@ -84,10 +84,6 @@ public class Arm extends SubsystemBase {
 
   public void setIntakeSpeed(double speed) {
     _io.setIntakeMotorSpeed(speed);
-  }
-
-  public void setFeederSpeed(double speed) {
-    _io.setFeederMotorSpeed(speed);
   }
 
   public void spit() {
@@ -148,8 +144,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void runArmPID() {
-    double out = (_armPidController.calculate(_inputs._armEncoderPositionDegrees)
-        + ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
+    double out = _armPidController.calculate(_inputs._armEncoderPositionDegrees)
+        + (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
     _io.setArmMotorVoltage(Voltage.ofBaseUnits(out, Volt));
   }
 

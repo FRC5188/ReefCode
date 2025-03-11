@@ -40,6 +40,7 @@ import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
 
@@ -87,6 +88,7 @@ public class RobotContainer {
   private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
   private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
   private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
+  private final JoystickButton gamepieceModeToggle = new JoystickButton(buttonbox1, 10);
 
   private final GenericHID buttonbox2 = new GenericHID(2);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
@@ -229,6 +231,9 @@ public class RobotContainer {
     LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
     L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
+    gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
+    gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
+
     // Runs the preset to score unless the preset is invalid.
     joystick.rightBumper().onTrue(
     multiSubsystemCommands.scoreGamepieceAtPosition(() -> preset.getLevel()).unless(()
@@ -274,6 +279,8 @@ public class RobotContainer {
     // Set initial positions
     CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
     CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
+
+    CommandScheduler.getInstance().schedule(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
   }
 
   public void startIdleAnimations() {

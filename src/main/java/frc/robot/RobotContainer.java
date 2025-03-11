@@ -228,7 +228,7 @@ public class RobotContainer {
     StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
     L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
     L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
+    // LoadingButton.onTrue(multiSubsystemCommands.loadGamepiece());
     L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));

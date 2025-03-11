@@ -16,7 +16,7 @@ public class Preset {
     private boolean _isSideValid = false;
 
     private void setPresetLevel(OverallPosition level) {
-        if (level == OverallPosition.Stow || level == OverallPosition.Loading || level == OverallPosition.L4_Score) {
+        if (level == OverallPosition.Stow || level == OverallPosition.Coral_Loading || level == OverallPosition.L4_Score) {
             throw new RuntimeException("Invalid Preset Level/Position");
         }
 

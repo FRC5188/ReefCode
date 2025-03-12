@@ -84,13 +84,13 @@ public class RobotContainer {
   private final JoystickButton StowButton = new JoystickButton(buttonbox1, 3);
   private final JoystickButton L3Button = new JoystickButton(buttonbox1, 4);
   private final JoystickButton L4Button = new JoystickButton(buttonbox1, 5);
-  private final JoystickButton LoadingButton = new JoystickButton(buttonbox1, 6);
   private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
   private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
   private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
   private final JoystickButton gamepieceModeToggle = new JoystickButton(buttonbox1, 10);
 
   private final GenericHID buttonbox2 = new GenericHID(2);
+  private final JoystickButton manualIntakeButton = new JoystickButton(buttonbox2, 1);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
   private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
@@ -228,7 +228,6 @@ public class RobotContainer {
     StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
     L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
     L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    // LoadingButton.onTrue(multiSubsystemCommands.loadGamepiece());
     L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
@@ -241,6 +240,8 @@ public class RobotContainer {
 
     // Resets the preset when we don't have a piece.
     armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
+
+    manualIntakeButton.whileTrue(Commands.run(() -> armSubsystem.setIntakeSpeed(0.1), armSubsystem));
 
     // Sets the level preset
     presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));

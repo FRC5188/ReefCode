@@ -113,7 +113,7 @@ public class MultiSubsystemCommands {
         return setOverallSetpoint(OverallPosition.Coral_Loading)
                 .andThen(waitForOverallMechanism())
                 .andThen(_armCommands.intake())
-                .andThen(setOverallSetpoint(OverallPosition.Stow))
+                // .andThen(setOverallSetpoint(OverallPosition.Stow))
                 .andThen(_armCommands.moveGamepieceToLightSensor())
                 .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), ElevatorPosition.Stow,
                         _arm.getCurrentPos(), ArmPosition.Loading));

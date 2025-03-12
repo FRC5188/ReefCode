@@ -97,7 +97,7 @@ public class ArmCommands {
             () -> {
                 _arm.setIntakeSpeed(0);
             },
-            _arm).until(() -> _arm.lightSensorSeesGamepiece()).unless(() -> _arm.lightSensorSeesGamepiece());       
+            _arm).until(() -> _arm.lightSensorSeesGamepiece());       
     }
 
     public Command runArmPID() {

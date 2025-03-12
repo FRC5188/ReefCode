@@ -45,10 +45,11 @@ public class VisionConstants {
   public static Transform3d robotToCamera5 =
       new Transform3d(Units.inchesToMeters(-13.75), Units.inchesToMeters(-11.25), Units.inchesToMeters(9.25),
       new Rotation3d(0.0, -Math.PI/4, Math.PI));
-  // Camera 6
+ 
+ // Camera 6
   public static Transform3d robotToCamera6 =
-      new Transform3d(Units.inchesToMeters(-13.75), Units.inchesToMeters(11.25), Units.inchesToMeters(9.25), 
-      new Rotation3d(0.0, 0, Math.PI));
+      new Transform3d(Units.inchesToMeters(13.75), Units.inchesToMeters(11.5), Units.inchesToMeters(9.25), 
+      new Rotation3d(0.0, 0, 0));
 
 
   // Camera 7

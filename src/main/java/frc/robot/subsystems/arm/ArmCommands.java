@@ -2,8 +2,10 @@ package frc.robot.subsystems.arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
@@ -17,41 +19,105 @@ public class ArmCommands {
     public Command spit() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    if (_arm.getCurrentPos() == ArmPosition.L4_Score)
+                        _arm.setArmSetpoint(ArmPosition.Stow);
+                    _arm.spit();
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
+                    _arm.clearHasGamepiece();
                 },
                 _arm).withTimeout(1);
+
     }
 
     public Command setArmPosition(ArmPosition setpoint) {
-
-        return new InstantCommand();
-        /* 
         if (setpoint == ArmPosition.L4_Score) {
             return new InstantCommand(
-                () -> {
-                    _arm.setArmSetpoint(setpoint);
-                },
-                _arm).alongWith(intakeForNumberOfRotations());
+                    () -> {
+                        _arm.setArmSetpoint(setpoint);
+                    },
+                    _arm).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {
                     _arm.setArmSetpoint(setpoint);
                 },
-                _arm); */
+                _arm);
     }
 
     public Command intake() {
+        return Commands.either(intakeAlgae(), intakeCoral(), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
+    }
+
+    private Command intakeCoral() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.5);
+                    _arm.setIntakeSpeed(0.35);
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
                 },
                 _arm).until(() -> _arm.hasPiece());
+    }
+
+    private Command intakeAlgae() {
+        return new Command() {
+            double intakeSpikeCounter = 0;
+
+            @Override
+            public void initialize() {
+                intakeSpikeCounter = 0;
+                _arm.setIntakeSpeed(0.5);
+            }
+
+            @Override
+            public void execute() {
+                if (_arm.getIntakeCurrent() >= Arm.HAS_ALGAE_CURRENT) {
+                    intakeSpikeCounter++;
+                }
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                _arm.setIntakeSpeed(0.05);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return intakeSpikeCounter > 15;
+            }
+        };
+    }
+
+    public Command moveGamepieceToLightSensor() {
+        return new Command() {
+            boolean movingDown = true;
+
+            @Override
+            public void initialize() {
+                // If we see the gamepiece, we want to move further down in the intake
+                // If we don't, it's too far down and needs to go back up
+                System.out.println("AAAAAAAAAAAAAAAAAAAAa");
+                movingDown = _arm.lightSensorSeesGamepiece();
+            }
+
+            @Override
+            public void execute() {
+                double speed = (movingDown) ? 0.065 : -0.065;
+                _arm.setIntakeSpeed(speed);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                _arm.setIntakeSpeed(0);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return (movingDown) ? !_arm.lightSensorSeesGamepiece() : _arm.lightSensorSeesGamepiece();
+            }
+        };
     }
 
     public Command runArmPID() {
@@ -63,15 +129,15 @@ public class ArmCommands {
     public Command intakeForNumberOfRotations() {
         return new StartEndCommand(() -> {
             _arm.resetIntakeEncoders();
-            _arm.setIntakeSpeed(-0.3);
+            _arm.setIntakeSpeed(-0.1);
         },
-        () -> {
-            _arm.setIntakeSpeed(0);
-        },
-        _arm).until(() -> _arm.intakeAtDesiredRotations());
+                () -> {
+                    _arm.setIntakeSpeed(0);
+                },
+                _arm).until(() -> _arm.intakeAtDesiredRotations());
     }
 
     public Command waitUntilAtSetpoint() {
-        return new WaitUntilCommand(_arm::armAtSetpoint);
+        return new WaitUntilCommand(_arm::isAtSetpoint);
     }
 }

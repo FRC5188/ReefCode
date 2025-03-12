@@ -10,13 +10,13 @@ public class Preset {
         Right;
     }
 
-    private OverallPosition _level = OverallPosition.Stow;
+    private OverallPosition _level = OverallPosition.L1;
     private ReefSide _side = ReefSide.Right;
     private boolean _isLevelValid = false;
     private boolean _isSideValid = false;
 
     private void setPresetLevel(OverallPosition level) {
-        if (level == OverallPosition.Stow || level == OverallPosition.Loading || level == OverallPosition.L4_Score) {
+        if (level == OverallPosition.Stow || level == OverallPosition.Coral_Loading || level == OverallPosition.L4_Score) {
             throw new RuntimeException("Invalid Preset Level/Position");
         }
 

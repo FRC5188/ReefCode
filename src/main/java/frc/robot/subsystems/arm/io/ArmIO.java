@@ -31,5 +31,4 @@ public interface ArmIO {
     public default void resetIntakeEncoders() {}
 
     public default void setArmMotorVoltage(Voltage voltage) {}
-
 }

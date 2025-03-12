@@ -30,6 +30,9 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.RealArmIO;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberCommands;
+import frc.robot.subsystems.climber.io.RealClimberIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.Telemetry;
@@ -43,7 +46,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.elevator.io.RealElevatorIO;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
 import frc.robot.subsystems.vision.Vision;
@@ -59,17 +65,20 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
+  private final LEDs LEDSubsystem = new LEDs();
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
-  private final Vision vision;
-  private final CommandXboxController joystick = new CommandXboxController(0);
+  private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
+
+  private final Climber climber = new Climber(new RealClimberIO());
+  private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
 
-  /** I am single :( 
-   * hi zoe :3
-  */
+  private final Vision vision;
+  private final CommandXboxController joystick = new CommandXboxController(0);
+
   private final Preset preset = new Preset();
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -89,13 +98,16 @@ public class RobotContainer {
   private final JoystickButton StowButton = new JoystickButton(buttonbox1, 3);
   private final JoystickButton L3Button = new JoystickButton(buttonbox1, 4);
   private final JoystickButton L4Button = new JoystickButton(buttonbox1, 5);
-  private final JoystickButton LoadingButton = new JoystickButton(buttonbox1, 6);
-  private final JoystickButton button7 = new JoystickButton(buttonbox1, 7);
+  private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
   private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
-  private final JoystickButton button9 = new JoystickButton(buttonbox1, 9);
+  private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
+  private final JoystickButton gamepieceModeToggle = new JoystickButton(buttonbox1, 10);
 
   private final GenericHID buttonbox2 = new GenericHID(2);
+  private final JoystickButton manualIntakeButton = new JoystickButton(buttonbox2, 1);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
+  private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
+  private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -193,7 +205,7 @@ public class RobotContainer {
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
-        multiSubsystemCommands.intake());
+        multiSubsystemCommands.loadGamepiece());
 
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -224,10 +236,25 @@ public class RobotContainer {
             () -> -joystick.getRightX())); 
 
 
-    // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    // joystick.b().whileTrue(drivetrain
-    //     .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
+       //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand())
 
+    // reset the field-centric heading on left bumper press
+    // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
+ 
+    // drive.registerTelemetry(logger::telemeterize);
+
+    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
+    spitButton.onTrue(armCommands.spit());
+
+    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
+    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
+    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
+    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
+    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
+    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+
+    gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
+    gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
     joystick.back().and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
@@ -237,14 +264,14 @@ public class RobotContainer {
 
     // Driver Right Bumper: Approach Nearest Right-Side Reef Branch
     joystick.rightBumper()
-            .whileTrue(
-                joystickApproach(
-                    () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.RIGHT)));
+        .whileTrue(
+            joystickApproach(
+            () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.RIGHT)));
 
-        // Driver Left Bumper: Approach Nearest Left-Side Reef Branch
+    // Driver Left Bumper: Approach Nearest Left-Side Reef Branch
     joystick.leftBumper()
-            .whileTrue(
-                joystickApproach(
+        .whileTrue(
+            joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
 
     

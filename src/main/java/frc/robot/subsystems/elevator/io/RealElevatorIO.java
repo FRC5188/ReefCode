@@ -11,8 +11,6 @@ import edu.wpi.first.units.measure.Voltage;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import frc.robot.HardwareConstants.CAN;
-import frc.robot.subsystems.arm.io.ArmIO;
-import frc.robot.subsystems.elevator.io.ElevatorIO.ElevatorIOInputs;
 
 public class RealElevatorIO implements ElevatorIO {
     private SparkFlex _primaryMotor;
@@ -26,11 +24,12 @@ public class RealElevatorIO implements ElevatorIO {
         SparkFlexConfig primaryConfig = new SparkFlexConfig();
         primaryConfig.inverted(true);
         primaryConfig.idleMode(IdleMode.kCoast);
-        _primaryMotor.configure(primaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        _primaryMotor.configure(primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkFlexConfig secondaryConfig = new SparkFlexConfig();
-        secondaryConfig.follow(CAN.PRIMARY_ELEVATOR_ID);
-        _secondaryMotor.configure(secondaryConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        secondaryConfig.follow(CAN.PRIMARY_ELEVATOR_ID, true);
+        secondaryConfig.idleMode(IdleMode.kCoast);
+        _secondaryMotor.configure(secondaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void updateInputs(ElevatorIOInputs inputs) {

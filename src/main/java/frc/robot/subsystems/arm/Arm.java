@@ -25,9 +25,9 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(80, 80),
-    Loading(128, 60),
-    L4_Score(45, 45),
+    Stow(100, 100),
+    Loading(128, 55),
+    L4_Score(65, 45),
     Algae_Score(60, 60);
 
     double coralAngle, algaeAngle;
@@ -129,7 +129,7 @@ public class Arm extends SubsystemBase {
     if (_currentMode == GamepieceMode.CORAL) {
       boolean currentState = _inputs._lightSensorState;
       // hasPiece = _prevLightSensorVal && !currentState;
-      hasPiece = _prevLightSensorVal;
+      hasPiece = currentState;
       _prevLightSensorVal = currentState;
     } 
 

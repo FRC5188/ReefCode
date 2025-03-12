@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -240,8 +241,6 @@ public class RobotContainer {
 
     // Resets the preset when we don't have a piece.
     armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
-
-    manualIntakeButton.whileTrue(Commands.run(() -> armSubsystem.setIntakeSpeed(0.1), armSubsystem));
 
     // Sets the level preset
     presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));

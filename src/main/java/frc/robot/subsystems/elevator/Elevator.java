@@ -31,41 +31,47 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
-    L1(5),
-    L2(9),
-    L3(25.5),
-    L4(48),
-    Stow(0.5);
+    L1(5, 5),
+    L2(9, 15),
+    L3(25.5, 32),
+    L4(48, 48),
+    Stow(0.5, 0.5);
 
-    public final double setpoint;
+    double coralHeight, algaeHeight;
 
-    private ElevatorPosition(double setpoint) {
-      this.setpoint = setpoint;
+    ElevatorPosition(double coralHeight, double algaeHeight) {
+      this.coralHeight = coralHeight;
+      this.algaeHeight = algaeHeight;
+    }
+
+    double getHeight(GamepieceMode mode) {
+      return (mode == GamepieceMode.ALGAE) ? this.algaeHeight : this.coralHeight;
     }
   }
 
   private static final double CALIBRATION_SPEED = -0.1;
-  private static final double HARD_STOP_CURRENT_LIMIT = 50;
+  private static final double HARD_STOP_CURRENT_LIMIT = 37;
 
   private static final double INCREMENT_CONSTANT = 1;
   private static final double DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.75;
-  private static final double ELEVATOR_MOTOR_KI = 0.15; 
+  private static final double ELEVATOR_MOTOR_KP = 0.8; //0.75;
+  private static final double ELEVATOR_MOTOR_KI = 0;//0.15; 
   private static final double ELEVATOR_MOTOR_KD = 0;
   private static final double ELEVATOR_PID_VEL = 220;
   private static final double ELEVATOR_PID_ACC = 215;
 
   private static final double ELEVATOR_MAX_INCHES = 52; //48;
-  private static final double ELEVATOR_MAX_ROTATIONS = -87; // 36.4;
+  private static final double ELEVATOR_MAX_ROTATIONS = 87; // 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
-  private static final double FEEDFORWARD_CONSTANT = 0.4;
+  private static final double FEEDFORWARD_CONSTANT = 0.225;
 
   private boolean _isCalibrated;
   private ElevatorPosition _currentPos;
   private ElevatorPosition _desiredPos;
+  private ElevatorPosition _prevPos;
   private MultiSubsystemCommands.GamepieceMode _currentMode;
 
   private ProfiledPIDController _elevatorMotorPID;
@@ -83,6 +89,7 @@ public class Elevator extends SubsystemBase {
 
     _currentPos = ElevatorPosition.Stow;
     _desiredPos = ElevatorPosition.Stow;
+    _prevPos = ElevatorPosition.Stow;
   }
 
   // Runs the motors down at the calibration speed
@@ -99,8 +106,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setSetpoint(ElevatorPosition setpoint) {
-    setSetpoint(setpoint.setpoint);
+    _prevPos = _currentPos;
     _desiredPos = setpoint;
+    setSetpoint(setpoint.getHeight(_currentMode));
   }
 
   // Sets the setpoint of the PID
@@ -142,7 +150,7 @@ public class Elevator extends SubsystemBase {
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-    // _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
+    _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
   }
 
   public boolean isCalibrated() {
@@ -160,6 +168,10 @@ public class Elevator extends SubsystemBase {
 
   public ElevatorPosition getCurrentPos() {
     return _currentPos;
+  }
+
+  public ElevatorPosition getPrevPos() {
+    return _prevPos;
   }
 
   public GamepieceMode getCurrentMode() {
@@ -189,6 +201,7 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/atSetpoint", isAtSetpoint());
     Logger.recordOutput("Elevator/currentPosEnum", _currentPos);
     Logger.recordOutput("Elevator/desiredPosEnum", _desiredPos);
+    Logger.recordOutput("Elevator/currentGamepieceMode", _currentMode);
   }
 
 }

@@ -15,7 +15,8 @@ import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 public class MultiSubsystemCommands {
     public enum OverallPosition {
         Stow(ElevatorPosition.Stow, ArmPosition.Stow),
-        Loading(ElevatorPosition.Stow, ArmPosition.Loading_Coral),
+        Coral_Loading(ElevatorPosition.Stow, ArmPosition.Loading),
+        Algae_Loading(ElevatorPosition.L2, ArmPosition.Loading),
         L1(ElevatorPosition.L1, ArmPosition.Stow),
         L2(ElevatorPosition.L2, ArmPosition.Stow),
         L3(ElevatorPosition.L3, ArmPosition.Stow),
@@ -94,7 +95,7 @@ public class MultiSubsystemCommands {
     }
 
     public Command scoreGamepieceAtPosition(OverallPosition setpoint) {
-        if (setpoint == OverallPosition.Stow || setpoint == OverallPosition.Loading
+        if (setpoint == OverallPosition.Stow || setpoint == OverallPosition.Coral_Loading
                 || setpoint == OverallPosition.L4_Score) {
             throw new RuntimeException("scoreGamepieceAtPosition cannot run to stow,loading,or L4_score");
         }
@@ -109,23 +110,23 @@ public class MultiSubsystemCommands {
     }
 
     public Command loadCoral() {
-        return setOverallSetpoint(OverallPosition.Loading)
+        return setOverallSetpoint(OverallPosition.Coral_Loading)
                 .andThen(waitForOverallMechanism())
                 .andThen(_armCommands.intake())
                 .andThen(setOverallSetpoint(OverallPosition.Stow))
                 .andThen(_armCommands.moveGamepieceToLightSensor())
                 .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), ElevatorPosition.Stow,
-                        _arm.getCurrentPos(), ArmPosition.Loading_Coral));
+                        _arm.getCurrentPos(), ArmPosition.Loading));
 
     }
 
     public Command loadAlgae() {
-        return setOverallSetpoint(OverallPosition.Loading)
+        return  _armCommands.setArmPosition(ArmPosition.Loading)
                 .andThen(waitForOverallMechanism())
                 .andThen(_armCommands.intake())
-                .andThen(setOverallSetpoint(OverallPosition.Stow))
+                .andThen(_armCommands.setArmPosition(ArmPosition.Stow))
                 .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), ElevatorPosition.L2,
-                _arm.getCurrentPos(), ArmPosition.Loading_Algae));
+                _arm.getCurrentPos(), ArmPosition.Loading));
     }
 
     public boolean canMoveToPos(ElevatorPosition currentElevator, ElevatorPosition desiredElevator,
@@ -138,10 +139,10 @@ public class MultiSubsystemCommands {
                 case L1:
                 case L2:
                 case L3:
-                    canMoveArm = (desiredArm != ArmPosition.L4_Score) && (desiredArm != ArmPosition.Loading_Coral);
+                    canMoveArm = (desiredArm != ArmPosition.L4_Score) && (desiredArm != ArmPosition.Loading);
                     break;
                 case L4:
-                    canMoveArm = (desiredArm != ArmPosition.Loading_Coral);
+                    canMoveArm = (desiredArm != ArmPosition.Loading);
                     break;
                 case Stow:
                     canMoveArm = (desiredArm != ArmPosition.L4_Score);
@@ -155,10 +156,10 @@ public class MultiSubsystemCommands {
                 case L1:
                 case L2:
                 case L3:
-                    canMoveElevator = (currentArm != ArmPosition.L4_Score) && (currentArm != ArmPosition.Loading_Coral);
+                    canMoveElevator = (currentArm != ArmPosition.L4_Score) && (currentArm != ArmPosition.Loading);
                     break;
                 case L4:
-                    canMoveElevator = (currentArm != ArmPosition.Loading_Coral);
+                    canMoveElevator = (currentArm != ArmPosition.Loading);
                     break;
                 case Stow:
                     canMoveElevator = (currentArm != ArmPosition.L4_Score);
@@ -178,7 +179,7 @@ public class MultiSubsystemCommands {
                     canMoveArm = desiredArm != ArmPosition.Algae_Score;
                     break;
                 case Stow:
-                    canMoveArm = desiredArm != ArmPosition.Loading_Algae;
+                    canMoveArm = desiredArm != ArmPosition.Loading;
                     break;
                 default:
                     canMoveArm = false;
@@ -195,16 +196,21 @@ public class MultiSubsystemCommands {
                     canMoveElevator = currentArm != ArmPosition.Algae_Score;
                     break;
                 case Stow:
-                    canMoveElevator = currentArm != ArmPosition.Loading_Algae;
+                    canMoveElevator = currentArm != ArmPosition.Loading;
                     break;
                 default:
                     canMoveElevator = false;
                     break;
             }
+
+            if (currentArm == ArmPosition.Loading) {
+                canMoveElevator = desiredElevator == _elevator.getPrevPos();
+                canMoveArm = canMoveElevator;
+            }
         }
         System.out.println("Arm: " + canMoveArm + " Elevator: " + canMoveElevator);
 
-        return canMoveArm && canMoveElevator;
+        return canMoveArm && canMoveElevator && _arm.isAtSetpoint() && _elevator.isAtSetpoint();
     }
 
 }

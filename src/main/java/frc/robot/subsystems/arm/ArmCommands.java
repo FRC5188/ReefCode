@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
@@ -25,7 +26,7 @@ public class ArmCommands {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
                 },
-                _arm).withTimeout(0.5);
+                _arm).withTimeout(1);
 
     }
 
@@ -47,13 +48,14 @@ public class ArmCommands {
     public Command intake() {
         return new StartEndCommand(
                 () -> {
-                    _arm.resetIntakeSpikeCounter();
                     _arm.setIntakeSpeed(0.45);
-                    _arm.setFeederSpeed(0.45);
                 },
                 () -> {
-                    _arm.setIntakeSpeed(0);
-                    _arm.setFeederSpeed(0);
+                    if (_arm.getCurrentMode() == GamepieceMode.ALGAE) {
+                        _arm.setIntakeSpeed(0.1);
+                    } else {
+                        _arm.setIntakeSpeed(0);
+                    }
                 },
                 _arm).until(() -> _arm.hasPiece());
     }
@@ -87,6 +89,6 @@ public class ArmCommands {
     }
 
     public Command waitUntilAtSetpoint() {
-        return new WaitUntilCommand(_arm::armAtSetpoint);
+        return new WaitUntilCommand(_arm::isAtSetpoint);
     }
 }

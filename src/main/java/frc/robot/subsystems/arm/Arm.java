@@ -25,17 +25,20 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(80),
-    Loading_Coral(120),
-    Loading_Algae(50),
-    Loading(120),
-    L4_Score(45),
-    Algae_Score(60);
+    Stow(80, 80),
+    Loading(128, 60),
+    L4_Score(45, 45),
+    Algae_Score(60, 60);
 
-    double angle;
+    double coralAngle, algaeAngle;
 
-    ArmPosition(double angle) {
-      this.angle = angle;
+    ArmPosition(double coralAngle, double algaeAngle) {
+      this.coralAngle = coralAngle;
+      this.algaeAngle = algaeAngle;
+    }
+
+    double getAngle(GamepieceMode mode) {
+      return (mode == GamepieceMode.ALGAE) ? this.algaeAngle : this.coralAngle;
     }
   }
 
@@ -52,15 +55,15 @@ public class Arm extends SubsystemBase {
 
   private ProfiledPIDController _armPidController;
 
-  private static final double KP = 0.09;
-  private static final double KI = 0.01;
-  private static final double KD = 0;
+  private static final double KP = 0.06;//0.09;
+  private static final double KI = 0; //0.01;
+  private static final double KD = 0.005;
   private static final double PROFILE_VEL = 160;
   private static final double PROFILE_ACC = 145;
 
-  private static final double HAS_ALGAE_CURRENT = 2;
+  private static final double HAS_ALGAE_CURRENT = 40;
 
-  private static final double ARM_FEEDFORWARD_COEFF = 0.53;
+  private static final double ARM_FEEDFORWARD_COEFF = 0.4;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
       new SysIdRoutine.Mechanism(this::setArmVoltage, this::populateLog, this));
@@ -74,33 +77,30 @@ public class Arm extends SubsystemBase {
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
-    if (setpoint == ArmPosition.Loading)
-      setpoint = (_currentMode == GamepieceMode.ALGAE) ? ArmPosition.Loading_Algae : ArmPosition.Loading_Coral;
-
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
-    _armPidController.setGoal(setpoint.angle);
+    _armPidController.setGoal(setpoint.getAngle(_currentMode));
     _desiredPos = setpoint;
   }
 
   public void setIntakeSpeed(double speed) {
+    if (_currentMode == GamepieceMode.ALGAE) speed *= -1;
     _io.setIntakeMotorSpeed(speed);
   }
 
-  public void setFeederSpeed(double speed) {
-    _io.setFeederMotorSpeed(speed);
-  }
-
   public void spit() {
-    setIntakeSpeed(0.5);
+    double speed = (_currentMode == GamepieceMode.ALGAE) ? -0.5 : 0.5;
+    setIntakeSpeed(speed);
   }
 
   public void clearHasGamepiece() {
     _hasGamepiece = false;
+    _intakeSpikeCounter = 0;
   }
 
   public void setArmVoltage(Voltage voltage) {
     _io.setArmMotorVoltage(voltage);
   }
+
 
   public void resetIntakeEncoders() {
     _io.resetIntakeEncoders();
@@ -120,7 +120,7 @@ public class Arm extends SubsystemBase {
       if (_inputs._intakeMotorCurrent >= HAS_ALGAE_CURRENT) {
         _intakeSpikeCounter++;
       }
-      hasPiece = _intakeSpikeCounter >= 5;
+      hasPiece = _intakeSpikeCounter >= 8;
     }
 
     if (hasPiece) _hasGamepiece = true;
@@ -128,15 +128,11 @@ public class Arm extends SubsystemBase {
     return _hasGamepiece;
   }
 
-  public void resetIntakeSpikeCounter() {
-    _intakeSpikeCounter = 0;
-  }
-
   public boolean lightSensorSeesGamepiece() {
     return _inputs._lightSensorState;
   }
 
-  public boolean armAtSetpoint() {
+  public boolean isAtSetpoint() {
     boolean atSetpoint = _armPidController.atGoal();
     if (atSetpoint)
       _currentPos = _desiredPos;
@@ -148,8 +144,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void runArmPID() {
-    double out = (_armPidController.calculate(_inputs._armEncoderPositionDegrees)
-        + ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
+    double out = _armPidController.calculate(_inputs._armEncoderPositionDegrees)
+        + (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
     _io.setArmMotorVoltage(Voltage.ofBaseUnits(out, Volt));
   }
 
@@ -184,7 +180,7 @@ public class Arm extends SubsystemBase {
 
     Logger.recordOutput("Arm/desiredPos", _armPidController.getSetpoint().position);
     Logger.recordOutput("Arm/hasPiece", hasPiece());
-    Logger.recordOutput("Arm/atSetpoint", armAtSetpoint());
+    Logger.recordOutput("Arm/atSetpoint", isAtSetpoint());
     Logger.recordOutput("Arm/currentPosEnum", _currentPos);
     Logger.recordOutput("Arm/desiredPosEnum", _desiredPos);
   }

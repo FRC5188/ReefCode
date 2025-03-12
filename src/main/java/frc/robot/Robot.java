@@ -81,11 +81,11 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-
   }
 
   @Override
   public void disabledInit() {
+    m_robotContainer.startIdleAnimations();
   }
 
   @Override
@@ -150,9 +150,11 @@ public class Robot extends LoggedRobot {
     System.out.println(m_autonomousCommand);
 
     if (m_autonomousCommand != null) {
-      System.out.println("FOUND A COMMAND");
       m_autonomousCommand.schedule();
     }
+
+    m_robotContainer.calibrateAndStartPIDs();
+    m_robotContainer.startEnabledLEDs();
   }
 
   @Override
@@ -167,6 +169,8 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.calibrateAndStartPIDs();
+    m_robotContainer.startEnabledLEDs();
   }
 
   @Override

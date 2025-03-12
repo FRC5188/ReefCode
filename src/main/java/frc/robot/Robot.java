@@ -149,8 +149,6 @@ public class Robot extends LoggedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println(m_autonomousCommand);
 
-
-    System.out.println("!!!!!!!!!!Autonomous init!!!!!!!!!!!");
     if (m_autonomousCommand != null) {
       System.out.println("FOUND A COMMAND");
       m_autonomousCommand.schedule();

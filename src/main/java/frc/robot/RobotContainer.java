@@ -76,7 +76,7 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final CommandXboxController joystick = new CommandXboxController(0);
-  private final CommandXboxController climberstick = new CommandXboxController(1);
+  private final CommandXboxController climberstick = new CommandXboxController(3);
 
   private final GenericHID buttonbox1 = new GenericHID(1);
   private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);

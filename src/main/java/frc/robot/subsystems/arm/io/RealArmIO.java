@@ -23,7 +23,7 @@ public class RealArmIO implements ArmIO {
     private static final double POS_AT_90 = 0.711;
     private static final double POS_AT_0 = 0.458;
     private static final double ENCODER_CONVERSION = (POS_AT_90 - POS_AT_0) / 90.0;
-    private static final double LASERCAN_DISTANCE = 40;
+    private static final double LASERCAN_DISTANCE_MM = 50;
 
     private double INTAKE_ROTATION_CONVERSION = 1;
 
@@ -43,12 +43,15 @@ public class RealArmIO implements ArmIO {
         armConfig.voltageCompensation(12);
         _armMotor.configure(armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        _laserCan = new LaserCan(0);
+        SparkFlexConfig intakeConfig = new SparkFlexConfig();
+        intakeConfig.idleMode(IdleMode.kBrake);
+        _intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        _laserCan = new LaserCan(CAN.CORAL_LASERCAN_ID);
         // Optionally initialise the settings of the LaserCAN, if you haven't already
         // done so in GrappleHook
         try {
             _laserCan.setRangingMode(LaserCan.RangingMode.SHORT);
-            _laserCan.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
             _laserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
@@ -62,7 +65,7 @@ public class RealArmIO implements ArmIO {
 
         LaserCan.Measurement measurement = _laserCan.getMeasurement();
         if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) 
-            inputs._lightSensorState = measurement.distance_mm <= LASERCAN_DISTANCE;
+            inputs._lightSensorState = measurement.distance_mm <= LASERCAN_DISTANCE_MM;
         inputs._intakeMotorVelocityRotationsPerMin = _intakeMotor.get();
         inputs._intakeMotorCurrent = _intakeMotor.getOutputCurrent();
         inputs._intakeMotorVoltage = _intakeMotor.getAppliedOutput() * _armMotor.getBusVoltage();

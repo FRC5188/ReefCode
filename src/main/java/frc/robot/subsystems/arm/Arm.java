@@ -61,7 +61,7 @@ public class Arm extends SubsystemBase {
   private static final double PROFILE_VEL = 160;
   private static final double PROFILE_ACC = 145;
 
-  private static final double HAS_ALGAE_CURRENT = 40;
+  public static final double HAS_ALGAE_CURRENT = 40;
 
   private static final double ARM_FEEDFORWARD_COEFF = 0.4;
 
@@ -94,13 +94,27 @@ public class Arm extends SubsystemBase {
 
   public void clearHasGamepiece() {
     _hasGamepiece = false;
+  }
+
+  public void setHasGamepiece() {
+    _hasGamepiece = true;
+  }
+
+  public void clearIntakeSpikeCounter() {
     _intakeSpikeCounter = 0;
+  }
+
+  public double getIntakeSpikeCounter() {
+    return _intakeSpikeCounter;
   }
 
   public void setArmVoltage(Voltage voltage) {
     _io.setArmMotorVoltage(voltage);
   }
 
+  public double getIntakeCurrent() {
+    return _inputs._intakeMotorCurrent;
+  }
 
   public void resetIntakeEncoders() {
     _io.resetIntakeEncoders();
@@ -111,17 +125,13 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean hasPiece() {
-    boolean hasPiece;
+    boolean hasPiece = false;
     if (_currentMode == GamepieceMode.CORAL) {
       boolean currentState = _inputs._lightSensorState;
-      hasPiece = _prevLightSensorVal && !currentState;
+      // hasPiece = _prevLightSensorVal && !currentState;
+      hasPiece = _prevLightSensorVal;
       _prevLightSensorVal = currentState;
-    } else {
-      if (_inputs._intakeMotorCurrent >= HAS_ALGAE_CURRENT) {
-        _intakeSpikeCounter++;
-      }
-      hasPiece = _intakeSpikeCounter >= 8;
-    }
+    } 
 
     if (hasPiece) _hasGamepiece = true;
 
@@ -179,9 +189,10 @@ public class Arm extends SubsystemBase {
     Logger.processInputs("Arm", _inputs);
 
     Logger.recordOutput("Arm/desiredPos", _armPidController.getSetpoint().position);
-    Logger.recordOutput("Arm/hasPiece", hasPiece());
+    Logger.recordOutput("Arm/hasPiece", _hasGamepiece);
     Logger.recordOutput("Arm/atSetpoint", isAtSetpoint());
     Logger.recordOutput("Arm/currentPosEnum", _currentPos);
     Logger.recordOutput("Arm/desiredPosEnum", _desiredPos);
+    Logger.recordOutput("Arm/intakeSpikeCounter", _intakeSpikeCounter);
   }
 }

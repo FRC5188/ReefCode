@@ -46,29 +46,58 @@ public class ArmCommands {
     }
 
     public Command intake() {
+        return Commands.either(intakeAlgae(), intakeCoral(), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
+    }
+
+    private Command intakeCoral() {
         return new StartEndCommand(
                 () -> {
-                    _arm.setIntakeSpeed(0.45);
+                        _arm.setIntakeSpeed(0.4);
                 },
                 () -> {
-                    if (_arm.getCurrentMode() == GamepieceMode.ALGAE) {
-                        _arm.setIntakeSpeed(0.1);
-                    } else {
                         _arm.setIntakeSpeed(0);
-                    }
                 },
                 _arm).until(() -> _arm.hasPiece());
+    }
+
+    private Command intakeAlgae() {
+        return new Command() {
+            double intakeSpikeCounter = 0;
+
+            @Override
+            public void initialize() {
+                intakeSpikeCounter = 0;
+                _arm.setIntakeSpeed(0.5);
+            }
+
+            @Override
+            public void execute() {
+                if (_arm.getIntakeCurrent() >= Arm.HAS_ALGAE_CURRENT) {
+                    intakeSpikeCounter++;
+                }
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                _arm.setIntakeSpeed(0.05);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return intakeSpikeCounter > 15;
+            }
+        };
     }
 
     public Command moveGamepieceToLightSensor() {
         return new StartEndCommand(
             () -> {
-                _arm.setIntakeSpeed(-0.3);
+                _arm.setIntakeSpeed(-0.1);
             },
             () -> {
                 _arm.setIntakeSpeed(0);
             },
-            _arm).until(() -> _arm.lightSensorSeesGamepiece());       
+            _arm).until(() -> _arm.lightSensorSeesGamepiece()).unless(() -> _arm.lightSensorSeesGamepiece());       
     }
 
     public Command runArmPID() {
@@ -80,7 +109,7 @@ public class ArmCommands {
     public Command intakeForNumberOfRotations() {
         return new StartEndCommand(() -> {
             _arm.resetIntakeEncoders();
-            _arm.setIntakeSpeed(-0.3);
+            _arm.setIntakeSpeed(-0.1);
         },
         () -> {
             _arm.setIntakeSpeed(0);

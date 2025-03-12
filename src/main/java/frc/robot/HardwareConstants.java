@@ -31,7 +31,8 @@ public class HardwareConstants {
 
         public static final int CANDLE_ID = 50;
 
-        public static final int FEEDER_MTR_ID = 20;
+        public static final int CORAL_LASERCAN_ID = 20;
+
     }
 
     public class DIO {

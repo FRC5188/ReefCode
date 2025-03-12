@@ -41,7 +41,7 @@ public class RealElevatorIO implements ElevatorIO {
     }
 
     public void setElevatorSpeed(double speed) {
-         _primaryMotor.set(speed);
+        _primaryMotor.set(speed);
     }
 
     public void setElevatorVoltage(Voltage voltage) {

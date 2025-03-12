@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -42,6 +43,7 @@ import frc.robot.subsystems.drive.io.GyroIOPigeon2;
 import frc.robot.subsystems.drive.io.ModuleIO;
 import frc.robot.subsystems.drive.io.ModuleIOSim;
 import frc.robot.subsystems.drive.io.ModuleIOTalonFX;
+import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
@@ -255,6 +257,7 @@ public class RobotContainer {
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
     gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
+
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
     joystick.back().and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
@@ -275,7 +278,17 @@ public class RobotContainer {
                     () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
 
     
+    // Resets the preset when we don't have a piece.
+    armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
 
+    // Sets the level preset
+    presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
+    presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
+    presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
+    presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
+
+    incrementButton.onTrue(elevatorCommands.incrementElevatorPosition());
+    decrementButton.onTrue(elevatorCommands.decrementElevatorPosition());
     /* 
      // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
      joystick.rightBumper()
@@ -297,26 +310,6 @@ public class RobotContainer {
     // // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
  
-    // drive.registerTelemetry(logger::telemeterize);
-
-    // Elevator sys id routines
-    button7.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kForward));
-    button9.whileTrue(elevatorSubsystem.sysIdDynamic(Direction.kReverse));
-
-    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
-    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
-    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
-    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
-    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
-
-    
-    // Runs the preset to score unless the preset is invalid.
-    /* 
-    joystick.rightBumper().onTrue(
-        multiSubsystemCommands.scoreGamepieceAtPosition(preset.getLevel()).unless(() -> !preset.isPresetValid()));
-    */
 
     // Resets the preset when we don't have a piece.
     armSubsystem._hasPiece.onFalse(preset.resetPreset());
@@ -335,6 +328,44 @@ public class RobotContainer {
 
   public Drive getDrive() {
     return drive;
+  }
+  public void calibrateAndStartPIDs() {
+    // PID commands: we only want one of them so start/stop works correctly
+    Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
+    Command armPIDCommand = armCommands.runArmPID();
+    // Start elevator pid
+    if (elevatorSubsystem.isCalibrated()) {
+      elevatorCommands.runElevatorPID();
+      if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
+        CommandScheduler.getInstance().schedule(elevatorPIDCommand);
+      }
+    } else {
+      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
+      CommandScheduler.getInstance().schedule(calibCommand);
+    }
+
+    // Start arm pid
+    if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
+      CommandScheduler.getInstance().schedule(armPIDCommand);
+    }
+
+    // Set initial positions
+    CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
+    CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
+
+    CommandScheduler.getInstance().schedule(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
+  }
+
+  public void startIdleAnimations() {
+    Command disabled1 = LEDCommands.disabledAnimation1();
+    if (!CommandScheduler.getInstance().isScheduled(disabled1))
+      CommandScheduler.getInstance().schedule(disabled1);
+  }
+
+  public void startEnabledLEDs() {
+    Command initialLEDs = LEDCommands.pickingUpCoral();
+    if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
+      CommandScheduler.getInstance().schedule(initialLEDs);
   }
   
 }

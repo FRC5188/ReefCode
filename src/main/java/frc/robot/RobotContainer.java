@@ -111,9 +111,13 @@ public class RobotContainer {
   private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
 
+  private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
+  private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);
+
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
   private double speedMultiplier = 0.9;
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -260,10 +264,10 @@ public class RobotContainer {
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
-    joystick.back().and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
-    joystick.back().and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
-    joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-    joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+    dynamic.and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
+    dynamic.and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
+    qstatic.and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+    qstatic.and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
     // Driver Right Bumper: Approach Nearest Right-Side Reef Branch
     joystick.rightBumper()

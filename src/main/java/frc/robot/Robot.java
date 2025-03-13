@@ -86,6 +86,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.startIdleAnimations();
+    SmartDashboard.putData("Auto Trajectory", m_autoTraj);
   }
 
   @Override

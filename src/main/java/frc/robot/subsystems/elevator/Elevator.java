@@ -34,7 +34,7 @@ public class Elevator extends SubsystemBase {
     L1(5, 5),
     L2(11, 20),
     L3(27, 38),
-    L4(50.5, 50.5),
+    L4(52, 52),
     Stow(0.5, 0.5);
 
     double coralHeight, algaeHeight;

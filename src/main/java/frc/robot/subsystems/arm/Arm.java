@@ -121,7 +121,7 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean intakeAtDesiredRotations() {
-    return _inputs._intakeMotorPositionRotations <= -2;
+    return _inputs._intakeMotorPositionRotations <= -1.5;
   }
 
   public boolean hasPiece() {

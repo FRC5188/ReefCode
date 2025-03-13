@@ -115,7 +115,7 @@ public class MultiSubsystemCommands {
                 .andThen(waitForOverallMechanism())
                 .andThen(_armCommands.intake())
                 .andThen(new WaitCommand(0.25))
-                // .andThen(setOverallSetpoint(OverallPosition.Stow))
+                .andThen(setOverallSetpoint(OverallPosition.Stow))
                 .andThen(_armCommands.moveGamepieceToLightSensor())
                 .andThen(new WaitCommand(0.25))
                 .andThen(_armCommands.moveGamepieceToLightSensor().unless(() -> _arm.lightSensorSeesGamepiece()))
@@ -125,12 +125,18 @@ public class MultiSubsystemCommands {
     }
 
     public Command loadAlgae() {
-        return  _armCommands.setArmPosition(ArmPosition.Loading)
+        return _armCommands.setArmPosition(ArmPosition.Loading)
                 .andThen(waitForOverallMechanism())
                 .andThen(_armCommands.intake())
                 .andThen(_armCommands.setArmPosition(ArmPosition.Stow))
                 .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), ElevatorPosition.L2,
-                _arm.getCurrentPos(), ArmPosition.Loading));
+                        _arm.getCurrentPos(), ArmPosition.Loading));
+    }
+
+    public Command goToL4() {
+        return setOverallSetpoint(OverallPosition.L4)
+                .andThen(waitForOverallMechanism())
+                .andThen(setOverallSetpoint(OverallPosition.L4_Score));
     }
 
     public boolean canMoveToPos(ElevatorPosition currentElevator, ElevatorPosition desiredElevator,

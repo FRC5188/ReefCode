@@ -98,7 +98,6 @@ public class ArmCommands {
             public void initialize() {
                 // If we see the gamepiece, we want to move further down in the intake
                 // If we don't, it's too far down and needs to go back up
-                System.out.println("AAAAAAAAAAAAAAAAAAAAa");
                 movingDown = _arm.lightSensorSeesGamepiece();
             }
 

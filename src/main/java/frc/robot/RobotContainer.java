@@ -212,6 +212,19 @@ public class RobotContainer {
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
         multiSubsystemCommands.loadGamepiece());
+    
+    // AutoAlign + Algae Removal
+     NamedCommands.registerCommand("AlgaeL2",
+     multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2)
+     .andThen(multiSubsystemCommands.waitForOverallMechanism())
+     .andThen(multiSubsystemCommands.loadAlgae()));
+
+  // AutoAlign + Algae Removal
+    NamedCommands.registerCommand("AlgaeL3",
+     multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3)
+     .andThen(multiSubsystemCommands.waitForOverallMechanism())
+     .andThen(multiSubsystemCommands.loadAlgae()));
+
 
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

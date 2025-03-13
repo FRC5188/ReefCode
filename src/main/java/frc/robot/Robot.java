@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -11,17 +16,25 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import au.grapplerobotics.CanBridge;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.HardwareConstants.CAN;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
-
-  private final RobotContainer m_robotContainer;
+  private Command _previousAutonomousCommand;
+  private RobotContainer m_robotContainer;
+  private Field2d _autonomousTrajectory = new Field2d();
+  private List<Pose2d> _shownPaths = new ArrayList<>();
 
   public Robot() {
     CanBridge.runTCP();
@@ -52,10 +65,34 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.startIdleAnimations();
+        SmartDashboard.putData("Autonomous Selection Preview", this._autonomousTrajectory);
   }
 
   @Override
   public void disabledPeriodic() {
+        // The currently selected command.
+        this.m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        if (this.m_autonomousCommand != this._previousAutonomousCommand) {
+          if (AutoBuilder.getAllAutoNames().contains(m_autonomousCommand.getName())) {
+            this._shownPaths.clear();
+            try {
+              PathPlannerAuto.getPathGroupFromAutoFile(this.m_autonomousCommand.getName()).stream()
+                  .forEach(
+                      path -> {
+                        this._shownPaths.addAll(path.getPathPoses());
+                      }
+                  );
+            } catch (IOException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            } catch (ParseException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+              this._autonomousTrajectory.getObject("Trajectory").setPoses(this._shownPaths);
+          }
+        }
+        this._previousAutonomousCommand = this.m_autonomousCommand;
   }
 
   @Override

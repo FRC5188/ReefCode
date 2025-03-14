@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volt;
 
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -53,8 +55,8 @@ public class Elevator extends SubsystemBase {
   private static final double CALIBRATION_SPEED = -0.1;
   private static final double HARD_STOP_CURRENT_LIMIT = 37;
 
-  private static final double INCREMENT_CONSTANT = 1;
-  private static final double DECREMENT_CONSTANT = 1;
+  private static final int INCREMENT_CONSTANT = 1;
+  private static final int DECREMENT_CONSTANT = 1;
 
   private static final double ELEVATOR_MOTOR_KP = 0.8; //0.75;
   private static final double ELEVATOR_MOTOR_KI = 0;//0.15; 
@@ -75,6 +77,7 @@ public class Elevator extends SubsystemBase {
   private ElevatorPosition _desiredPos;
   private ElevatorPosition _prevPos;
   private MultiSubsystemCommands.GamepieceMode _currentMode;
+  private HashMap<String, Integer> _manualAdjustments;
 
   private ProfiledPIDController _elevatorMotorPID;
 
@@ -92,6 +95,8 @@ public class Elevator extends SubsystemBase {
     _currentPos = ElevatorPosition.Stow;
     _desiredPos = ElevatorPosition.Stow;
     _prevPos = ElevatorPosition.Stow;
+
+    _manualAdjustments = new HashMap<>();
   }
 
   // Runs the motors down at the calibration speed
@@ -110,7 +115,8 @@ public class Elevator extends SubsystemBase {
   public void setSetpoint(ElevatorPosition setpoint) {
     _prevPos = _currentPos;
     _desiredPos = setpoint;
-    setSetpoint(setpoint.getHeight(_currentMode));
+    String key = getManualAdjustKey();
+    setSetpoint(setpoint.getHeight(_currentMode) + _manualAdjustments.getOrDefault(key, 0));
   }
 
   // Sets the setpoint of the PID
@@ -132,16 +138,24 @@ public class Elevator extends SubsystemBase {
     return atSetpoint;
   }
 
+  private String getManualAdjustKey() {
+    return _currentPos.toString() + _currentMode.toString();
+  }
+
   // Increases elevator position
   public void incrementElevatorPosition() {
-    _currentPos = ElevatorPosition.Manual;
-    setSetpoint(_elevatorMotorPID.getGoal().position + INCREMENT_CONSTANT);
+    String key = getManualAdjustKey();
+    Integer offset = _manualAdjustments.getOrDefault(key, 0) + INCREMENT_CONSTANT;
+    _manualAdjustments.put(key, offset);
+    setSetpoint(_currentPos);
   }
 
   // Decreases elevator position
   public void decrementElevatorPosition() {
-    _currentPos = ElevatorPosition.Manual;
-    setSetpoint(_elevatorMotorPID.getGoal().position - DECREMENT_CONSTANT);
+    String key = getManualAdjustKey();
+    Integer offset = _manualAdjustments.getOrDefault(key, 0) + DECREMENT_CONSTANT;
+    _manualAdjustments.put(key, offset);
+    setSetpoint(_currentPos);
   }
 
   // Checks if above limit

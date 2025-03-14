@@ -67,10 +67,10 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
-  private final LEDs LEDSubsystem = new LEDs();
+  // private final LEDs LEDSubsystem = new LEDs();
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
-  private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
+  // private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
   private final Climber climber = new Climber(new RealClimberIO());
   private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
@@ -296,7 +296,7 @@ public class RobotContainer {
 
     
     // Resets the preset when we don't have a piece.
-    armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
+    // armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
 
     // Sets the level preset
     presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
@@ -374,15 +374,15 @@ public class RobotContainer {
   }
 
   public void startIdleAnimations() {
-    Command disabled1 = LEDCommands.disabledAnimation1();
-    if (!CommandScheduler.getInstance().isScheduled(disabled1))
-      CommandScheduler.getInstance().schedule(disabled1);
+    // Command disabled1 = LEDCommands.disabledAnimation1();
+    // if (!CommandScheduler.getInstance().isScheduled(disabled1))
+    //   CommandScheduler.getInstance().schedule(disabled1);
   }
 
   public void startEnabledLEDs() {
-    Command initialLEDs = LEDCommands.pickingUpCoral();
-    if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
-      CommandScheduler.getInstance().schedule(initialLEDs);
+    // Command initialLEDs = LEDCommands.pickingUpCoral();
+    // if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
+    //   CommandScheduler.getInstance().schedule(initialLEDs);
   }
   
 }

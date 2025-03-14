@@ -95,6 +95,7 @@ public class Elevator extends SubsystemBase {
     _currentPos = ElevatorPosition.Stow;
     _desiredPos = ElevatorPosition.Stow;
     _prevPos = ElevatorPosition.Stow;
+    _currentMode = GamepieceMode.CORAL;
 
     _manualAdjustments = new HashMap<>();
   }
@@ -139,23 +140,27 @@ public class Elevator extends SubsystemBase {
   }
 
   private String getManualAdjustKey() {
-    return _currentPos.toString() + _currentMode.toString();
+    return _desiredPos.toString() + _currentMode.toString();
   }
 
   // Increases elevator position
   public void incrementElevatorPosition() {
-    String key = getManualAdjustKey();
-    Integer offset = _manualAdjustments.getOrDefault(key, 0) + INCREMENT_CONSTANT;
-    _manualAdjustments.put(key, offset);
-    setSetpoint(_currentPos);
+    if (_currentPos == _desiredPos) {
+      String key = getManualAdjustKey();
+      Integer offset = _manualAdjustments.getOrDefault(key, 0) + INCREMENT_CONSTANT;
+      _manualAdjustments.put(key, offset);
+      setSetpoint(_currentPos);
+    }
   }
 
   // Decreases elevator position
   public void decrementElevatorPosition() {
-    String key = getManualAdjustKey();
-    Integer offset = _manualAdjustments.getOrDefault(key, 0) + DECREMENT_CONSTANT;
-    _manualAdjustments.put(key, offset);
-    setSetpoint(_currentPos);
+    if (_currentPos == _desiredPos) {
+      String key = getManualAdjustKey();
+      Integer offset = _manualAdjustments.getOrDefault(key, 0) - DECREMENT_CONSTANT;
+      _manualAdjustments.put(key, offset);
+      setSetpoint(_currentPos);
+    }
   }
 
   // Checks if above limit

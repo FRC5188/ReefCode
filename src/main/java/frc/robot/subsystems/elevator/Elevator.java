@@ -35,7 +35,8 @@ public class Elevator extends SubsystemBase {
     L2(11, 20),
     L3(27, 38),
     L4(52, 52),
-    Stow(0.5, 0.5);
+    Stow(0.5, 0.5),
+    Manual(0, 0);
 
     double coralHeight, algaeHeight;
 
@@ -69,6 +70,7 @@ public class Elevator extends SubsystemBase {
   private static final double FEEDFORWARD_CONSTANT = 0.225;
 
   private boolean _isCalibrated;
+  private boolean _atSetpoint;
   private ElevatorPosition _currentPos;
   private ElevatorPosition _desiredPos;
   private ElevatorPosition _prevPos;
@@ -115,6 +117,7 @@ public class Elevator extends SubsystemBase {
   public void setSetpoint(double setpoint) {
     if (setpoint < 0.25 || setpoint > ELEVATOR_MAX_INCHES)
       return;
+    _atSetpoint = false;
     _elevatorMotorPID.reset(getCurrentPosInches());
     _elevatorMotorPID.setGoal(setpoint);
   }
@@ -122,18 +125,22 @@ public class Elevator extends SubsystemBase {
   // Checks if it is at the setpoint
   public boolean isAtSetpoint() {
     boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 0.5;
-    if (atSetpoint)
+    if (atSetpoint) {
       _currentPos = _desiredPos;
+      _atSetpoint = true;
+    }
     return atSetpoint;
   }
 
   // Increases elevator position
   public void incrementElevatorPosition() {
+    _currentPos = ElevatorPosition.Manual;
     setSetpoint(_elevatorMotorPID.getGoal().position + INCREMENT_CONSTANT);
   }
 
   // Decreases elevator position
   public void decrementElevatorPosition() {
+    _currentPos = ElevatorPosition.Manual;
     setSetpoint(_elevatorMotorPID.getGoal().position - DECREMENT_CONSTANT);
   }
 

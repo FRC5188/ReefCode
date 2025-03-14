@@ -103,7 +103,7 @@ public class ArmCommands {
 
             @Override
             public void execute() {
-                double speed = (movingDown) ? 0.065 : -0.065;
+                double speed = (movingDown) ? 0.07 : -0.07;
                 _arm.setIntakeSpeed(speed);
             }
 

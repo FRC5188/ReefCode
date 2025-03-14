@@ -174,6 +174,9 @@ public class MultiSubsystemCommands {
                 case Stow:
                     canMoveElevator = (currentArm != ArmPosition.L4_Score);
                     break;
+                case Manual:
+                    canMoveElevator = currentArm == ArmPosition.Stow;
+                    break;
                 default:
                     canMoveElevator = false;
                     break;
@@ -207,6 +210,9 @@ public class MultiSubsystemCommands {
                     break;
                 case Stow:
                     canMoveElevator = currentArm != ArmPosition.Loading;
+                    break;
+                case Manual:
+                    canMoveElevator = currentArm == ArmPosition.Stow;
                     break;
                 default:
                     canMoveElevator = false;

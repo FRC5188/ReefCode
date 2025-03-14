@@ -48,6 +48,7 @@ public class Arm extends SubsystemBase {
   private ArmIOInputsAutoLogged _inputs;
   private boolean _prevLightSensorVal;
   private boolean _hasGamepiece;
+  private boolean _atSetpoint;
   private int _intakeSpikeCounter;
   private ArmPosition _currentPos;
   private ArmPosition _desiredPos;
@@ -57,7 +58,7 @@ public class Arm extends SubsystemBase {
 
   private static final double KP = 0.06;//0.09;
   private static final double KI = 0; //0.01;
-  private static final double KD = 0.005;
+  private static final double KD = 0.01;
   private static final double PROFILE_VEL = 160;
   private static final double PROFILE_ACC = 145;
 
@@ -73,13 +74,14 @@ public class Arm extends SubsystemBase {
     _inputs = new ArmIOInputsAutoLogged();
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
-    _armPidController.setTolerance(7);
+    _armPidController.setTolerance(4);
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
     _armPidController.setGoal(setpoint.getAngle(_currentMode));
     _desiredPos = setpoint;
+    _atSetpoint = false;
   }
 
   public void setIntakeSpeed(double speed) {
@@ -144,8 +146,10 @@ public class Arm extends SubsystemBase {
 
   public boolean isAtSetpoint() {
     boolean atSetpoint = _armPidController.atGoal();
-    if (atSetpoint)
+    if (atSetpoint) {
       _currentPos = _desiredPos;
+      _atSetpoint = true;
+    }
     return atSetpoint;
   }
 

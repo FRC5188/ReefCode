@@ -84,7 +84,7 @@ public class RobotContainer {
   private final Preset preset = new Preset();
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
+  private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second max
                                                                                     // angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -108,8 +108,8 @@ public class RobotContainer {
   private final GenericHID buttonbox2 = new GenericHID(2);
   private final JoystickButton manualIntakeButton = new JoystickButton(buttonbox2, 1);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
-  private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
-  private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
+  private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
+  private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
 
   private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
   private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);
@@ -249,7 +249,7 @@ public class RobotContainer {
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
+    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
     L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
@@ -264,10 +264,10 @@ public class RobotContainer {
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
-    dynamic.and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
-    dynamic.and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
-    qstatic.and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-    qstatic.and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+    // dynamic.and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
+    // dynamic.and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
+    // qstatic.and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+    // qstatic.and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
     // Driver Right Bumper: Approach Nearest Right-Side Reef Branch
     joystick.rightBumper()
@@ -291,8 +291,8 @@ public class RobotContainer {
     presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
     presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
 
-    incrementButton.onTrue(elevatorCommands.incrementElevatorPosition());
-    decrementButton.onTrue(elevatorCommands.decrementElevatorPosition());
+    incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
+    decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
     /* 
      // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
      joystick.rightBumper()

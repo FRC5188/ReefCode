@@ -104,9 +104,6 @@ public class Robot extends LoggedRobot {
             (Command command) -> {
               logCommandFunction.accept(command, false);
             });
-                      
-    m_robotContainer = new RobotContainer();
-
   }
 
   @Override

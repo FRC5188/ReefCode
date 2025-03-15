@@ -24,7 +24,7 @@ public final class ElevatorCommands {
             () -> {
                 _elevator.decrementElevatorPosition();
                 
-            } , _elevator);  
+            });  
     }
   
     public Command incrementElevatorPosition(){
@@ -32,7 +32,7 @@ public final class ElevatorCommands {
            () -> {
             _elevator.incrementElevatorPosition();
     
-           }, _elevator);
+           });
     } 
 
     public Command setElevatorSetpoint(ElevatorPosition setpoint) {

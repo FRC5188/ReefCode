@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volt;
 
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -35,7 +37,8 @@ public class Elevator extends SubsystemBase {
     L2(11, 20),
     L3(27, 38),
     L4(52, 52),
-    Stow(0.5, 0.5);
+    Stow(0.5, 0.5),
+    Manual(0, 0);
 
     double coralHeight, algaeHeight;
 
@@ -52,8 +55,8 @@ public class Elevator extends SubsystemBase {
   private static final double CALIBRATION_SPEED = -0.1;
   private static final double HARD_STOP_CURRENT_LIMIT = 37;
 
-  private static final double INCREMENT_CONSTANT = 1;
-  private static final double DECREMENT_CONSTANT = 1;
+  private static final int INCREMENT_CONSTANT = 1;
+  private static final int DECREMENT_CONSTANT = 1;
 
   private static final double ELEVATOR_MOTOR_KP = 0.8; //0.75;
   private static final double ELEVATOR_MOTOR_KI = 0;//0.15; 
@@ -69,10 +72,12 @@ public class Elevator extends SubsystemBase {
   private static final double FEEDFORWARD_CONSTANT = 0.225;
 
   private boolean _isCalibrated;
+  private boolean _atSetpoint;
   private ElevatorPosition _currentPos;
   private ElevatorPosition _desiredPos;
   private ElevatorPosition _prevPos;
   private MultiSubsystemCommands.GamepieceMode _currentMode;
+  private HashMap<String, Integer> _manualAdjustments;
 
   private ProfiledPIDController _elevatorMotorPID;
 
@@ -90,6 +95,9 @@ public class Elevator extends SubsystemBase {
     _currentPos = ElevatorPosition.Stow;
     _desiredPos = ElevatorPosition.Stow;
     _prevPos = ElevatorPosition.Stow;
+    _currentMode = GamepieceMode.CORAL;
+
+    _manualAdjustments = new HashMap<>();
   }
 
   // Runs the motors down at the calibration speed
@@ -108,13 +116,15 @@ public class Elevator extends SubsystemBase {
   public void setSetpoint(ElevatorPosition setpoint) {
     _prevPos = _currentPos;
     _desiredPos = setpoint;
-    setSetpoint(setpoint.getHeight(_currentMode));
+    String key = getManualAdjustKey();
+    setSetpoint(setpoint.getHeight(_currentMode) + _manualAdjustments.getOrDefault(key, 0));
   }
 
   // Sets the setpoint of the PID
   public void setSetpoint(double setpoint) {
     if (setpoint < 0.25 || setpoint > ELEVATOR_MAX_INCHES)
       return;
+    _atSetpoint = false;
     _elevatorMotorPID.reset(getCurrentPosInches());
     _elevatorMotorPID.setGoal(setpoint);
   }
@@ -122,19 +132,35 @@ public class Elevator extends SubsystemBase {
   // Checks if it is at the setpoint
   public boolean isAtSetpoint() {
     boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 0.5;
-    if (atSetpoint)
+    if (atSetpoint) {
       _currentPos = _desiredPos;
+      _atSetpoint = true;
+    }
     return atSetpoint;
+  }
+
+  private String getManualAdjustKey() {
+    return _desiredPos.toString() + _currentMode.toString();
   }
 
   // Increases elevator position
   public void incrementElevatorPosition() {
-    setSetpoint(_elevatorMotorPID.getGoal().position + INCREMENT_CONSTANT);
+    if (_currentPos == _desiredPos) {
+      String key = getManualAdjustKey();
+      Integer offset = _manualAdjustments.getOrDefault(key, 0) + INCREMENT_CONSTANT;
+      _manualAdjustments.put(key, offset);
+      setSetpoint(_currentPos);
+    }
   }
 
   // Decreases elevator position
   public void decrementElevatorPosition() {
-    setSetpoint(_elevatorMotorPID.getGoal().position - DECREMENT_CONSTANT);
+    if (_currentPos == _desiredPos) {
+      String key = getManualAdjustKey();
+      Integer offset = _manualAdjustments.getOrDefault(key, 0) - DECREMENT_CONSTANT;
+      _manualAdjustments.put(key, offset);
+      setSetpoint(_currentPos);
+    }
   }
 
   // Checks if above limit

@@ -67,10 +67,10 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
-  private final LEDs LEDSubsystem = new LEDs();
+  // private final LEDs LEDSubsystem = new LEDs();
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
-  private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
+  // private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
   private final Climber climber = new Climber(new RealClimberIO());
   private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
@@ -84,7 +84,7 @@ public class RobotContainer {
   private final Preset preset = new Preset();
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
+  private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second max
                                                                                     // angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -95,21 +95,21 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final GenericHID buttonbox1 = new GenericHID(1);
-  private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
-  private final JoystickButton L2Button = new JoystickButton(buttonbox1, 2);
-  private final JoystickButton StowButton = new JoystickButton(buttonbox1, 3);
-  private final JoystickButton L3Button = new JoystickButton(buttonbox1, 4);
-  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 5);
+  private final GenericHID buttonbox2 = new GenericHID(2);
+
+  private final JoystickButton StowButton = new JoystickButton(buttonbox2, 5);
+  private final JoystickButton L1Button = new JoystickButton(buttonbox2, 2);
+  private final JoystickButton L2Button = new JoystickButton(buttonbox1, 8);
+  private final JoystickButton L3Button = new JoystickButton(buttonbox1,5);
+  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 2);
+
   private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
-  private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
   private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
+  
   private final JoystickButton gamepieceModeToggle = new JoystickButton(buttonbox1, 10);
 
-  private final GenericHID buttonbox2 = new GenericHID(2);
-  private final JoystickButton manualIntakeButton = new JoystickButton(buttonbox2, 1);
-  private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
-  private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
-  private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
+  private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
+  private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
 
   private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
   private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);
@@ -212,6 +212,19 @@ public class RobotContainer {
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
         multiSubsystemCommands.loadGamepiece());
+    
+    // AutoAlign + Algae Removal
+     NamedCommands.registerCommand("AlgaeL2",
+     multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2)
+     .andThen(multiSubsystemCommands.waitForOverallMechanism())
+     .andThen(multiSubsystemCommands.loadAlgae()));
+
+  // AutoAlign + Algae Removal
+    NamedCommands.registerCommand("AlgaeL3",
+     multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3)
+     .andThen(multiSubsystemCommands.waitForOverallMechanism())
+     .andThen(multiSubsystemCommands.loadAlgae()));
+
 
         NamedCommands.registerCommand("AlgaeL2",
       multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
@@ -256,25 +269,24 @@ public class RobotContainer {
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
+    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
+    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
     L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
     L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
     L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
     L4Button.onTrue(multiSubsystemCommands.goToL4());
-    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
     gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
-    dynamic.and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
-    dynamic.and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
-    qstatic.and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-    qstatic.and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+    // dynamic.and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
+    // dynamic.and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
+    // qstatic.and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+    // qstatic.and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
     // Driver Right Bumper: Approach Nearest Right-Side Reef Branch
     joystick.rightBumper()
@@ -288,18 +300,8 @@ public class RobotContainer {
             joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
 
-    
-    // Resets the preset when we don't have a piece.
-    armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
-
-    // Sets the level preset
-    presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
-    presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
-    presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
-    presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
-
-    incrementButton.onTrue(elevatorCommands.incrementElevatorPosition());
-    decrementButton.onTrue(elevatorCommands.decrementElevatorPosition());
+    incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
+    decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
     /* 
      // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
      joystick.rightBumper()
@@ -320,16 +322,7 @@ public class RobotContainer {
 
     // // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
- 
 
-    // Resets the preset when we don't have a piece.
-    armSubsystem._hasPiece.onFalse(preset.resetPreset());
-
-    // Sets the level preset
-    presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
-    presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
-    presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
-    presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
   }
 
 
@@ -368,15 +361,15 @@ public class RobotContainer {
   }
 
   public void startIdleAnimations() {
-    Command disabled1 = LEDCommands.disabledAnimation1();
-    if (!CommandScheduler.getInstance().isScheduled(disabled1))
-      CommandScheduler.getInstance().schedule(disabled1);
+    // Command disabled1 = LEDCommands.disabledAnimation1();
+    // if (!CommandScheduler.getInstance().isScheduled(disabled1))
+    //   CommandScheduler.getInstance().schedule(disabled1);
   }
 
   public void startEnabledLEDs() {
-    Command initialLEDs = LEDCommands.pickingUpCoral();
-    if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
-      CommandScheduler.getInstance().schedule(initialLEDs);
+    // Command initialLEDs = LEDCommands.pickingUpCoral();
+    // if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
+    //   CommandScheduler.getInstance().schedule(initialLEDs);
   }
   
 }

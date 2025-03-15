@@ -46,7 +46,7 @@ public class Robot extends LoggedRobot {
   public static final Translation2d fieldCenter =
         new Translation2d(fieldLength / 2, fieldWidth / 2);
 
-  private final RobotContainer m_robotContainer;
+  private final RobotContainer m_robotContainer = new RobotContainer();
 
   public Robot() {
 
@@ -75,7 +75,6 @@ public class Robot extends LoggedRobot {
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
                     // be added.
                       
-    m_robotContainer = new RobotContainer();
   }
 
   @Override
@@ -86,59 +85,58 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.startIdleAnimations();
-    SmartDashboard.putData("Auto Trajectory", m_autoTraj);
+    // SmartDashboard.putData("Auto Trajectory", m_autoTraj);
   }
 
   @Override
   public void disabledPeriodic() {
-    {
         var m_alliance = DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == Alliance.Red;
         // Get currently selected command
 
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-        // Check if is the same as the last one
-        if (m_autonomousCommand != m_lastAutonomousCommand && m_autonomousCommand != null) {
-            // Check if its contained in the list of our autos
-            if (AutoBuilder.getAllAutoNames().contains(m_autonomousCommand.getName())) {
-                // Clear the current path
-                m_pathsToShow.clear();
-                // Grabs all paths from the auto
-                try {
-                    for (PathPlannerPath path : PathPlannerAuto
-                        .getPathGroupFromAutoFile(m_autonomousCommand.getName())) {
-                        // Adds all poses to master list
-                        m_pathsToShow.addAll(path.getPathPoses());
-                    }
-                } catch (IOException | ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                // Check to see which alliance we are on Red Alliance
-                if (m_alliance) {
-                    for (int i = 0; i < m_pathsToShow.size(); i++) {
-                        m_pathsToShow.set(i,
-                            m_pathsToShow.get(i).rotateAround(fieldCenter, Rotation2d.k180deg));
-                    }
-                }
-                // Displays all poses on Field2d widget
-                m_autoTraj.getObject("traj").setPoses(m_pathsToShow);
-            }
-        }
-        m_lastAutonomousCommand = m_autonomousCommand;
+    //     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    //     // Check if is the same as the last one
+    //     if (m_autonomousCommand != m_lastAutonomousCommand && m_autonomousCommand != null) {
+    //         // Check if its contained in the list of our autos
+    //         if (AutoBuilder.getAllAutoNames().contains(m_autonomousCommand.getName())) {
+    //             // Clear the current path
+    //             m_pathsToShow.clear();
+    //             // Grabs all paths from the auto
+    //             try {
+    //                 for (PathPlannerPath path : PathPlannerAuto
+    //                     .getPathGroupFromAutoFile(m_autonomousCommand.getName())) {
+    //                     // Adds all poses to master list
+    //                     m_pathsToShow.addAll(path.getPathPoses());
+    //                 }
+    //             } catch (IOException | ParseException e) {
+    //                 // TODO Auto-generated catch block
+    //                 e.printStackTrace();
+    //             }
+    //             // Check to see which alliance we are on Red Alliance
+    //             if (m_alliance) {
+    //                 for (int i = 0; i < m_pathsToShow.size(); i++) {
+    //                     m_pathsToShow.set(i,
+    //                         m_pathsToShow.get(i).rotateAround(fieldCenter, Rotation2d.k180deg));
+    //                 }
+    //             }
+    //             // Displays all poses on Field2d widget
+    //             m_autoTraj.getObject("traj").setPoses(m_pathsToShow);
+    //         }
+    //     }
+    //     m_lastAutonomousCommand = m_autonomousCommand;
 
-        if (!m_pathsToShow.isEmpty()) {
-            var firstPose = m_pathsToShow.get(0);
-            Logger.recordOutput("Alignment/StartPose", firstPose);
-            SmartDashboard.putBoolean("Alignment/Translation",
-                firstPose.getTranslation().getDistance(
-                    m_robotContainer.getDrive().getPose().getTranslation()) <= Units
-                        .inchesToMeters(1.5));
-            SmartDashboard.putBoolean("Alignment/Rotation",
-                firstPose.getRotation().minus(m_robotContainer.getDrive().getPose().getRotation())
-                    .getDegrees() < 1);
-        }
-    }
+    //     if (!m_pathsToShow.isEmpty()) {
+    //         var firstPose = m_pathsToShow.get(0);
+    //         Logger.recordOutput("Alignment/StartPose", firstPose);
+    //         SmartDashboard.putBoolean("Alignment/Translation",
+    //             firstPose.getTranslation().getDistance(
+    //                 m_robotContainer.getDrive().getPose().getTranslation()) <= Units
+    //                     .inchesToMeters(1.5));
+    //         SmartDashboard.putBoolean("Alignment/Rotation",
+    //             firstPose.getRotation().minus(m_robotContainer.getDrive().getPose().getRotation())
+    //                 .getDegrees() < 1);
+    //     }
+    // }
   }
 
   @Override

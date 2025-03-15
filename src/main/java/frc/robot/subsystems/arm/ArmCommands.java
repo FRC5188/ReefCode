@@ -1,5 +1,7 @@
 package frc.robot.subsystems.arm;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -64,28 +66,32 @@ public class ArmCommands {
     private Command intakeAlgae() {
         return new Command() {
             double intakeSpikeCounter = 0;
+            int counter = 0;
 
             @Override
             public void initialize() {
                 intakeSpikeCounter = 0;
+                counter = 0;
                 _arm.setIntakeSpeed(0.5);
             }
 
             @Override
             public void execute() {
-                if (_arm.getIntakeCurrent() >= Arm.HAS_ALGAE_CURRENT) {
+                counter++;
+                if (_arm.getIntakeCurrent() >= Arm.HAS_ALGAE_CURRENT && counter > 12) {
                     intakeSpikeCounter++;
                 }
+                Logger.recordOutput("Arm/intakeSpikeCount", intakeSpikeCounter);
             }
 
             @Override
             public void end(boolean interrupted) {
-                _arm.setIntakeSpeed(0.05);
+                _arm.setIntakeSpeed(0.08);
             }
 
             @Override
             public boolean isFinished() {
-                return intakeSpikeCounter > 15;
+                return intakeSpikeCounter > 3;
             }
         };
     }

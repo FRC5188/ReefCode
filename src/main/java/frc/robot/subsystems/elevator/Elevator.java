@@ -117,8 +117,8 @@ public class Elevator extends SubsystemBase {
   public void setSetpoint(ElevatorPosition setpoint) {
     _prevPos = _currentPos;
     _desiredPos = setpoint;
-    String key = getManualAdjustKey();
-    setSetpoint(setpoint.getHeight(_currentMode) + _manualAdjustments.getOrDefault(key, 0));
+    // String key = getManualAdjustKey();
+    // setSetpoint(setpoint.getHeight(_currentMode));
   }
 
   // Sets the setpoint of the PID

@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -211,7 +212,8 @@ public class RobotContainer {
     
     // AutoAlignToReef + Move to L4 + Score
     NamedCommands.registerCommand("L4",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
+        //multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
+        elevatorCommands.setElevatorSetpoint(ElevatorPosition.L3));
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
@@ -237,6 +239,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("AlgaeL3",
       multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
       .andThen(multiSubsystemCommands.loadAlgae()));
+
+    NamedCommands.registerCommand("Stow",
+      new PrintCommand("AAA"));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 

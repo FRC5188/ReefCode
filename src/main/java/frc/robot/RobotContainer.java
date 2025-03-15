@@ -339,13 +339,10 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    try {
-      return autos.A3_L4();
-    } catch (FileVersionException | IOException | ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }//autoChooser.get();
-    return null;
+    // try {
+
+    return autoChooser.get();
+    // return null;
   }
 
   public Drive getDrive() {
@@ -370,12 +367,6 @@ public class RobotContainer {
     if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
       CommandScheduler.getInstance().schedule(armPIDCommand);
     }
-
-    // Set initial positions
-    CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
-    CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
-
-    CommandScheduler.getInstance().schedule(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
   }
 
   public void startIdleAnimations() {

@@ -99,6 +99,8 @@ public class Elevator extends SubsystemBase {
     _currentMode = GamepieceMode.CORAL;
 
     _manualAdjustments = new HashMap<>();
+
+    setSetpoint(ElevatorPosition.Stow);
   }
 
   // Runs the motors down at the calibration speed

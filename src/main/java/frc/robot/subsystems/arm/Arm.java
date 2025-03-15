@@ -77,6 +77,8 @@ public class Arm extends SubsystemBase {
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
     _armPidController.setTolerance(4);
+
+    setArmSetpoint(ArmPosition.Stow);
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {

@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeaveA"
+            "pathName": "A_R3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
           }
         }
       ]

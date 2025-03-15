@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.141,
-        "y": 5.058
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 7.101052505681702,
-        "y": 5.235142414101164
-      },
-      "isLocked": false,
-      "linkedName": "C"
-    },
-    {
-      "anchor": {
         "x": 5.166700819672132,
         "y": 5.5414446721311466
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.376465786078236,
+        "y": 5.405434897230054
+      },
+      "isLocked": false,
+      "linkedName": "R3"
+    },
+    {
+      "anchor": {
+        "x": 5.324783571442977,
+        "y": 5.43542116633939
+      },
       "prevControl": {
-        "x": 6.203474054637512,
-        "y": 5.404294915727
+        "x": 5.105176780835683,
+        "y": 5.554890231453185
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R3"
+      "linkedName": "R3Algae"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 5.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -45,10 +45,10 @@
     "rotation": -121.5
   },
   "reversed": false,
-  "folder": "Start to Reef",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -121.5
   },
   "useDefaultConstraints": true
 }

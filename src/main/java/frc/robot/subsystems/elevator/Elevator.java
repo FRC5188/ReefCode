@@ -91,7 +91,7 @@ public class Elevator extends SubsystemBase {
 
     _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD,
         new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
-    _elevatorMotorPID.setTolerance(0.5);
+    _elevatorMotorPID.setTolerance(1);
 
     _currentPos = ElevatorPosition.Stow;
     _desiredPos = ElevatorPosition.Stow;
@@ -132,7 +132,7 @@ public class Elevator extends SubsystemBase {
 
   // Checks if it is at the setpoint
   public boolean isAtSetpoint() {
-    boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 0.5;
+    boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 1;
     if (atSetpoint) {
       _currentPos = _desiredPos;
       _atSetpoint = true;

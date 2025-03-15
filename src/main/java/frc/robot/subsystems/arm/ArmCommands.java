@@ -26,7 +26,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
-                }).withTimeout(1);
+                }, _arm).withTimeout(1);
 
     }
 
@@ -56,11 +56,11 @@ public class ArmCommands {
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
-                }).until(() -> _arm.hasPiece());
+                }, _arm).until(() -> _arm.hasPiece());
     }
 
     private Command intakeAlgae() {
-        return new Command() {
+        Command c = new Command() {
             double intakeSpikeCounter = 0;
 
             @Override
@@ -86,6 +86,9 @@ public class ArmCommands {
                 return intakeSpikeCounter > 15;
             }
         };
+        c.addRequirements(_arm);
+
+        return c;
     }
 
     public Command moveGamepieceToLightSensor() {

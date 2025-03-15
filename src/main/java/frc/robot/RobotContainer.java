@@ -6,14 +6,17 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.io.IOException;
 import java.lang.invoke.VarHandle.AccessMode;
 import java.util.function.Supplier;
 
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.FileVersionException;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,6 +34,7 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.RealArmIO;
+import frc.robot.subsystems.autos.Autos;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberCommands;
 import frc.robot.subsystems.climber.io.RealClimberIO;
@@ -77,6 +81,7 @@ public class RobotContainer {
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
+  private final Autos autos = new Autos(multiSubsystemCommands);
 
   private final Vision vision;
   private final CommandXboxController joystick = new CommandXboxController(0);
@@ -340,7 +345,13 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    try {
+      return autos.A3_L4();
+    } catch (FileVersionException | IOException | ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }//autoChooser.get();
+    return null;
   }
 
   public Drive getDrive() {

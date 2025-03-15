@@ -95,19 +95,19 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final GenericHID buttonbox1 = new GenericHID(1);
-  private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
-  private final JoystickButton L2Button = new JoystickButton(buttonbox1, 2);
-  private final JoystickButton StowButton = new JoystickButton(buttonbox1, 3);
-  private final JoystickButton L3Button = new JoystickButton(buttonbox1, 4);
-  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 5);
+  private final GenericHID buttonbox2 = new GenericHID(2);
+
+  private final JoystickButton StowButton = new JoystickButton(buttonbox2, 5);
+  private final JoystickButton L1Button = new JoystickButton(buttonbox2, 2);
+  private final JoystickButton L2Button = new JoystickButton(buttonbox1, 8);
+  private final JoystickButton L3Button = new JoystickButton(buttonbox1,5);
+  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 2);
+
   private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
-  private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
   private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
+  
   private final JoystickButton gamepieceModeToggle = new JoystickButton(buttonbox1, 10);
 
-  private final GenericHID buttonbox2 = new GenericHID(2);
-  private final JoystickButton manualIntakeButton = new JoystickButton(buttonbox2, 1);
-  private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
   private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
 
@@ -265,12 +265,11 @@ public class RobotContainer {
     intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
+    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
     L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
     L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
     L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
     L4Button.onTrue(multiSubsystemCommands.goToL4());
-    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
     gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
@@ -294,16 +293,6 @@ public class RobotContainer {
             joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
 
-    
-    // Resets the preset when we don't have a piece.
-    // armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
-
-    // Sets the level preset
-    presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
-    presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
-    presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
-    presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
-
     incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
     decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
     /* 
@@ -326,16 +315,7 @@ public class RobotContainer {
 
     // // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
- 
 
-    // Resets the preset when we don't have a piece.
-    armSubsystem._hasPiece.onFalse(preset.resetPreset());
-
-    // Sets the level preset
-    presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
-    presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
-    presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
-    presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
   }
 
 

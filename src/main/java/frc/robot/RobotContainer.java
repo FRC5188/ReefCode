@@ -213,6 +213,13 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake",
         multiSubsystemCommands.loadGamepiece());
 
+        NamedCommands.registerCommand("AlgaeL2",
+      multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
+      .andThen(multiSubsystemCommands.loadAlgae()));
+
+    NamedCommands.registerCommand("AlgaeL3",
+      multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
+      .andThen(multiSubsystemCommands.loadAlgae()));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 

@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.1,
-        "y": 4.05
+        "x": 5.166700819672132,
+        "y": 5.5414446721311466
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.228887668477433,
-        "y": 0.6385793840777492
+        "x": 5.376465786078236,
+        "y": 5.405434897230054
       },
       "isLocked": false,
-      "linkedName": "R4"
+      "linkedName": "R3"
     },
     {
       "anchor": {
-        "x": 7.2735,
-        "y": 0.905
+        "x": 5.324783571442977,
+        "y": 5.43542116633939
       },
       "prevControl": {
-        "x": 7.265791075075885,
-        "y": 1.1548811166865443
+        "x": 5.105176780835683,
+        "y": 5.554890231453185
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "R3Algae"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -46,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -90.0
+    "velocity": 0,
+    "rotation": -121.5
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 0.0,
-    "rotation": 180.0
+    "velocity": 0,
+    "rotation": -121.5
   },
   "useDefaultConstraints": true
 }

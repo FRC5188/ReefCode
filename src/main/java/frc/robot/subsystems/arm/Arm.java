@@ -73,6 +73,8 @@ public class Arm extends SubsystemBase {
     _io = io;
     _inputs = new ArmIOInputsAutoLogged();
 
+    _currentMode = GamepieceMode.CORAL;
+
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
     _armPidController.setTolerance(4);
   }

@@ -7,25 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "B_R4"
+            "pathName": "A_R3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L2"
+            "name": "L4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AlgaeL3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "R4_P"
+            "name": "Stow"
           }
         }
       ]

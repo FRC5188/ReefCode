@@ -293,6 +293,13 @@ public class RobotContainer {
             joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
 
+    
+    // a -button approach reef
+    joystick.a()
+        .whileTrue(
+            joystickApproach(
+                    () -> FieldConstants.getNearestReefFace(drive.getPose())));
+
     incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
     decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
     /* 

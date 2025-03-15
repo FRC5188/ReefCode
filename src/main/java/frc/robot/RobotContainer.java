@@ -34,7 +34,6 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.RealArmIO;
-import frc.robot.subsystems.autos.Autos;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberCommands;
 import frc.robot.subsystems.climber.io.RealClimberIO;
@@ -81,7 +80,6 @@ public class RobotContainer {
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
-  private final Autos autos = new Autos(multiSubsystemCommands);
 
   private final Vision vision;
   private final CommandXboxController joystick = new CommandXboxController(0);
@@ -367,6 +365,9 @@ public class RobotContainer {
     if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
       CommandScheduler.getInstance().schedule(armPIDCommand);
     }
+
+    CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
+    CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
   }
 
   public void startIdleAnimations() {

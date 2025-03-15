@@ -95,6 +95,7 @@ public class Elevator extends SubsystemBase {
     _currentPos = ElevatorPosition.Stow;
     _desiredPos = ElevatorPosition.Stow;
     _prevPos = ElevatorPosition.Stow;
+    _currentMode = GamepieceMode.CORAL;
 
     _manualAdjustments = new HashMap<>();
   }

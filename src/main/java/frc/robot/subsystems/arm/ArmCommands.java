@@ -26,8 +26,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
-                },
-                _arm).withTimeout(1);
+                }).withTimeout(1);
 
     }
 
@@ -36,14 +35,14 @@ public class ArmCommands {
             return new InstantCommand(
                     () -> {
                         _arm.setArmSetpoint(setpoint);
-                    },
-                    _arm).andThen(intakeForNumberOfRotations());
+                    }
+                    ).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {
                     _arm.setArmSetpoint(setpoint);
-                },
-                _arm);
+                }
+                );
     }
 
     public Command intake() {
@@ -57,8 +56,7 @@ public class ArmCommands {
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
-                },
-                _arm).until(() -> _arm.hasPiece());
+                }).until(() -> _arm.hasPiece());
     }
 
     private Command intakeAlgae() {
@@ -132,8 +130,7 @@ public class ArmCommands {
         },
                 () -> {
                     _arm.setIntakeSpeed(0);
-                },
-                _arm).until(() -> _arm.intakeAtDesiredRotations());
+                }).until(() -> _arm.intakeAtDesiredRotations());
     }
 
     public Command waitUntilAtSetpoint() {

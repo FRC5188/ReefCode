@@ -23,7 +23,6 @@ public final class ElevatorCommands {
         return new InstantCommand(
             () -> {
                 _elevator.decrementElevatorPosition();
-                
             });  
     }
   
@@ -31,7 +30,6 @@ public final class ElevatorCommands {
         return new InstantCommand(
            () -> {
             _elevator.incrementElevatorPosition();
-    
            });
     } 
 
@@ -39,7 +37,7 @@ public final class ElevatorCommands {
         return new InstantCommand(
             () -> {
             _elevator.setSetpoint(setpoint);
-            }, _elevator);
+            });
     }
 
     public Command waitUntilAtSetpoint() {

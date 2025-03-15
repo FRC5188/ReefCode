@@ -76,7 +76,7 @@ public class Arm extends SubsystemBase {
     _currentMode = GamepieceMode.CORAL;
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
-    _armPidController.setTolerance(4);
+    _armPidController.setTolerance(5);
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {

@@ -6,14 +6,17 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.io.IOException;
 import java.lang.invoke.VarHandle.AccessMode;
 import java.util.function.Supplier;
 
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.FileVersionException;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -67,10 +70,10 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator elevatorSubsystem = new Elevator(new RealElevatorIO());
   private final Arm armSubsystem = new Arm(new RealArmIO());
-  // private final LEDs LEDSubsystem = new LEDs();
+  // // private final LEDs LEDSubsystem = new LEDs();
   private final ElevatorCommands elevatorCommands = new ElevatorCommands(elevatorSubsystem);
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
-  // private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
+  // // private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
   private final Climber climber = new Climber(new RealClimberIO());
   private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
@@ -339,7 +342,10 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
+    // try {
+
     return autoChooser.get();
+    // return null;
   }
 
   public Drive getDrive() {
@@ -365,11 +371,8 @@ public class RobotContainer {
       CommandScheduler.getInstance().schedule(armPIDCommand);
     }
 
-    // Set initial positions
     CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
     CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
-
-    CommandScheduler.getInstance().schedule(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
   }
 
   public void startIdleAnimations() {

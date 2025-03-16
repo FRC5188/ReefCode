@@ -5,9 +5,10 @@
   "pathFolders": [
     "HP to Reef",
     "Leave Start",
-    "Test",
+    "CoralAlgae",
     "Reef to HP",
-    "Start to Reef"
+    "Start to Reef",
+    "Test"
   ],
   "autoFolders": [
     "LeaveStart",

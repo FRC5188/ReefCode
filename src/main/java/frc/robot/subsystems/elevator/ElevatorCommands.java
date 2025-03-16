@@ -43,5 +43,9 @@ public final class ElevatorCommands {
     public Command waitUntilAtSetpoint() {
         return new WaitUntilCommand(_elevator::isAtSetpoint);
     }
+
+    public Command clearManualAdjustments() {
+        return Commands.runOnce(() -> _elevator.clearManualAdjustments());
+    }
 }
 

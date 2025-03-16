@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.185655737704918,
-        "y": 5.996977459016393
+        "x": 5.65,
+        "y": 4.2
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.3954207041110225,
-        "y": 5.860967684115301
+        "x": 5.685256114365243,
+        "y": 3.952498471924182
       },
       "isLocked": false,
-      "linkedName": "R3"
+      "linkedName": "R4"
     },
     {
       "anchor": {
-        "x": 5.324783571442977,
-        "y": 5.43542116633939
+        "x": 6.125717213114753,
+        "y": 3.971055327868852
       },
       "prevControl": {
-        "x": 5.105176780835683,
-        "y": 5.554890231453185
+        "x": 6.084651907971616,
+        "y": 4.217659546635484
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R3Algae"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -121.5
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "CoralAlgae",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -121.5
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

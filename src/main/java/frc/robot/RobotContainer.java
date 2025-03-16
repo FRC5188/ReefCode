@@ -116,6 +116,10 @@ public class RobotContainer {
   private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
 
+  private final JoystickButton sadButton = new JoystickButton(buttonbox2, 3);
+
+  private final JoystickButton climb = new JoystickButton(buttonbox2, 10);
+
   private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
   private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);
 
@@ -212,8 +216,7 @@ public class RobotContainer {
     
     // AutoAlignToReef + Move to L4 + Score
     NamedCommands.registerCommand("L4",
-        //multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
-        elevatorCommands.setElevatorSetpoint(ElevatorPosition.L3));
+        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
@@ -230,15 +233,6 @@ public class RobotContainer {
      multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3)
      .andThen(multiSubsystemCommands.waitForOverallMechanism())
      .andThen(multiSubsystemCommands.loadAlgae()));
-
-
-    NamedCommands.registerCommand("AlgaeL2",
-      multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
-      .andThen(multiSubsystemCommands.loadAlgae()));
-
-    NamedCommands.registerCommand("AlgaeL3",
-      multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
-      .andThen(multiSubsystemCommands.loadAlgae()));
 
     NamedCommands.registerCommand("Stow", 
       multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
@@ -277,7 +271,7 @@ public class RobotContainer {
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
  
     // drive.registerTelemetry(logger::telemeterize);
-
+    //Commands.either(multiSubsystemCommands.loadGamepiece(), armCommands.intakeManual(), () -> !armSubsystem.hasPiece())
     intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
@@ -290,6 +284,8 @@ public class RobotContainer {
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
     gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
+
+    sadButton.onTrue(multiSubsystemCommands.resetElevator());
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.

@@ -177,6 +177,7 @@ public class Robot extends LoggedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println(m_autonomousCommand);
 
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }

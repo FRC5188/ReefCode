@@ -164,6 +164,10 @@ public class Elevator extends SubsystemBase {
     }
   }
 
+  public void clearManualAdjustments() {
+    _manualAdjustments.clear();
+  }
+
   // Checks if above limit
   public boolean isAboveCurrentLimit() {
     return _inputs._elevatorMotorCurrent > HARD_STOP_CURRENT_LIMIT;

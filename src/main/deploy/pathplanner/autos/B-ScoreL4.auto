@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TestPath"
+            "pathName": "B_R4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Test",
+  "folder": null,
   "choreoAuto": false
 }

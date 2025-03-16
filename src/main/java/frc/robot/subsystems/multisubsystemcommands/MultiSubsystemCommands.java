@@ -5,10 +5,12 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmCommands;
+import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
@@ -139,6 +141,15 @@ public class MultiSubsystemCommands {
                 .andThen(setOverallSetpoint(OverallPosition.L4_Score));
     }
 
+    public Command resetElevator() {
+        Command c = new PrintCommand("RESET")
+        .andThen(_elevatorCommands.setElevatorSetpoint(ElevatorPosition.L2))
+        .andThen(_armCommands.setArmPosition(ArmPosition.Stow))
+        .andThen(_elevatorCommands.clearManualAdjustments());
+        c.addRequirements(_elevator, _arm);
+        return c;
+    }
+
     public boolean canMoveToPos(ElevatorPosition currentElevator, ElevatorPosition desiredElevator,
             ArmPosition currentArm, ArmPosition desiredArm) {
         boolean canMoveArm = false;
@@ -149,10 +160,10 @@ public class MultiSubsystemCommands {
                 case L1:
                 case L2:
                 case L3:
-                    canMoveArm = (desiredArm != ArmPosition.L4_Score) && (desiredArm != ArmPosition.Loading);
+                    canMoveArm = desiredArm == ArmPosition.Stow;
                     break;
                 case L4:
-                    canMoveArm = (desiredArm != ArmPosition.Loading);
+                    canMoveArm = desiredArm == ArmPosition.Stow || desiredArm == ArmPosition.L4_Score;
                     break;
                 case Stow:
                     canMoveArm = (desiredArm != ArmPosition.L4_Score);
@@ -166,10 +177,10 @@ public class MultiSubsystemCommands {
                 case L1:
                 case L2:
                 case L3:
-                    canMoveElevator = (currentArm != ArmPosition.L4_Score) && (currentArm != ArmPosition.Loading);
+                    canMoveElevator = currentArm == ArmPosition.Stow;
                     break;
                 case L4:
-                    canMoveElevator = (currentArm != ArmPosition.Loading);
+                    canMoveElevator = currentArm == ArmPosition.Stow || currentArm == ArmPosition.L4_Score;
                     break;
                 case Stow:
                     canMoveElevator = (currentArm != ArmPosition.L4_Score);

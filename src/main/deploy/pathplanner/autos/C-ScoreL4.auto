@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeaveD"
+            "pathName": "C_R5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "LeaveStart",
+  "folder": null,
   "choreoAuto": false
 }

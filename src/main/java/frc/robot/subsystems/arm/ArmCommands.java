@@ -51,6 +51,10 @@ public class ArmCommands {
         return Commands.either(intakeAlgae(), intakeCoral(), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
     }
 
+    public Command intakeManual() {
+        return Commands.either(Commands.runOnce(() -> _arm.setIntakeSpeed(0.5)), Commands.runOnce(() -> _arm.setIntakeSpeed(0.07)), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
+    }
+
     private Command intakeCoral() {
         return new StartEndCommand(
                 () -> {

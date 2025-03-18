@@ -28,7 +28,8 @@ public class Arm extends SubsystemBase {
     Stow(100, 100),
     Loading(128, 55),
     L4_Score(65, 45),
-    Algae_Score(60, 60);
+    Algae_Score(60, 60),
+    Transient(90, 90);
 
     double coralAngle, algaeAngle;
 

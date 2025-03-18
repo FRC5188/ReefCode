@@ -78,6 +78,7 @@ public class Arm extends SubsystemBase {
 
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
     _armPidController.setTolerance(5);
+    setArmSetpoint(ArmPosition.Stow);
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
@@ -158,6 +159,10 @@ public class Arm extends SubsystemBase {
 
   public ArmPosition getCurrentPos() {
     return _currentPos;
+  }
+
+  public void resetPID(){
+    _armPidController.reset(_inputs._armEncoderPositionDegrees);
   }
 
   public void runArmPID() {

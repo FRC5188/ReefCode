@@ -90,7 +90,7 @@ public class MultiSubsystemCommands {
     }
 
     public Command loadAlgae(OverallPosition position) {
-        if (position != OverallPosition.Algae_Loading_L2 || position != OverallPosition.Algae_Loading_L3) {
+        if (position != OverallPosition.Algae_Loading_L2 && position != OverallPosition.Algae_Loading_L3) {
             throw new IllegalArgumentException("Can Only Load Algae @ L2 or L3");
         }
         return moveToPosition(position)

@@ -149,4 +149,8 @@ public class ArmCommands {
     public Command moveArm(ArmPosition pos) {
         return setArmPosition(pos).andThen(waitUntilAtSetpoint());
     }
+    
+    public Command resetArmPID(){
+        return Commands.runOnce(() -> _arm.resetPID());
+    }
 }

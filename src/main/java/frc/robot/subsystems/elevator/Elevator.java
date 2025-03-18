@@ -99,6 +99,8 @@ public class Elevator extends SubsystemBase {
     _currentMode = GamepieceMode.CORAL;
 
     _manualAdjustments = new HashMap<>();
+
+    setSetpoint(ElevatorPosition.Stow);
   }
 
   // Runs the motors down at the calibration speed
@@ -138,6 +140,10 @@ public class Elevator extends SubsystemBase {
       _atSetpoint = true;
     }
     return atSetpoint;
+  }
+
+  public void resetPID() {
+    _elevatorMotorPID.reset(getCurrentPosInches());
   }
 
   private String getManualAdjustKey() {

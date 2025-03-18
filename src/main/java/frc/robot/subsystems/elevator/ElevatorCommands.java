@@ -49,4 +49,8 @@ public final class ElevatorCommands {
     public Command moveElevator(ElevatorPosition pos) {
         return setElevatorSetpoint(pos).andThen(waitUntilAtSetpoint());
     }
+
+    public Command resetElevatorPID() {
+        return Commands.runOnce(() -> _elevator.resetPID());
+    }
 }

@@ -221,11 +221,11 @@ public class RobotContainer {
     
     // AutoAlign + Algae Removal
      NamedCommands.registerCommand("AlgaeL2",
-     multiSubsystemCommands.loadAlgae(OverallPosition.L2));
+     multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2));
 
   // AutoAlign + Algae Removal
     NamedCommands.registerCommand("AlgaeL3",
-     multiSubsystemCommands.loadAlgae(OverallPosition.L3));
+     multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3));
 
     NamedCommands.registerCommand("Stow", 
       multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
@@ -360,8 +360,9 @@ public class RobotContainer {
       CommandScheduler.getInstance().schedule(armPIDCommand);
     }
 
-    CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
-    CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
+    // Reset PIDs
+    CommandScheduler.getInstance().schedule(elevatorCommands.resetElevatorPID());
+    CommandScheduler.getInstance().schedule(armCommands.resetArmPID());
   }
 
   public void startIdleAnimations() {

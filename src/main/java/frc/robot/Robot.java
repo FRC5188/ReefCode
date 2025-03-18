@@ -38,7 +38,6 @@ import frc.robot.HardwareConstants.CAN;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
-
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private Command m_lastAutonomousCommand;
@@ -46,8 +45,7 @@ public class Robot extends LoggedRobot {
   private Field2d m_autoTraj = new Field2d();
   public static final double fieldLength = Units.inchesToMeters(690.876);
   public static final double fieldWidth = Units.inchesToMeters(317);
-  public static final Translation2d fieldCenter =
-        new Translation2d(fieldLength / 2, fieldWidth / 2);
+  public static final Translation2d fieldCenter = new Translation2d(fieldLength / 2, fieldWidth / 2);
 
   private final RobotContainer m_robotContainer = new RobotContainer();
 
@@ -69,7 +67,8 @@ public class Robot extends LoggedRobot {
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog();
         Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new
+                                                                                              // log
         break;
     }
 
@@ -80,15 +79,14 @@ public class Robot extends LoggedRobot {
 
     // Log active commands
     Map<String, Integer> commandCounts = new HashMap<>();
-    BiConsumer<Command, Boolean> logCommandFunction =
-        (Command command, Boolean active) -> {
-          String name = command.getName();
-          int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
-          commandCounts.put(name, count);
-          Logger.recordOutput(
-                  "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
-          Logger.recordOutput("CommandsAll/" + name, count > 0);
-        };
+    BiConsumer<Command, Boolean> logCommandFunction = (Command command, Boolean active) -> {
+      String name = command.getName();
+      int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+      commandCounts.put(name, count);
+      Logger.recordOutput(
+          "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+      Logger.recordOutput("CommandsAll/" + name, count > 0);
+    };
     CommandScheduler.getInstance()
         .onCommandInitialize(
             (Command command) -> {
@@ -119,53 +117,52 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-        var m_alliance = DriverStation.getAlliance().isPresent()
-            && DriverStation.getAlliance().get() == Alliance.Red;
-        // Get currently selected command
+    var m_alliance = DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get() == Alliance.Red;
+    // Get currently selected command
 
-    //     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    //     // Check if is the same as the last one
-    //     if (m_autonomousCommand != m_lastAutonomousCommand && m_autonomousCommand != null) {
-    //         // Check if its contained in the list of our autos
-    //         if (AutoBuilder.getAllAutoNames().contains(m_autonomousCommand.getName())) {
-    //             // Clear the current path
-    //             m_pathsToShow.clear();
-    //             // Grabs all paths from the auto
-    //             try {
-    //                 for (PathPlannerPath path : PathPlannerAuto
-    //                     .getPathGroupFromAutoFile(m_autonomousCommand.getName())) {
-    //                     // Adds all poses to master list
-    //                     m_pathsToShow.addAll(path.getPathPoses());
-    //                 }
-    //             } catch (IOException | ParseException e) {
-    //                 // TODO Auto-generated catch block
-    //                 e.printStackTrace();
-    //             }
-    //             // Check to see which alliance we are on Red Alliance
-    //             if (m_alliance) {
-    //                 for (int i = 0; i < m_pathsToShow.size(); i++) {
-    //                     m_pathsToShow.set(i,
-    //                         m_pathsToShow.get(i).rotateAround(fieldCenter, Rotation2d.k180deg));
-    //                 }
-    //             }
-    //             // Displays all poses on Field2d widget
-    //             m_autoTraj.getObject("traj").setPoses(m_pathsToShow);
-    //         }
-    //     }
-    //     m_lastAutonomousCommand = m_autonomousCommand;
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // Check if is the same as the last one
+    if (m_autonomousCommand != m_lastAutonomousCommand && m_autonomousCommand != null) {
+      // Check if its contained in the list of our autos
+      if (AutoBuilder.getAllAutoNames().contains(m_autonomousCommand.getName())) {
+        // Clear the current path
+        m_pathsToShow.clear();
+        // Grabs all paths from the auto
+        try {
+          for (PathPlannerPath path : PathPlannerAuto
+              .getPathGroupFromAutoFile(m_autonomousCommand.getName())) {
+            // Adds all poses to master list
+            m_pathsToShow.addAll(path.getPathPoses());
+          }
+        } catch (IOException | ParseException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+        // Check to see which alliance we are on Red Alliance
+        if (m_alliance) {
+          for (int i = 0; i < m_pathsToShow.size(); i++) {
+            m_pathsToShow.set(i,
+                m_pathsToShow.get(i).rotateAround(fieldCenter, Rotation2d.k180deg));
+          }
+        }
+        // Displays all poses on Field2d widget
+        m_autoTraj.getObject("traj").setPoses(m_pathsToShow);
+      }
+    }
+    m_lastAutonomousCommand = m_autonomousCommand;
 
-    //     if (!m_pathsToShow.isEmpty()) {
-    //         var firstPose = m_pathsToShow.get(0);
-    //         Logger.recordOutput("Alignment/StartPose", firstPose);
-    //         SmartDashboard.putBoolean("Alignment/Translation",
-    //             firstPose.getTranslation().getDistance(
-    //                 m_robotContainer.getDrive().getPose().getTranslation()) <= Units
-    //                     .inchesToMeters(1.5));
-    //         SmartDashboard.putBoolean("Alignment/Rotation",
-    //             firstPose.getRotation().minus(m_robotContainer.getDrive().getPose().getRotation())
-    //                 .getDegrees() < 1);
-    //     }
-    // }
+    if (!m_pathsToShow.isEmpty()) {
+      var firstPose = m_pathsToShow.get(0);
+      Logger.recordOutput("Alignment/StartPose", firstPose);
+      SmartDashboard.putBoolean("Alignment/Translation",
+          firstPose.getTranslation().getDistance(
+              m_robotContainer.getDrive().getPose().getTranslation()) <= Units
+                  .inchesToMeters(1.5));
+      SmartDashboard.putBoolean("Alignment/Rotation",
+          firstPose.getRotation().minus(m_robotContainer.getDrive().getPose().getRotation())
+              .getDegrees() < 1);
+    }
   }
 
   @Override
@@ -186,7 +183,8 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {} 
+  public void autonomousPeriodic() {
+  }
 
   @Override
   public void autonomousExit() {

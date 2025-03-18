@@ -59,11 +59,8 @@ public class MultiSubsystemCommands {
         _armCommands = armCommands;
     }
 
-    public Command setOverallSetpoint(OverallPosition setpoint) {
-        return _elevatorCommands.setElevatorSetpoint(setpoint.getElevatorPosition())
-                .alongWith(_armCommands.setArmPosition(setpoint.getArmPosition()))
-                .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), setpoint.getElevatorPosition(),
-                        _arm.getCurrentPos(), setpoint.getArmPosition()));
+    public Command moveToPosition(OverallPosition setpoint) {
+        return _armCommands.moveArm(setpoint.)
     }
 
     public Command setGamepieceMode(GamepieceMode mode) {

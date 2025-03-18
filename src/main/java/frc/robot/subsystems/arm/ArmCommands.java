@@ -145,4 +145,8 @@ public class ArmCommands {
     public Command waitUntilAtSetpoint() {
         return new WaitUntilCommand(_arm::isAtSetpoint);
     }
+
+    public Command moveArm(ArmPosition pos) {
+        return setArmPosition(pos).andThen(waitUntilAtSetpoint());
+    }
 }

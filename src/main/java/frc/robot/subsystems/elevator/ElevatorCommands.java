@@ -16,32 +16,37 @@ public final class ElevatorCommands {
     public Command runElevatorPID() {
         return Commands.run(() -> {
             _elevator.runMotorsWithPID();
-        } );
+        });
     }
 
     public Command decrementElevatorPosition() {
         return new InstantCommand(
             () -> {
                 _elevator.decrementElevatorPosition();
-            });  
+                
+            } , _elevator);  
     }
-  
-    public Command incrementElevatorPosition(){
+
+    public Command incrementElevatorPosition() {
         return new InstantCommand(
            () -> {
             _elevator.incrementElevatorPosition();
-           });
+    
+           }, _elevator);
     } 
 
     public Command setElevatorSetpoint(ElevatorPosition setpoint) {
         return new InstantCommand(
             () -> {
             _elevator.setSetpoint(setpoint);
-            });
+            }, _elevator);
     }
 
     public Command waitUntilAtSetpoint() {
         return new WaitUntilCommand(_elevator::isAtSetpoint);
     }
-}
 
+    public Command moveElevator(ElevatorPosition pos) {
+        return setElevatorSetpoint(pos).andThen(waitUntilAtSetpoint());
+    }
+}

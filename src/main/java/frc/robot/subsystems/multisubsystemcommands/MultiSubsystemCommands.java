@@ -85,7 +85,7 @@ public class MultiSubsystemCommands {
                 .andThen(new WaitCommand(0.25))
                 .andThen(_armCommands.moveGamepieceToLightSensor())
                 .andThen(new WaitCommand(0.25))
-                .andThen(_armCommands.moveGamepieceToLightSensor().unless(() -> _arm.lightSensorSeesGamepiece()))
+                .andThen(_armCommands.moveGamepieceToLightSensor().unless(() -> _arm.upperLightSensorSeesGamepiece()))
                 .andThen(moveToPosition(OverallPosition.Stow));
     }
 

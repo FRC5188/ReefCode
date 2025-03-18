@@ -23,12 +23,15 @@ public class RealArmIO implements ArmIO {
     private static final double POS_AT_90 = 0.711;
     private static final double POS_AT_0 = 0.458;
     private static final double ENCODER_CONVERSION = (POS_AT_90 - POS_AT_0) / 90.0;
-    private static final double LASERCAN_DISTANCE_MM = 50;
+    private static final double CORAL_LASERCAN_DISTANCE_MM = 50;
+    private static final double ALGAE_LASERCAN_DISTANCE_MM = 50;
 
     private double INTAKE_ROTATION_CONVERSION = 1;
 
     private SparkFlex _armMotor;
-    private LaserCan _laserCan;
+    private LaserCan _upperLaserCan;
+    private LaserCan _lowerLaserCan;
+    private LaserCan _algaeLaserCan;
     private SparkFlex _intakeMotor;
     private SparkAbsoluteEncoder _armEncoder;
 
@@ -47,12 +50,18 @@ public class RealArmIO implements ArmIO {
         intakeConfig.idleMode(IdleMode.kBrake);
         _intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        _laserCan = new LaserCan(CAN.CORAL_LASERCAN_ID);
+        _upperLaserCan = new LaserCan(CAN.UPPER_CORAL_LASERCAN_ID);
+        _lowerLaserCan = new LaserCan(CAN.LOWER_CORAL_LASERCAN_ID);
+        _algaeLaserCan = new LaserCan(CAN.ALGAE_LASERCAN_ID);
         // Optionally initialise the settings of the LaserCAN, if you haven't already
         // done so in GrappleHook
         try {
-            _laserCan.setRangingMode(LaserCan.RangingMode.SHORT);
-            _laserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            _upperLaserCan.setRangingMode(LaserCan.RangingMode.SHORT);
+            _upperLaserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            _lowerLaserCan.setRangingMode(LaserCan.RangingMode.SHORT);
+            _lowerLaserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            _algaeLaserCan.setRangingMode(LaserCan.RangingMode.SHORT);
+            _algaeLaserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
         }
@@ -63,9 +72,16 @@ public class RealArmIO implements ArmIO {
         inputs._armMotorCurrent = _armMotor.getOutputCurrent();
         inputs._armMotorVoltage = _armMotor.getAppliedOutput() * _armMotor.getBusVoltage();
 
-        LaserCan.Measurement measurement = _laserCan.getMeasurement();
-        if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) 
-            inputs._lightSensorState = measurement.distance_mm <= LASERCAN_DISTANCE_MM;
+        LaserCan.Measurement upperMeasurement = _upperLaserCan.getMeasurement();
+        if (upperMeasurement != null && upperMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
+            inputs._upperLightSensorState = upperMeasurement.distance_mm <= CORAL_LASERCAN_DISTANCE_MM;
+        LaserCan.Measurement lowerMeasurement = _upperLaserCan.getMeasurement();
+        if (lowerMeasurement != null && lowerMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
+            inputs._lowerLightSensorState = lowerMeasurement.distance_mm <= CORAL_LASERCAN_DISTANCE_MM;
+        LaserCan.Measurement algaeMeasurement = _upperLaserCan.getMeasurement();
+        if (algaeMeasurement != null && algaeMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
+            inputs._algaeLightSensorState = algaeMeasurement.distance_mm <= ALGAE_LASERCAN_DISTANCE_MM;
+
         inputs._intakeMotorVelocityRotationsPerMin = _intakeMotor.get();
         inputs._intakeMotorCurrent = _intakeMotor.getOutputCurrent();
         inputs._intakeMotorVoltage = _intakeMotor.getAppliedOutput() * _armMotor.getBusVoltage();

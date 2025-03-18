@@ -19,7 +19,9 @@ public interface ArmIO {
         public double _intakeMotorCurrent = 0.0;
         public double _intakeMotorVoltage = 0.0;
 
-        public boolean _lightSensorState = false;
+        public boolean _upperLightSensorState = false;
+        public boolean _lowerLightSensorState = false;
+        public boolean _algaeLightSensorState = false;
     }
 
     public default void updateInputs(ArmIOInputs inputs) {}

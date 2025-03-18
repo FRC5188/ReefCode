@@ -52,48 +52,55 @@ public class ArmCommands {
     }
 
     private Command intakeCoral() {
-        return new StartEndCommand(
-                () -> {
-                    _arm.setIntakeSpeed(0.35);
-                },
-                () -> {
-                    _arm.setIntakeSpeed(0);
-                }, _arm).until(() -> _arm.hasPiece());
-    }
-
-    private Command intakeAlgae() {
         Command c = new Command() {
-            double intakeSpikeCounter = 0;
-            int counter = 0;
-
-            @Override
-            public void initialize() {
-                intakeSpikeCounter = 0;
-                counter = 0;
-                _arm.setIntakeSpeed(0.5);
-            }
 
             @Override
             public void execute() {
-                counter++;
-                if (_arm.getIntakeCurrent() >= Arm.HAS_ALGAE_CURRENT && counter > 12) {
-                    intakeSpikeCounter++;
+                if (_arm.lowerLightSensorSeesGamepiece()) {
+                    _arm.setIntakeSpeed(0.08);
+                } else {
+                    _arm.setIntakeSpeed(0.35);
                 }
-                Logger.recordOutput("Arm/intakeSpikeCount", intakeSpikeCounter);
             }
 
             @Override
             public void end(boolean interrupted) {
-                _arm.setIntakeSpeed(0.08);
+                _arm.setIntakeSpeed(0);
             }
 
             @Override
             public boolean isFinished() {
-                return intakeSpikeCounter > 3;
+                return _arm.hasPiece();
             }
         };
         c.addRequirements(_arm);
+        return c;
+    }
 
+    private Command intakeAlgae() {
+        Command c = new Command() {
+
+            @Override
+            public void initialize() {
+                this.addRequirements(_arm);
+                _arm.setIntakeSpeed(0.6);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                if (interrupted) {
+                    _arm.setIntakeSpeed(0);
+                } else {
+                    _arm.setIntakeSpeed(0.05);
+                }
+            }
+
+            @Override
+            public boolean isFinished() {
+                return _arm.hasPiece();
+            }
+        };
+        c.addRequirements(_arm);
         return c;
     }
 
@@ -105,7 +112,7 @@ public class ArmCommands {
             public void initialize() {
                 // If we see the gamepiece, we want to move further down in the intake
                 // If we don't, it's too far down and needs to go back up
-                movingDown = _arm.lightSensorSeesGamepiece();
+                movingDown = _arm.upperLightSensorSeesGamepiece();
             }
 
             @Override
@@ -121,7 +128,7 @@ public class ArmCommands {
 
             @Override
             public boolean isFinished() {
-                return (movingDown) ? !_arm.lightSensorSeesGamepiece() : _arm.lightSensorSeesGamepiece();
+                return (movingDown) ? !_arm.upperLightSensorSeesGamepiece() : _arm.upperLightSensorSeesGamepiece();
             }
         };
     }

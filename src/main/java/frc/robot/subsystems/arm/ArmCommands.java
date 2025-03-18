@@ -37,14 +37,12 @@ public class ArmCommands {
             return new InstantCommand(
                     () -> {
                         _arm.setArmSetpoint(setpoint);
-                    }
-                    ).andThen(intakeForNumberOfRotations());
+                    }).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {
                     _arm.setArmSetpoint(setpoint);
-                }
-                );
+                });
     }
 
     public Command intake() {
@@ -144,5 +142,10 @@ public class ArmCommands {
 
     public Command waitUntilAtSetpoint() {
         return new WaitUntilCommand(_arm::isAtSetpoint);
+    }
+
+    public Command moveArm(ArmPosition position) {
+        return setArmPosition(position)
+                .andThen(waitUntilAtSetpoint());
     }
 }

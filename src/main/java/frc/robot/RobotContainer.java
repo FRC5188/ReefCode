@@ -57,7 +57,6 @@ import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
-import frc.robot.subsystems.presets.Preset;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -84,8 +83,6 @@ public class RobotContainer {
 
   private final Vision vision;
   private final CommandXboxController joystick = new CommandXboxController(0);
-
-  private final Preset preset = new Preset();
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second max
@@ -212,36 +209,23 @@ public class RobotContainer {
     
     // AutoAlignToReef + Move to L4 + Score
     NamedCommands.registerCommand("L4",
-        //multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
-        elevatorCommands.setElevatorSetpoint(ElevatorPosition.L3));
+        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
-        multiSubsystemCommands.loadGamepiece());
+        multiSubsystemCommands.loadCoral());
     
     // AutoAlign + Algae Removal
      NamedCommands.registerCommand("AlgaeL2",
-     multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2)
-     .andThen(multiSubsystemCommands.waitForOverallMechanism())
-     .andThen(multiSubsystemCommands.loadAlgae()));
+     multiSubsystemCommands.loadAlgae(OverallPosition.Load_Algae_L2));
 
   // AutoAlign + Algae Removal
     NamedCommands.registerCommand("AlgaeL3",
-     multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3)
-     .andThen(multiSubsystemCommands.waitForOverallMechanism())
-     .andThen(multiSubsystemCommands.loadAlgae()));
-
-
-    NamedCommands.registerCommand("AlgaeL2",
-      multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
-      .andThen(multiSubsystemCommands.loadAlgae()));
-
-    NamedCommands.registerCommand("AlgaeL3",
-      multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)
-      .andThen(multiSubsystemCommands.loadAlgae()));
+     multiSubsystemCommands.moveToPosition(OverallPosition.L3)
+     .andThen(multiSubsystemCommands.loadAlgae(OverallPosition.Load_Algae_L3)));
 
     NamedCommands.registerCommand("Stow", 
-      multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
+      multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -278,15 +262,14 @@ public class RobotContainer {
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
+    intakeButton.onTrue(multiSubsystemCommands.loadCoral());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
-    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
-    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
-    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
-    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    L4ScoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+    StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
+    L1Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L1));
+    L2Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L2));
+    L3Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L3));
+    L4Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L4));
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
     gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));

@@ -57,7 +57,6 @@ import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
-import frc.robot.subsystems.presets.Preset;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -84,8 +83,6 @@ public class RobotContainer {
 
   private final Vision vision;
   private final CommandXboxController joystick = new CommandXboxController(0);
-
-  private final Preset preset = new Preset();
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second max
@@ -270,10 +267,9 @@ public class RobotContainer {
 
     StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
     L1Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L1));
-    L2Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L2));
-    L3Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L3));
+    L2Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2), multiSubsystemCommands.moveToPosition(OverallPosition.L2), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    L3Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3), multiSubsystemCommands.moveToPosition(OverallPosition.L3), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
     L4Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L4));
-    L4ScoreButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L4_Score));
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
     gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));

@@ -22,6 +22,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -50,6 +51,7 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer = new RobotContainer();
 
   public Robot() {
+    CanBridge.runTCP();
 
     switch (HardwareConstants.currentMode) {
       case REAL:

@@ -22,8 +22,7 @@ public class MultiSubsystemCommands {
         L1(ElevatorPosition.L1, ArmPosition.Stow),
         L2(ElevatorPosition.L2, ArmPosition.Stow),
         L3(ElevatorPosition.L3, ArmPosition.Stow),
-        L4(ElevatorPosition.L4, ArmPosition.Stow),
-        L4_Score(ElevatorPosition.L4, ArmPosition.L4_Score);
+        L4(ElevatorPosition.L4, ArmPosition.L4_Score);
 
         ElevatorPosition _elevatorSetpoint;
         ArmPosition _armSetpoint;
@@ -63,6 +62,7 @@ public class MultiSubsystemCommands {
     public Command moveToPosition(OverallPosition setpoint) {
         return _armCommands.moveArm(ArmPosition.Transient)
         .andThen(_elevatorCommands.moveElevator(setpoint.getElevatorPosition()))
+        .unless(() -> _elevator.getCurrentPos() == setpoint.getElevatorPosition())
         .andThen(_armCommands.moveArm(setpoint.getArmPosition()));
     }
 

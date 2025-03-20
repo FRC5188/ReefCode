@@ -83,7 +83,7 @@ public class ArmCommands {
             @Override
             public void initialize() {
                 this.addRequirements(_arm);
-                _arm.setIntakeSpeed(0.6);
+                _arm.setIntakeSpeed(0.5);
             }
 
             @Override
@@ -117,7 +117,7 @@ public class ArmCommands {
 
             @Override
             public void execute() {
-                double speed = (movingDown) ? 0.1 : -0.1;
+                double speed = (movingDown) ? 0.08 : -0.08;
                 _arm.setIntakeSpeed(speed);
             }
 

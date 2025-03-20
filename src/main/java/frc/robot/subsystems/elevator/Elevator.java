@@ -143,6 +143,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void resetPID() {
+    _elevatorMotorPID.setGoal(ElevatorPosition.Stow.getHeight(_currentMode));
     _elevatorMotorPID.reset(getCurrentPosInches());
   }
 

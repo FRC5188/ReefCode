@@ -169,6 +169,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void resetPID(){
+    _armPidController.setGoal(ArmPosition.Stow.getAngle(_currentMode));
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
   }
 

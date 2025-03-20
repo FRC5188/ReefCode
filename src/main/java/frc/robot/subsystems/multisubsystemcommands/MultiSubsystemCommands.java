@@ -82,9 +82,9 @@ public class MultiSubsystemCommands {
     public Command loadCoral() {
         return moveToPosition(OverallPosition.Coral_Loading)
                 .alongWith(_armCommands.intake())
-                .andThen(new WaitCommand(0.25))
+                .andThen(new WaitCommand(0.1))
                 .andThen(_armCommands.moveGamepieceToLightSensor())
-                .andThen(new WaitCommand(0.25))
+                .andThen(new WaitCommand(0.1))
                 .andThen(_armCommands.moveGamepieceToLightSensor().unless(() -> _arm.upperLightSensorSeesGamepiece()))
                 .andThen(moveToPosition(OverallPosition.Stow));
     }

@@ -271,8 +271,8 @@ public class RobotContainer {
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
  
     // drive.registerTelemetry(logger::telemeterize);
-    //Commands.either(multiSubsystemCommands.loadGamepiece(), armCommands.intakeManual(), () -> !armSubsystem.hasPiece())
-    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
+
+    intakeButton.onTrue(Commands.either(multiSubsystemCommands.loadGamepiece(), armCommands.intakeManual(), () -> !armSubsystem.hasPiece()));//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
     StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));

@@ -3,12 +3,14 @@ package frc.robot.subsystems.arm;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class ArmCommands {
@@ -48,7 +50,15 @@ public class ArmCommands {
     }
 
     public Command intake() {
-        return Commands.either(intakeAlgae(), intakeCoral(), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
+        return Commands.either(intakeAlgae(), intakeCoralWithAdjust(), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
+    }
+
+    private Command intakeCoralWithAdjust() {
+        return intakeCoral()
+                .andThen(new WaitCommand(0.1))
+                .andThen(moveGamepieceToLightSensor())
+                .andThen(new WaitCommand(0.1))
+                .andThen(moveGamepieceToLightSensor().unless(() -> _arm.upperLightSensorSeesGamepiece()));
     }
 
     private Command intakeCoral() {
@@ -110,6 +120,12 @@ public class ArmCommands {
 
             @Override
             public void initialize() {
+                // if we don't see the gamepiece in the middle, we assume that we don't have it
+                // Cancel this command (and everything that follows it) by rescheduling intaking
+                if (!_arm.lowerLightSensorSeesGamepiece()) {
+                    CommandScheduler.getInstance().schedule(intakeCoralWithAdjust());
+                }
+
                 // If we see the gamepiece, we want to move further down in the intake
                 // If we don't, it's too far down and needs to go back up
                 movingDown = _arm.upperLightSensorSeesGamepiece();

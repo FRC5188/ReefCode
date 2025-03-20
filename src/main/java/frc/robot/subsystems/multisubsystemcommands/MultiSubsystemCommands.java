@@ -61,9 +61,9 @@ public class MultiSubsystemCommands {
 
     public Command moveToPosition(OverallPosition setpoint) {
         return _armCommands.moveArm(ArmPosition.Transient)
-        .andThen(_elevatorCommands.moveElevator(setpoint.getElevatorPosition()))
-        .unless(() -> _elevator.getCurrentPos() == setpoint.getElevatorPosition())
-        .andThen(_armCommands.moveArm(setpoint.getArmPosition()));
+                .andThen(_elevatorCommands.moveElevator(setpoint.getElevatorPosition()))
+                .unless(() -> _elevator.getCurrentPos() == setpoint.getElevatorPosition())
+                .andThen(_armCommands.moveArm(setpoint.getArmPosition()));
     }
 
     public Command setGamepieceMode(GamepieceMode mode) {
@@ -81,12 +81,9 @@ public class MultiSubsystemCommands {
 
     public Command loadCoral() {
         return moveToPosition(OverallPosition.Coral_Loading)
-                .alongWith(_armCommands.intake())
-                .andThen(new WaitCommand(0.1))
-                .andThen(_armCommands.moveGamepieceToLightSensor())
-                .andThen(new WaitCommand(0.1))
-                .andThen(_armCommands.moveGamepieceToLightSensor().unless(() -> _arm.upperLightSensorSeesGamepiece()))
+                .andThen(_armCommands.intake())
                 .andThen(moveToPosition(OverallPosition.Stow));
+
     }
 
     public Command loadAlgae(OverallPosition position) {

@@ -140,6 +140,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                new VisionIOPhotonVision(camera5Name, robotToCamera5),
                 new VisionIOPhotonVision(camera6Name, robotToCamera6)
                 );   
         break;

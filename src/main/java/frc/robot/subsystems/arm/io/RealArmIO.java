@@ -75,10 +75,10 @@ public class RealArmIO implements ArmIO {
         LaserCan.Measurement upperMeasurement = _upperLaserCan.getMeasurement();
         if (upperMeasurement != null && upperMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
             inputs._upperLightSensorState = upperMeasurement.distance_mm <= CORAL_LASERCAN_DISTANCE_MM;
-        LaserCan.Measurement lowerMeasurement = _upperLaserCan.getMeasurement();
+        LaserCan.Measurement lowerMeasurement = _lowerLaserCan.getMeasurement();
         if (lowerMeasurement != null && lowerMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
             inputs._lowerLightSensorState = lowerMeasurement.distance_mm <= CORAL_LASERCAN_DISTANCE_MM;
-        LaserCan.Measurement algaeMeasurement = _upperLaserCan.getMeasurement();
+        LaserCan.Measurement algaeMeasurement = _algaeLaserCan.getMeasurement();
         if (algaeMeasurement != null && algaeMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
             inputs._algaeLightSensorState = algaeMeasurement.distance_mm <= ALGAE_LASERCAN_DISTANCE_MM;
 
@@ -96,7 +96,7 @@ public class RealArmIO implements ArmIO {
     }
 
     public void setIntakeMotorSpeed(double speed) {
-        // _intakeMotor.set(speed);
+         _intakeMotor.set(speed);
     }
 
     public void resetIntakeEncoders() {

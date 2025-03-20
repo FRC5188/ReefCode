@@ -132,10 +132,11 @@ public class Arm extends SubsystemBase {
 
   public boolean hasPiece() {
     boolean hasPiece = false;
+    // boolean _hasGamepiece = false;
     if (_currentMode == GamepieceMode.CORAL) {
-      boolean currentState = _inputs._upperLightSensorState;
-      hasPiece = _prevLightSensorVal && !currentState;
-      hasPiece = currentState;
+      boolean currentState = _inputs._upperLightSensorState; 
+      hasPiece = (_prevLightSensorVal && !currentState) && _inputs._lowerLightSensorState;
+      //hasPiece = currentState;
       _prevLightSensorVal = currentState;
     } else {
       hasPiece = _inputs._algaeLightSensorState;

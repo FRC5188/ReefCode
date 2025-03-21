@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
     Loading(140, 78),
     L4_Score(86, 86),
     Algae_Score(100, 100),
-    Transient(100, 100);
+    Transient(108, 108);
 
     double coralAngle, algaeAngle;
 
@@ -57,8 +57,8 @@ public class Arm extends SubsystemBase {
 
   private ProfiledPIDController _armPidController;
 
-  private static final double KP = 0.08;//0.09;
-  private static final double KI = 0.002; //0.01;
+  private static final double KP = 0.06;//0.09;
+  private static final double KI = 0.00; //0.01;
   private static final double KD = 0.01;
   private static final double PROFILE_VEL = 160;
   private static final double PROFILE_ACC = 145;

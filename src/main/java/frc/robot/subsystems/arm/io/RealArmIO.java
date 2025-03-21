@@ -79,8 +79,11 @@ public class RealArmIO implements ArmIO {
         if (lowerMeasurement != null && lowerMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
             inputs._lowerLightSensorState = lowerMeasurement.distance_mm <= CORAL_LASERCAN_DISTANCE_MM;
         LaserCan.Measurement algaeMeasurement = _algaeLaserCan.getMeasurement();
-        if (algaeMeasurement != null && algaeMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
+        if (algaeMeasurement != null && algaeMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
             inputs._algaeLightSensorState = algaeMeasurement.distance_mm <= ALGAE_LASERCAN_DISTANCE_MM;
+        } else {
+            inputs._algaeLightSensorState = false;
+        }
 
         inputs._intakeMotorVelocityRotationsPerMin = _intakeMotor.get();
         inputs._intakeMotorCurrent = _intakeMotor.getOutputCurrent();

@@ -44,14 +44,14 @@ public class VisionConstants {
   // Camera 5
   // Facing forward, not tilted
   public static Transform3d robotToCamera5 =
-      new Transform3d(Units.inchesToMeters(13.75), Units.inchesToMeters(-11.5), Units.inchesToMeters(9.25), 
+      new Transform3d(Units.inchesToMeters(12.75), Units.inchesToMeters(-11.5), Units.inchesToMeters(8.5), 
       new Rotation3d(0.0, 0, 0));
  
  // Camera 6 (Back left swerve module)
  // Tilted up 10 degrees, facing backwards
  public static Transform3d robotToCamera6 =
-      new Transform3d(Units.inchesToMeters(-13.75), Units.inchesToMeters(11.5), Units.inchesToMeters(9.25),
-      new Rotation3d(0.0, -Units.degreesToRadians(10), Math.PI));
+      new Transform3d(Units.inchesToMeters(-13), Units.inchesToMeters(12.5), Units.inchesToMeters(8.75),
+      new Rotation3d(Units.degreesToRadians(0.0), 0.0, Math.PI));
 
 //   // Camera 7
 //   public static Transform3d robotToCamera7 =

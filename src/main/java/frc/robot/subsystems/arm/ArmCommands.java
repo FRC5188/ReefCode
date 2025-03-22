@@ -115,20 +115,8 @@ public class ArmCommands {
         return new Command() {
 
             @Override
-            public void initialize() {
-                // if we don't see the gamepiece in the middle, we assume that we don't have it
-                // Cancel this command (and everything that follows it) by rescheduling intaking
-                if (!_arm.lowerLightSensorSeesGamepiece()) {
-                    CommandScheduler.getInstance().schedule(intakeCoralWithAdjust());
-                }
-
-                // If we see the gamepiece, we want to move further down in the intake
-                // If we don't, it's too far down and needs to go back up
-            }
-
-            @Override
             public void execute() {
-                double speed = -0.08;
+                double speed = -0.1; // -0.08
                 _arm.setIntakeSpeed(speed);
             }
 
@@ -153,7 +141,7 @@ public class ArmCommands {
     public Command intakeForNumberOfRotations() {
         return new StartEndCommand(() -> {
             _arm.resetIntakeEncoders();
-            _arm.setIntakeSpeed(-0.1);
+            _arm.setIntakeSpeed(-0.13); // -0.1
         },
                 () -> {
                     _arm.setIntakeSpeed(0);

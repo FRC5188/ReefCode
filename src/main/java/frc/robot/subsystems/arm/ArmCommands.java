@@ -141,7 +141,7 @@ public class ArmCommands {
     public Command intakeForNumberOfRotations() {
         return new StartEndCommand(() -> {
             _arm.resetIntakeEncoders();
-            _arm.setIntakeSpeed(-0.13); // -0.1
+            _arm.setIntakeSpeed(-0.15); // -0.1
         },
                 () -> {
                     _arm.setIntakeSpeed(0);

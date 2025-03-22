@@ -229,6 +229,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("Stow", 
       multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
 
+    NamedCommands.registerCommand("Score", 
+      armCommands.spit());
+
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // hide the joystick missing warnings

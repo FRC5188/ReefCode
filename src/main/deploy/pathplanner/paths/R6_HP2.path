@@ -8,51 +8,37 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.776505419244593,
-        "y": 3.1628562792383064
+        "x": 3.5195763539459746,
+        "y": 2.293122682733051
       },
       "isLocked": false,
       "linkedName": "R6"
     },
     {
       "anchor": {
-        "x": 2.521747572815534,
-        "y": 3.496796116504854
+        "x": 1.1931710970554246,
+        "y": 1.000314900025919
       },
       "prevControl": {
-        "x": 2.571937204010619,
-        "y": 2.6310249783896342
-      },
-      "nextControl": {
-        "x": 2.385436893203884,
-        "y": 5.848155339805825
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.247,
-        "y": 6.779
-      },
-      "prevControl": {
-        "x": 2.163932038834951,
-        "y": 6.870485436893204
+        "x": 1.3544462534336672,
+        "y": 1.1913393066737938
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "HP1"
+      "linkedName": "HP2"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0681992337164712,
-      "rotationDegrees": -53.8
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Stow",
+      "waypointRelativePos": 0.20085243866822436,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
@@ -63,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -53.8
+    "rotation": 53.8
   },
   "reversed": false,
   "folder": "Reef to HP",

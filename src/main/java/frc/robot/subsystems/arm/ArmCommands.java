@@ -64,7 +64,7 @@ public class ArmCommands {
             @Override
             public void execute() {
                 if (_arm.lowerLightSensorSeesGamepiece()) {
-                    _arm.setIntakeSpeed(0.08);
+                    _arm.setIntakeSpeed(0.07);
                 } else {
                     _arm.setIntakeSpeed(0.25); // 0.35
                 }

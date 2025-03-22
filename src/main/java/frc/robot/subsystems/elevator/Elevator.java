@@ -35,11 +35,10 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
     L1(5, 5),
-    L2(11, 20),
-    L3(27, 38),
-    L4(52, 52),
-    Stow(0.5, 0.5),
-    Manual(0, 0);
+    L2(11, 18),
+    L3(27, 36),
+    L4(50.75, 50.75),
+    Stow(0.5, 0.5);
 
     double coralHeight, algaeHeight;
 

@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
@@ -103,12 +104,13 @@ public class RobotContainer {
   private final JoystickButton L2Button = new JoystickButton(buttonbox1, 8);
   private final JoystickButton L3Button = new JoystickButton(buttonbox1,5);
   private final JoystickButton L4Button = new JoystickButton(buttonbox1, 2);
-  private final JoystickButton L4ScoreButton = new JoystickButton(buttonbox1, 3);
 
   private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
   private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
   
   private final JoystickButton gamepieceModeToggle = new JoystickButton(buttonbox1, 10);
+
+  private final JoystickButton manualIntakeButton = new JoystickButton(buttonbox2, 1);
 
   private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
@@ -263,7 +265,7 @@ public class RobotContainer {
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    intakeButton.onTrue(multiSubsystemCommands.loadCoral());//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
+    intakeButton.onTrue(multiSubsystemCommands.loadCoral().unless(() -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
     spitButton.onTrue(armCommands.spit());
 
     StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
@@ -301,6 +303,8 @@ public class RobotContainer {
             joystickApproach(
                     () -> FieldConstants.getNearestReefFace(drive.getPose())));
 
+    manualIntakeButton.whileTrue(armCommands.manualIntake());
+
     incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
     decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
     /* 
@@ -323,15 +327,11 @@ public class RobotContainer {
 
     // // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
-
+    joystick.leftTrigger(0.75).onTrue(armCommands.spit());
   }
 
-
   public Command getAutonomousCommand() {
-    // try {
-
     return autoChooser.get();
-    // return null;
   }
 
   public Drive getDrive() {

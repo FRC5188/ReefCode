@@ -23,14 +23,14 @@ public class ArmCommands {
     public Command spit() {
         return new StartEndCommand(
                 () -> {
-                    if (_arm.getCurrentPos() == ArmPosition.L4_Score)
-                        _arm.setArmSetpoint(ArmPosition.Stow);
                     _arm.spit();
                 },
                 () -> {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
-                }, _arm).withTimeout(1);
+                }, _arm).withTimeout(1)
+                .andThen(Commands.runOnce(() -> _arm.setArmSetpoint(ArmPosition.Stow), _arm).unless(() -> _arm.getCurrentPos() != ArmPosition.L4_Score));
+                
 
     }
 
@@ -39,26 +39,23 @@ public class ArmCommands {
             return new InstantCommand(
                     () -> {
                         _arm.setArmSetpoint(setpoint);
-                    }
-                    ).andThen(intakeForNumberOfRotations());
+                    }).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {
                     _arm.setArmSetpoint(setpoint);
-                }
-                );
+                });
     }
 
     public Command intake() {
-        return Commands.either(intakeAlgae(), intakeCoralWithAdjust(), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
+        return Commands.either(intakeAlgae(), intakeCoralWithAdjust(),
+                () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
     }
 
     private Command intakeCoralWithAdjust() {
         return intakeCoral()
-                .andThen(new WaitCommand(0.1))
-                .andThen(moveGamepieceToLightSensor())
-                .andThen(new WaitCommand(0.1))
-                .andThen(moveGamepieceToLightSensor().unless(() -> _arm.upperLightSensorSeesGamepiece()));
+                .andThen(new WaitCommand(0.25))
+                .andThen(moveGamepieceToLightSensor());
     }
 
     private Command intakeCoral() {
@@ -67,7 +64,7 @@ public class ArmCommands {
             @Override
             public void execute() {
                 if (_arm.lowerLightSensorSeesGamepiece()) {
-                    _arm.setIntakeSpeed(0.08); 
+                    _arm.setIntakeSpeed(0.08);
                 } else {
                     _arm.setIntakeSpeed(0.25); // 0.35
                 }
@@ -116,7 +113,6 @@ public class ArmCommands {
 
     public Command moveGamepieceToLightSensor() {
         return new Command() {
-            boolean movingDown = true;
 
             @Override
             public void initialize() {
@@ -128,12 +124,11 @@ public class ArmCommands {
 
                 // If we see the gamepiece, we want to move further down in the intake
                 // If we don't, it's too far down and needs to go back up
-                movingDown = _arm.upperLightSensorSeesGamepiece();
             }
 
             @Override
             public void execute() {
-                double speed = (movingDown) ? 0.08 : -0.08;
+                double speed = -0.08;
                 _arm.setIntakeSpeed(speed);
             }
 
@@ -144,7 +139,7 @@ public class ArmCommands {
 
             @Override
             public boolean isFinished() {
-                return (movingDown) ? !_arm.upperLightSensorSeesGamepiece() : _arm.upperLightSensorSeesGamepiece();
+                return _arm.upperLightSensorSeesGamepiece();
             }
         };
     }
@@ -172,8 +167,15 @@ public class ArmCommands {
     public Command moveArm(ArmPosition pos) {
         return setArmPosition(pos).andThen(waitUntilAtSetpoint());
     }
-    
-    public Command resetArmPID(){
+
+    public Command resetArmPID() {
         return Commands.runOnce(() -> _arm.resetPID());
+    }
+
+    public Command manualIntake() {
+        return Commands.either(Commands.runOnce(
+                () -> _arm.setIntakeSpeed(0.1), _arm),
+                Commands.runOnce(() -> _arm.setIntakeSpeed(0.5), _arm),
+                () -> _arm.getCurrentMode() == GamepieceMode.CORAL);
     }
 }

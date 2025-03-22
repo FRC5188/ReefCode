@@ -91,7 +91,8 @@ public class MultiSubsystemCommands {
             throw new IllegalArgumentException("Can Only Load Algae @ L2 or L3");
         }
         return moveToPosition(position)
-                .alongWith(_armCommands.intake());
+                .alongWith(_armCommands.intake())
+                .andThen(_armCommands.setArmPosition(ArmPosition.Stow));
     }
 
 }

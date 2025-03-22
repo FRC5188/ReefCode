@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -24,7 +25,7 @@ public class RealArmIO implements ArmIO {
     private static final double POS_AT_0 = 0.168;
     private static final double ENCODER_CONVERSION = (POS_AT_90 - POS_AT_0) / 90.0;
     private static final double CORAL_LASERCAN_DISTANCE_MM = 50;
-    private static final double ALGAE_LASERCAN_DISTANCE_MM = 30;
+    private static final double ALGAE_LASERCAN_DISTANCE_MM = 20;
 
     private double INTAKE_ROTATION_CONVERSION = 1;
 
@@ -58,10 +59,13 @@ public class RealArmIO implements ArmIO {
         try {
             _upperLaserCan.setRangingMode(LaserCan.RangingMode.SHORT);
             _upperLaserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            _upperLaserCan.setRegionOfInterest(new RegionOfInterest(8, 8, 8, 8));
             _lowerLaserCan.setRangingMode(LaserCan.RangingMode.SHORT);
             _lowerLaserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            _lowerLaserCan.setRegionOfInterest(new RegionOfInterest(8, 8, 8, 8));
             _algaeLaserCan.setRangingMode(LaserCan.RangingMode.SHORT);
             _algaeLaserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            _algaeLaserCan.setRegionOfInterest(new RegionOfInterest(8, 8, 8, 8));
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
         }

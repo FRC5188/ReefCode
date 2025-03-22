@@ -27,7 +27,7 @@ public class Arm extends SubsystemBase {
   public enum ArmPosition {
     Stow(114, 114),
     Loading(140, 78),
-    L4_Score(86, 86),
+    L4_Score(102, 102), // 86
     Algae_Score(100, 100),
     Transient(108, 108);
 

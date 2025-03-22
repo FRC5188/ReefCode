@@ -212,8 +212,8 @@ public class RobotContainer {
     
     // AutoAlignToReef + Move to L4 + Score
     NamedCommands.registerCommand("L4",
-        //multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
-        elevatorCommands.setElevatorSetpoint(ElevatorPosition.L3));
+        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
+        //elevatorCommands.setElevatorSetpoint(ElevatorPosition.L3));
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",

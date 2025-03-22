@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.343,
-        "y": 2.80625
+        "x": 5.3116683262536375,
+        "y": 2.983365314185704
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.242490973792311,
-        "y": 3.2122621030042224
+        "x": 5.211159300045948,
+        "y": 3.3893774171899267
       },
       "isLocked": false,
       "linkedName": "R5"
@@ -85,7 +85,7 @@
   "folder": "Reef to HP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 120.89912407537605
   },
   "useDefaultConstraints": true
 }

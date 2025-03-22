@@ -77,7 +77,7 @@ public class MultiSubsystemCommands {
     public Command scoreGamepieceAtPosition(OverallPosition setpoint) {
         return moveToPosition(setpoint)
                 .andThen(_armCommands.spit());
-    }
+    } 
 
     public Command loadCoral() {
         return moveToPosition(OverallPosition.Coral_Loading)

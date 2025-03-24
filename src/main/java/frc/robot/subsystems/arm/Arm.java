@@ -65,7 +65,7 @@ public class Arm extends SubsystemBase {
 
   public static final double HAS_ALGAE_CURRENT = 40;
 
-  private static final double ARM_FEEDFORWARD_COEFF = 0.4;
+  private static final double ARM_FEEDFORWARD_COEFF = 0.6;
   private static final double ARM_FEEDFORWARD_ANGLE_OFFSET = -22.3;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
@@ -176,7 +176,7 @@ public class Arm extends SubsystemBase {
 
   public void runArmPID() {
     double out = _armPidController.calculate(_inputs._armEncoderPositionDegrees)
-        + (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees + ARM_FEEDFORWARD_ANGLE_OFFSET)));
+      + (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees + ARM_FEEDFORWARD_ANGLE_OFFSET)));
     _io.setArmMotorVoltage(Voltage.ofBaseUnits(out, Volt));
   }
 

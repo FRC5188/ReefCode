@@ -53,21 +53,79 @@ public class ArmCommands {
     }
 
     private Command intakeCoralWithAdjust() {
-        return intakeCoral()
-                .andThen(new WaitCommand(0.25))
-                .andThen(moveGamepieceToLightSensor());
+        return intakeCoral().andThen(moveArm(ArmPosition.Stow));
+
     }
 
     private Command intakeCoral() {
         Command c = new Command() {
+            /*
+             * This command will run the intake at a fast speed until the lower light sensor detects the coral
+             * Then, the speed will decrease and run until both sensors detect the coral
+             * Then, the motor will turn off for a few cycles (~100 ms)
+             * Then, the motor will run at a slow speed in reverse until the upper light sensor detects the coral
+             * Then, the arm will go back to stow
+             * 
+             * In the case that the lower and upper light sensors don't detect a piece when running reverse, 
+             * we assume there is no piece and start running at a fast speed again
+             */
+            boolean hasPieceDetected = false;
+            boolean prevHasPieceDetected = false;
+            boolean waiting = false;
+            boolean done = false;
+
+            int counter = 0;
+
+            @Override
+            public void initialize() {
+                // Init flags
+                hasPieceDetected = false;
+                prevHasPieceDetected = false;
+                waiting = false;
+                done = false;
+
+                counter = 0;
+            }
 
             @Override
             public void execute() {
-                if (_arm.lowerLightSensorSeesGamepiece()) {
-                    _arm.setIntakeSpeed(0.07);
+                // We don't think we have a piece, so try to intake it
+                if (!hasPieceDetected) {
+                    if (_arm.lowerLightSensorSeesGamepiece()) {
+                        _arm.setIntakeSpeed(0.07);
+                    } else {
+                        _arm.setIntakeSpeed(0.25); // 0.35
+                    }
                 } else {
-                    _arm.setIntakeSpeed(0.25); // 0.35
+                    // We think we have a piece, so if this just triggered, wait for a little bit
+                    if (!prevHasPieceDetected && hasPieceDetected) {
+                        // Set counter flag so we start waiting
+                        waiting = true;
+                        _arm.setIntakeSpeed(0);
+                    }
+
+                    if (waiting) {
+                        counter++;
+                        if (counter >= 5) {
+                            // We've waited long enough, let the motors run backwards
+                            waiting = false;
+                        }
+                    } else {
+                        // Check if we actually see the gamepiece on our lower sensor after waiting
+                        if (!_arm.lowerLightSensorSeesGamepiece()) {
+                            // Clear out hasPiece so normal intaking will start again
+                            _arm.clearHasGamepiece();
+                        } else {
+                            // Run the motors backwards until we see the piece in the upper light sensor
+                            _arm.setIntakeSpeed(-0.1);
+                            done = _arm.upperLightSensorSeesGamepiece();
+                        }
+                    }
                 }
+
+                // Update hasPiece
+                prevHasPieceDetected = hasPieceDetected;
+                hasPieceDetected = _arm.hasPiece();
             }
 
             @Override
@@ -77,7 +135,7 @@ public class ArmCommands {
 
             @Override
             public boolean isFinished() {
-                return _arm.hasPiece();
+                return done;
             }
         };
         c.addRequirements(_arm);

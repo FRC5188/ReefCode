@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.564241803278687,
-        "y": 1.9810963114754099
+        "x": 3.6802254098360656,
+        "y": 2.6404200819672123
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.33834728384462,
-        "y": 1.8987244973168789
+        "x": 3.8968743230212,
+        "y": 2.7651728310980435
       },
       "isLocked": false,
-      "linkedName": "C"
+      "linkedName": "R6"
     },
     {
       "anchor": {
-        "x": 5.33452868852459,
-        "y": 2.9817499999999995
+        "x": 3.9585000000000004,
+        "y": 2.7965
       },
       "prevControl": {
-        "x": 5.468015810725064,
-        "y": 2.7703707479277213
+        "x": 3.7316487075937057,
+        "y": 2.69143577614814
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "ScoreR5"
+      "linkedName": "ScoreR6"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": 162.15573333673396
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -46,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 120.9
+    "velocity": 0.0,
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "Start to Reef",
+  "folder": "Move to Score",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }

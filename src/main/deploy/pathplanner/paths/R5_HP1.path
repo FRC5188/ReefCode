@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.3116683262536375,
-        "y": 2.983365314185704
+        "x": 5.33452868852459,
+        "y": 2.9817499999999995
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.211159300045948,
-        "y": 3.3893774171899267
+        "x": 5.234019662316901,
+        "y": 3.387762103004222
       },
       "isLocked": false,
-      "linkedName": "R5"
+      "linkedName": "ScoreR5"
     },
     {
       "anchor": {
@@ -85,7 +85,7 @@
   "folder": "Reef to HP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 120.89912407537605
+    "rotation": 120.9
   },
   "useDefaultConstraints": true
 }

@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 3.7,
-        "y": 5.45
+        "y": 5.067417254011322
       },
       "prevControl": null,
       "nextControl": {
         "x": 3.3930000000000002,
-        "y": 5.88725
+        "y": 5.504667254011322
       },
       "isLocked": true,
-      "linkedName": "R2"
+      "linkedName": "ScoreR2"
     },
     {
       "anchor": {

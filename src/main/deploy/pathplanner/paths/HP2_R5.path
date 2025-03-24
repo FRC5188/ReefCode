@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 5.3116683262536375,
-        "y": 2.983365314185704
+        "x": 5.33452868852459,
+        "y": 2.9817499999999995
       },
       "prevControl": {
-        "x": 5.075131438612651,
-        "y": 2.9024313856691952
+        "x": 5.097991800883603,
+        "y": 2.9008160714834905
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R5"
+      "linkedName": "ScoreR5"
     }
   ],
   "rotationTargets": [
@@ -47,7 +47,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 120.89912407537605
+    "rotation": 120.9
   },
   "reversed": false,
   "folder": "HP to Reef",

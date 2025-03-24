@@ -33,15 +33,15 @@
     {
       "anchor": {
         "x": 3.7,
-        "y": 5.45
+        "y": 5.067417254011322
       },
       "prevControl": {
         "x": 3.864246218182973,
-        "y": 5.261524060388093
+        "y": 4.878941314399415
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R2"
+      "linkedName": "ScoreR2"
     }
   ],
   "rotationTargets": [],

@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 2.85,
-        "y": 4.05
+        "x": 3.2841721390676866,
+        "y": 3.837271284603343
       },
       "prevControl": {
-        "x": 2.778195881418401,
-        "y": 3.7155294420433176
+        "x": 3.2123680204860876,
+        "y": 3.5028007266466608
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R1"
+      "linkedName": "ScoreR1"
     }
   ],
   "rotationTargets": [

@@ -81,9 +81,7 @@ public class MultiSubsystemCommands {
 
     public Command loadCoral() {
         return moveToPosition(OverallPosition.Coral_Loading)
-                .andThen(_armCommands.intake())
-                .andThen(moveToPosition(OverallPosition.Stow));
-
+                .andThen(_armCommands.intake());
     }
 
     public Command loadAlgae(OverallPosition position) {

@@ -80,7 +80,6 @@ public class ArmCommands {
             public void initialize() {
                 // Init flags
                 hasPieceDetected = false;
-                prevHasPieceDetected = false;
                 waiting = false;
                 done = false;
 
@@ -91,41 +90,32 @@ public class ArmCommands {
             public void execute() {
                 // We don't think we have a piece, so try to intake it
                 if (!hasPieceDetected) {
-                    if (_arm.lowerLightSensorSeesGamepiece()) {
-                        _arm.setIntakeSpeed(0.07);
+                    if (_arm.upperLightSensorSeesGamepiece()) {
+                        _arm.setIntakeSpeed(0.09);
                     } else {
-                        _arm.setIntakeSpeed(0.25); // 0.35
-                    }
-                } else {
-                    // We think we have a piece, so if this just triggered, wait for a little bit
-                    if (!prevHasPieceDetected && hasPieceDetected) {
-                        // Set counter flag so we start waiting
-                        waiting = true;
-                        _arm.setIntakeSpeed(0);
+                        _arm.setIntakeSpeed(0.22); // 0.35
                     }
 
-                    if (waiting) {
+                    // Update hasPiece
+                    hasPieceDetected = _arm.hasPiece();
+                } else {
+                    // Check if we actually see the gamepiece on our lower sensor after waiting
+                    if (!_arm.lowerLightSensorSeesGamepiece()) {
                         counter++;
-                        if (counter >= 5) {
-                            // We've waited long enough, let the motors run backwards
-                            waiting = false;
-                        }
+                    }
+
+                    if (counter > 15) {
+                        // Assume that at this point we don't have a piece
+                        // Clear out hasPiece so normal intaking will start again
+                        _arm.clearHasGamepiece();
+                        hasPieceDetected = false;
+                        counter = 0;
                     } else {
-                        // Check if we actually see the gamepiece on our lower sensor after waiting
-                        if (!_arm.lowerLightSensorSeesGamepiece()) {
-                            // Clear out hasPiece so normal intaking will start again
-                            _arm.clearHasGamepiece();
-                        } else {
-                            // Run the motors backwards until we see the piece in the upper light sensor
-                            _arm.setIntakeSpeed(-0.1);
-                            done = _arm.upperLightSensorSeesGamepiece();
-                        }
+                        // Run the motors backwards until we see the piece in the upper light sensor
+                        _arm.setIntakeSpeed(-0.09);
+                        done = _arm.upperLightSensorSeesGamepiece();
                     }
                 }
-
-                // Update hasPiece
-                prevHasPieceDetected = hasPieceDetected;
-                hasPieceDetected = _arm.hasPiece();
             }
 
             @Override
@@ -219,9 +209,15 @@ public class ArmCommands {
     }
 
     public Command manualIntake() {
-        return Commands.either(Commands.runOnce(
-                () -> _arm.setIntakeSpeed(0.1), _arm),
-                Commands.runOnce(() -> _arm.setIntakeSpeed(0.5), _arm),
+        return Commands.either(
+            new StartEndCommand(
+                () -> _arm.setIntakeSpeed(-0.1), 
+                () -> _arm.setIntakeSpeed(0),
+                _arm),
+            new StartEndCommand(
+                    () -> _arm.setIntakeSpeed(0.5), 
+                    () -> _arm.setIntakeSpeed(0),
+                    _arm),
                 () -> _arm.getCurrentMode() == GamepieceMode.CORAL);
     }
 }

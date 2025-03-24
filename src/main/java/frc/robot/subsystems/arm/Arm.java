@@ -175,8 +175,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void runArmPID() {
-    double out = _armPidController.calculate(_inputs._armEncoderPositionDegrees)
-        + (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees + ARM_FEEDFORWARD_ANGLE_OFFSET)));
+    // double out = _armPidController.calculate(_inputs._armEncoderPositionDegrees)
+        double out = (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees + ARM_FEEDFORWARD_ANGLE_OFFSET)));
     _io.setArmMotorVoltage(Voltage.ofBaseUnits(out, Volt));
   }
 

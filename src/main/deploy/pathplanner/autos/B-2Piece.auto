@@ -74,9 +74,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "Stow"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "R6_HP2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         }
       ]

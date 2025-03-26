@@ -260,7 +260,7 @@ public class RobotContainer {
             () -> -joystick.getRightX())); 
 
 
-       //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand())
+       //joystick.start().and(joystick.y()).onTrue(getAutonomousCommand());
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));

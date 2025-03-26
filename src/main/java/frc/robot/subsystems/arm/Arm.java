@@ -57,11 +57,11 @@ public class Arm extends SubsystemBase {
 
   private ProfiledPIDController _armPidController;
 
-  private static final double KP = 0.06;//0.09;
+  private static final double KP = 0.1;//0.09;
   private static final double KI = 0.00; //0.01;
   private static final double KD = 0.01;
-  private static final double PROFILE_VEL = 160;
-  private static final double PROFILE_ACC = 145;
+  private static final double PROFILE_VEL = 330;
+  private static final double PROFILE_ACC = 300;
 
   public static final double HAS_ALGAE_CURRENT = 40;
 

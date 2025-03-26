@@ -58,11 +58,11 @@ public class Elevator extends SubsystemBase {
   private static final int INCREMENT_CONSTANT = 1;
   private static final int DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.8; //0.75;
+  private static final double ELEVATOR_MOTOR_KP = 1.5; //0.75;
   private static final double ELEVATOR_MOTOR_KI = 0;//0.15; 
   private static final double ELEVATOR_MOTOR_KD = 0;
-  private static final double ELEVATOR_PID_VEL = 220;
-  private static final double ELEVATOR_PID_ACC = 215;
+  private static final double ELEVATOR_PID_VEL = 400;
+  private static final double ELEVATOR_PID_ACC = 335;
 
   private static final double ELEVATOR_MAX_INCHES = 52; //48;
   private static final double ELEVATOR_MAX_ROTATIONS = 87; // 36.4;

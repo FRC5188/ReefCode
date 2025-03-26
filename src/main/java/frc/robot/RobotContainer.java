@@ -84,6 +84,7 @@ public class RobotContainer {
 
   private final Vision vision;
   private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController climberstick = new CommandXboxController(3);
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second max
@@ -260,7 +261,11 @@ public class RobotContainer {
             () -> -joystick.getRightX())); 
 
 
-       //joystick.start().and(joystick.y()).onTrue(getAutonomousCommand());
+       //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand());
+
+    climber.setDefaultCommand(
+      ClimberCommands.runClimber(
+        () -> climberstick.getLeftY()));
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));

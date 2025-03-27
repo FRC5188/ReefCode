@@ -17,6 +17,6 @@ public class ClimberCommands {
                 () -> {
                     _climber.setClimberSpeed(ySupplier.getAsDouble());
                 },
-                _climber);
+                _climber).unless(() -> (ySupplier.getAsDouble() < 0.05));
     }
 }

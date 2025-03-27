@@ -1,5 +1,6 @@
 package frc.robot.subsystems.multisubsystemcommands;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberCommands;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
@@ -48,8 +51,10 @@ public class MultiSubsystemCommands {
 
     private Elevator _elevator;
     private Arm _arm;
+    private Climber _climber;
     private ElevatorCommands _elevatorCommands;
     private ArmCommands _armCommands;
+    private ClimberCommands _climberCommands;
 
     public MultiSubsystemCommands(Elevator elevator, Arm arm, ElevatorCommands elevatorCommands,
             ArmCommands armCommands) {
@@ -92,5 +97,5 @@ public class MultiSubsystemCommands {
                 .alongWith(_armCommands.intake())
                 .andThen(_armCommands.setArmPosition(ArmPosition.Stow));
     }
-
+    
 }

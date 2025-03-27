@@ -303,12 +303,17 @@ public class RobotContainer {
             joystickApproach(
                     () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
 
-    
     // a -button approach reef
     joystick.a()
         .whileTrue(
             joystickApproach(
                     () -> FieldConstants.getNearestReefFace(drive.getPose())));
+
+    // Set up robot for climb
+    climberstick.x()
+        .onTrue(
+          armCommands.moveArm(ArmPosition.Climbing)
+          .andThen(elevatorCommands.moveElevator(ElevatorPosition.Stow)));
 
     manualIntakeButton.whileTrue(armCommands.manualIntake());
 

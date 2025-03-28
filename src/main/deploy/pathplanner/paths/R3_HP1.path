@@ -8,36 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.778073770491804,
-        "y": 6.320645491803279
+        "x": 4.96275,
+        "y": 6.062749999999999
       },
       "isLocked": false,
       "linkedName": "ScoreR3"
     },
     {
       "anchor": {
-        "x": 2.940519751329567,
-        "y": 6.779
+        "x": 4.085249999999999,
+        "y": 6.238249999999999
       },
       "prevControl": {
-        "x": 3.380532786885246,
-        "y": 6.728227459016393
+        "x": 4.391379510922372,
+        "y": 6.100276135922311
       },
       "nextControl": {
-        "x": 2.400148726044413,
-        "y": 6.841352720966541
+        "x": 3.3929999999999993,
+        "y": 6.550249999999999
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.1505,
-        "y": 7.008500000000001
+        "x": 1.6185000000000003,
+        "y": 7.34975
       },
       "prevControl": {
-        "x": 1.8257661575487776,
-        "y": 7.198662308622983
+        "x": 1.8781417813890309,
+        "y": 7.256893925639328
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,16 +46,30 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0681992337164712,
+      "waypointRelativePos": 1.417904761904762,
       "rotationDegrees": -53.8
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6860986547085202,
+      "maxWaypointRelativePos": 1.626008968609865,
+      "constraints": {
+        "maxVelocity": 10.0,
+        "maxAcceleration": 4.5,
+        "maxAngularVelocity": 800.0,
+        "maxAngularAcceleration": 750.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 10.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

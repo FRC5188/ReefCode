@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HP2_R6"
+                  "pathName": "Fast_HP2_L.R6"
                 }
               }
             ]
@@ -80,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "R6_HP2"
+                  "pathName": "Fast_L.R6_HP2"
                 }
               },
               {
@@ -99,13 +99,32 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HP2_R6"
+                  "pathName": "Fast_HP2_R.R6"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L1"
+                  "name": "L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Fast_R.R6_HP2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
                 }
               }
             ]
@@ -134,6 +153,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "FAST AUTOS",
   "choreoAuto": false
 }

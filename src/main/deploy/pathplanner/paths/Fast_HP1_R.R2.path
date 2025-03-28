@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.723,
-        "y": 4.991511920463674
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 2.665728368105369,
-        "y": 6.223712505356056
-      },
-      "isLocked": true,
-      "linkedName": "ScoreR2"
-    },
-    {
-      "anchor": {
         "x": 1.6185000000000003,
         "y": 7.34975
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.8179302447703478,
+        "y": 7.148073150731447
+      },
+      "isLocked": false,
+      "linkedName": "HP1"
+    },
+    {
+      "anchor": {
+        "x": 3.722528569965569,
+        "y": 4.991511920463674
+      },
       "prevControl": {
-        "x": 1.7860635948907588,
-        "y": 7.164217141273343
+        "x": 3.5620492827809422,
+        "y": 5.1832054216177665
       },
       "nextControl": null,
-      "isLocked": true,
-      "linkedName": "HP1"
+      "isLocked": false,
+      "linkedName": "ScoreR2"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.45067264573991034,
+      "maxWaypointRelativePos": 0.531390134529148,
       "constraints": {
         "maxVelocity": 10.0,
         "maxAcceleration": 5.0,
@@ -48,21 +48,21 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 10.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -53.8
-  },
-  "reversed": false,
-  "folder": "Reef to HP",
-  "idealStartingState": {
     "velocity": 0,
     "rotation": -59.5
+  },
+  "reversed": false,
+  "folder": "Fast A 3 Piece",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -53.8
   },
   "useDefaultConstraints": false
 }

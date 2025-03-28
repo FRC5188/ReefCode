@@ -3,14 +3,17 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
+    "Fast A 3 Piece",
     "HP to Reef",
     "Leave Start",
-    "Move to Score",
     "Move back from Score",
+    "Move to Score",
+    "Fast C 3 Piece",
     "Reef to HP",
     "Start to Reef"
   ],
   "autoFolders": [
+    "FAST AUTOS",
     "LeaveStart",
     "StartToReef",
     "Test"

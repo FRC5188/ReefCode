@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.723,
-        "y": 4.991511920463674
+        "x": 4.039856557377049,
+        "y": 2.916137295081967
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.665728368105369,
-        "y": 6.223712505356056
+        "x": 3.571212098601804,
+        "y": 2.4178008984523625
       },
-      "isLocked": true,
-      "linkedName": "ScoreR2"
+      "isLocked": false,
+      "linkedName": "ScoreR6"
     },
     {
       "anchor": {
-        "x": 1.6185000000000003,
-        "y": 7.34975
+        "x": 1.599,
+        "y": 0.670999999999999
       },
       "prevControl": {
-        "x": 1.7860635948907588,
-        "y": 7.164217141273343
+        "x": 1.7602751563782437,
+        "y": 0.8620244066478749
       },
       "nextControl": null,
-      "isLocked": true,
-      "linkedName": "HP1"
+      "isLocked": false,
+      "linkedName": "HP2"
     }
   ],
   "rotationTargets": [],
@@ -33,12 +33,12 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.45067264573991034,
+      "maxWaypointRelativePos": 0.5493273542600897,
       "constraints": {
         "maxVelocity": 10.0,
         "maxAcceleration": 5.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
+        "maxAngularVelocity": 600.0,
+        "maxAngularAcceleration": 800.0,
         "nominalVoltage": 12.0,
         "unlimited": false
       }
@@ -48,21 +48,21 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 10.0,
-    "maxAcceleration": 3.5,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 600.0,
+    "maxAngularAcceleration": 800.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -53.8
+    "velocity": 0,
+    "rotation": 53.8
   },
   "reversed": false,
-  "folder": "Reef to HP",
+  "folder": "Fast C 3 Piece",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.5
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": false
 }

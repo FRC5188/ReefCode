@@ -48,7 +48,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 10.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -59,7 +59,7 @@
     "rotation": -53.8
   },
   "reversed": false,
-  "folder": "Reef to HP",
+  "folder": "Fast A 3 Piece",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -59.5

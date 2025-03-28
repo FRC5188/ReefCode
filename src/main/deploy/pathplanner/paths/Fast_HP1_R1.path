@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.723,
-        "y": 4.991511920463674
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 2.665728368105369,
-        "y": 6.223712505356056
-      },
-      "isLocked": true,
-      "linkedName": "ScoreR2"
-    },
-    {
-      "anchor": {
         "x": 1.6185000000000003,
         "y": 7.34975
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.68125,
+        "y": 6.60875
+      },
+      "isLocked": false,
+      "linkedName": "HP1"
+    },
+    {
+      "anchor": {
+        "x": 2.3985000000000003,
+        "y": 5.67275
+      },
       "prevControl": {
-        "x": 1.7860635948907588,
-        "y": 7.164217141273343
+        "x": 2.348509997001,
+        "y": 5.917701014695101
+      },
+      "nextControl": {
+        "x": 2.4960000000000004,
+        "y": 5.195
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.2841721390676866,
+        "y": 3.837271284603343
+      },
+      "prevControl": {
+        "x": 2.27175,
+        "y": 3.7812499999999996
       },
       "nextControl": null,
-      "isLocked": true,
-      "linkedName": "HP1"
+      "isLocked": false,
+      "linkedName": "ScoreR1"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +49,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.45067264573991034,
+      "maxWaypointRelativePos": 1.141704035874439,
       "constraints": {
         "maxVelocity": 10.0,
         "maxAcceleration": 5.0,
@@ -48,21 +64,21 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 10.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -53.8
+    "velocity": 0,
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Reef to HP",
+  "folder": "Fast A 3 Piece",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.5
+    "rotation": -53.8
   },
   "useDefaultConstraints": false
 }

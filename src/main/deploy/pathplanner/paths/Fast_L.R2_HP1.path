@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.723,
-        "y": 4.991511920463674
+        "x": 4.00725,
+        "y": 5.1365
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.665728368105369,
-        "y": 6.223712505356056
+        "x": 2.7798189688994217,
+        "y": 6.2871263127274535
       },
       "isLocked": true,
-      "linkedName": "ScoreR2"
+      "linkedName": "L.R2"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 7.34975
       },
       "prevControl": {
-        "x": 1.7860635948907588,
-        "y": 7.164217141273343
+        "x": 1.8023234741866845,
+        "y": 7.180312901529986
       },
       "nextControl": null,
       "isLocked": true,
@@ -48,7 +48,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 10.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -59,7 +59,7 @@
     "rotation": -53.8
   },
   "reversed": false,
-  "folder": "Reef to HP",
+  "folder": "Fast A 3 Piece",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -59.5

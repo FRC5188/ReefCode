@@ -3,37 +3,42 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.723,
-        "y": 4.991511920463674
+        "x": 7.564241803278687,
+        "y": 1.9810963114754099
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.665728368105369,
-        "y": 6.223712505356056
+        "x": 6.379939714782926,
+        "y": 2.224089085857935
       },
-      "isLocked": true,
-      "linkedName": "ScoreR2"
+      "isLocked": false,
+      "linkedName": "C"
     },
     {
       "anchor": {
-        "x": 1.6185000000000003,
-        "y": 7.34975
+        "x": 5.238627049180328,
+        "y": 3.036014344262295
       },
       "prevControl": {
-        "x": 1.7860635948907588,
-        "y": 7.164217141273343
+        "x": 5.503406048705033,
+        "y": 2.7758299406484523
       },
       "nextControl": null,
-      "isLocked": true,
-      "linkedName": "HP1"
+      "isLocked": false,
+      "linkedName": "ScoreR5"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.3,
+      "rotationDegrees": 162.15573333673396
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.45067264573991034,
+      "maxWaypointRelativePos": 0.39865470852017926,
       "constraints": {
         "maxVelocity": 10.0,
         "maxAcceleration": 5.0,
@@ -55,14 +60,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -53.8
+    "velocity": 0,
+    "rotation": 120.9
   },
   "reversed": false,
-  "folder": "Reef to HP",
+  "folder": "Fast C 3 Piece",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.5
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }

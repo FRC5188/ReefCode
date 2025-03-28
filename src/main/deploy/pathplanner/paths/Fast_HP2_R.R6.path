@@ -3,37 +3,42 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.723,
-        "y": 4.991511920463674
+        "x": 1.599,
+        "y": 0.670999999999999
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.665728368105369,
-        "y": 6.223712505356056
+        "x": 2.9838742645740246,
+        "y": 2.0569625625489363
       },
-      "isLocked": true,
-      "linkedName": "ScoreR2"
+      "isLocked": false,
+      "linkedName": "HP2"
     },
     {
       "anchor": {
-        "x": 1.6185000000000003,
-        "y": 7.34975
+        "x": 4.039856557377049,
+        "y": 2.916137295081967
       },
       "prevControl": {
-        "x": 1.7860635948907588,
-        "y": 7.164217141273343
+        "x": 3.8588082879463577,
+        "y": 2.743737979143208
       },
       "nextControl": null,
-      "isLocked": true,
-      "linkedName": "HP1"
+      "isLocked": false,
+      "linkedName": "ScoreR6"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.45,
+      "rotationDegrees": 59.99999999999999
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.45067264573991034,
+      "maxWaypointRelativePos": 0.48654708520179374,
       "constraints": {
         "maxVelocity": 10.0,
         "maxAcceleration": 5.0,
@@ -48,21 +53,21 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 10.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -53.8
+    "velocity": 0,
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "Reef to HP",
+  "folder": "Fast C 3 Piece",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.5
+    "rotation": 53.8
   },
   "useDefaultConstraints": false
 }

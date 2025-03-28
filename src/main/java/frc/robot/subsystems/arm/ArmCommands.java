@@ -2,6 +2,7 @@ package frc.robot.subsystems.arm;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -56,6 +57,14 @@ public class ArmCommands {
         return intakeCoral().andThen(moveArm(ArmPosition.Stow));
 
     }
+    
+    // private Command intakeCoralWithAdjust() {
+    //     if (RobotState.isAutonomous()) {
+    //         return intakeCoral();
+    //     } else {
+    //     return intakeCoral().andThen(moveArm(ArmPosition.Stow));
+    //     }
+    // }
 
     private Command intakeCoral() {
         Command c = new Command() {

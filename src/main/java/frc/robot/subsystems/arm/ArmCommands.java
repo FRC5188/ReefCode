@@ -54,17 +54,12 @@ public class ArmCommands {
     }
 
     private Command intakeCoralWithAdjust() {
+        if (RobotState.isAutonomous()) {
+            return intakeCoral();
+        } else {
         return intakeCoral().andThen(moveArm(ArmPosition.Stow));
-
+        }
     }
-    
-    // private Command intakeCoralWithAdjust() {
-    //     if (RobotState.isAutonomous()) {
-    //         return intakeCoral();
-    //     } else {
-    //     return intakeCoral().andThen(moveArm(ArmPosition.Stow));
-    //     }
-    // }
 
     private Command intakeCoral() {
         Command c = new Command() {

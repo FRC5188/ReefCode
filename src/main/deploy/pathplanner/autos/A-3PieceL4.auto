@@ -9,15 +9,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "L4"
+                  "pathName": "A_R3"
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "C_R5"
+                  "name": "L4"
                 }
               }
             ]
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "R5_HP2"
+                  "pathName": "R3_HP1"
                 }
               },
               {
@@ -53,15 +53,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "L4"
+                  "pathName": "HP1_R2"
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "HP2_R6"
+                  "name": "L4"
                 }
               }
             ]
@@ -80,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "R6_HP2"
+                  "pathName": "R2_HP1"
                 }
               },
               {
@@ -99,13 +99,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HP2_R6"
+                  "pathName": "HP1_R1"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L1"
+                  "name": "L4"
                 }
               }
             ]

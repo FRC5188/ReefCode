@@ -36,8 +36,8 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.io.RealArmIO;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.climber.ClimberCommands;
+// import frc.robot.subsystems.climber.Climber;
+// import frc.robot.subsystems.climber.ClimberCommands;
 import frc.robot.subsystems.climber.io.RealClimberIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
@@ -76,8 +76,8 @@ public class RobotContainer {
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
   private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
-  private final Climber climber = new Climber(new RealClimberIO());
-  private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
+  // private final Climber climber = new Climber(new RealClimberIO());
+  // private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
@@ -263,9 +263,9 @@ public class RobotContainer {
 
        //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand());
 
-    climber.setDefaultCommand(
-      ClimberCommands.runClimber(
-        () -> climberstick.getLeftY()));
+    // climber.setDefaultCommand(
+    //   ClimberCommands.runClimber(
+    //     () -> climberstick.getLeftY()));
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));

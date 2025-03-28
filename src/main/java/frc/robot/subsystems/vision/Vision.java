@@ -32,6 +32,7 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import java.util.List;
 
 
 public class Vision extends SubsystemBase {
@@ -39,6 +40,8 @@ public class Vision extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+  public boolean visionHasTarget = false;
+  private boolean seesThisTarget = false;
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -95,9 +98,19 @@ public class Vision extends SubsystemBase {
       // Add tag poses
       for (int tagId : inputs[cameraIndex].tagIds) {
         var tagPose = aprilTagLayout.getTagPose(tagId);
-        if (tagPose.isPresent()) {
-          tagPoses.add(tagPose.get());
-        }
+          if (tagPose.isPresent() && !rejectedTags.contains(tagId)) {
+                  tagPoses.add(tagPose.get());
+                  seesThisTarget = true;
+          }
+      }
+
+      // Report to visionhas Target whether or not vision sees at least one tag
+      if (seesThisTarget) {
+        visionHasTarget = true;
+        // Now reset seesThisTarget for next periodic loop
+        seesThisTarget = false;
+      } else {
+        visionHasTarget = false;
       }
 
       // Loop over pose observations

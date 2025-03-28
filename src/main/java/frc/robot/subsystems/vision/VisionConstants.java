@@ -21,6 +21,8 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
+import java.util.Arrays;
 
 public class VisionConstants {
   // AprilTag layout
@@ -81,6 +83,10 @@ public class VisionConstants {
         1.0, // Camera 7
         1.0  // Camera 8
       };
+
+
+  // List of tags that can be rejected if we want to align solely on the reef
+  public static List<Integer> rejectedTags = Arrays.asList(2, 3, 4, 5, 14, 15, 16);
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve

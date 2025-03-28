@@ -28,7 +28,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
-                }, _arm).withTimeout(0.3)
+                }, _arm).withTimeout(0.5)
                 .andThen(Commands.runOnce(() -> _arm.setArmSetpoint(ArmPosition.Stow), _arm).unless(() -> _arm.getCurrentPos() != ArmPosition.L4_Score));
                 
 

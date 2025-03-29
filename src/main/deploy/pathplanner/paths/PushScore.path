@@ -61,7 +61,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Fast C 3 Piece",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

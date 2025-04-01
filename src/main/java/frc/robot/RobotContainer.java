@@ -19,11 +19,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.FileVersionException;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,6 +39,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.Telemetry;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.drive.io.GyroIO;
 import frc.robot.subsystems.drive.io.GyroIOPigeon2;
 import frc.robot.subsystems.drive.io.ModuleIO;
@@ -51,6 +48,9 @@ import frc.robot.subsystems.drive.io.ModuleIOTalonFX;
 import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
+import frc.robot.subsystems.elevator.RealElevatorIO;
+import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.leds.LEDs;
@@ -89,13 +89,16 @@ public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second max
                                                                                     // angular velocity
-
+ 
   /* Setting up bindings for necessary control of the swerve drive platform */
   // private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
   //     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
   //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+  private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController climberstick = new CommandXboxController(1);
 
   private final GenericHID buttonbox1 = new GenericHID(1);
   private final GenericHID buttonbox2 = new GenericHID(2);
@@ -157,22 +160,11 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        /* We should be using this VisionIOPhotonVisionSim here but it's running too slow and 
-           causing the a loop overrun.  
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera7Name, robotToCamera7, drive::getPose),
-                new VisionIOPhotonVisionSim(camera8Name, robotToCamera8, drive::getPose)
-                );   */
-        vision = 
-            new Vision(
-                drive::addVisionMeasurement, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {});
-
+        // vision =
+        //     new Vision(
+        //         drive::addVisionMeasurement,
+        //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
+        //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
         break;
 
       default:
@@ -185,15 +177,10 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision = 
-            new Vision(
-                drive::addVisionMeasurement, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {});
+        // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
+    
 
     // All AutoAligns for reef will align to Left position
     //TODO: Add AutoAligns to all the commands.
@@ -251,14 +238,25 @@ public class RobotContainer {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
     
-     
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
             () -> -joystick.getLeftY(),
             () -> -joystick.getLeftX(),
-            () -> -joystick.getRightX())); 
+            () -> -joystick.getRightX()));
 
+    climber.setDefaultCommand(
+      ClimberCommands.runClimber(
+        () -> -climberstick.getLeftY()));
+
+    
+    // drivetrain.setDefaultCommand(
+    //     // Drivetrain will execute this command periodically
+    //     drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
+    //                                                                                        // negative Y (forward)
+    //         .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+    //         .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+    //     ));
 
        //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand());
 
@@ -342,11 +340,44 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return Commands.print("No autonomous command configured");
   }
 
-  public Drive getDrive() {
-    return drive;
+  public void calibrateAndStartPIDs() {
+    // PID commands: we only want one of them so start/stop works correctly
+    Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
+    Command armPIDCommand = armCommands.runArmPID();
+    // Start elevator pid
+    if (elevatorSubsystem.isCalibrated()) {
+      elevatorCommands.runElevatorPID();
+      if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
+        CommandScheduler.getInstance().schedule(elevatorPIDCommand);
+      }
+    } else {
+      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
+      CommandScheduler.getInstance().schedule(calibCommand);
+    }
+
+    // Start arm pid
+    if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
+      CommandScheduler.getInstance().schedule(armPIDCommand);
+    }
+
+    // Set initial positions
+    CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
+    CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
+  }
+
+  public void startIdleAnimations() {
+    Command disabled1 = LEDCommands.disabledAnimation1();
+    if (!CommandScheduler.getInstance().isScheduled(disabled1))
+      CommandScheduler.getInstance().schedule(disabled1);
+  }
+
+  public void startEnabledLEDs() {
+    Command initialLEDs = LEDCommands.pickingUpCoral();
+    if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
+      CommandScheduler.getInstance().schedule(initialLEDs);
   }
   public void calibrateAndStartPIDs() {
     // PID commands: we only want one of them so start/stop works correctly

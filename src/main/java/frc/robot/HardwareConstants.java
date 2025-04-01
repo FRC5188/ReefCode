@@ -40,7 +40,4 @@ public class HardwareConstants {
         // Add digitial I/O ports used here
         public static final int LIGHT_SENSOR_CHANNEL = 0;
     }
-
-    // Use LoggedTunableNumbers
-    public static final boolean tuningMode = true;
 }

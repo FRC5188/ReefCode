@@ -184,6 +184,17 @@ public class ArmCommands {
         };
     }
 
+    public Command moveGamepieceToLightSensor() {
+        return new StartEndCommand(
+            () -> {
+                _arm.setIntakeSpeed(-0.3);
+            },
+            () -> {
+                _arm.setIntakeSpeed(0);
+            },
+            _arm).until(() -> _arm.lightSensorSeesGamepiece());       
+    }
+
     public Command runArmPID() {
         return Commands.run(() -> {
             _arm.runArmPID();

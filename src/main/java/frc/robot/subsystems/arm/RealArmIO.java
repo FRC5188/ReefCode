@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm.io;
+package frc.robot.subsystems.arm;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -35,6 +35,7 @@ public class RealArmIO implements ArmIO {
     private LaserCan _algaeLaserCan;
     private SparkFlex _intakeMotor;
     private SparkAbsoluteEncoder _armEncoder;
+    private SparkMax _feederMotor;
 
     public RealArmIO() {
         _armMotor = new SparkFlex(CAN.ARM_MTR_ID, MotorType.kBrushless);
@@ -106,6 +107,10 @@ public class RealArmIO implements ArmIO {
          _intakeMotor.set(speed);
     }
 
+    public void setFeederMotorSpeed(double speed){
+        _feederMotor.set(speed);
+        
+    }
     public void resetIntakeEncoders() {
         _intakeMotor.getEncoder().setPosition(0);
     }

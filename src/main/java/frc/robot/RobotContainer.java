@@ -48,7 +48,6 @@ import frc.robot.subsystems.drive.io.GyroIOPigeon2;
 import frc.robot.subsystems.drive.io.ModuleIO;
 import frc.robot.subsystems.drive.io.ModuleIOSim;
 import frc.robot.subsystems.drive.io.ModuleIOTalonFX;
-import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
@@ -115,6 +114,8 @@ public class RobotContainer {
 
   private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
+
+  private final JoystickButton recalibrateButton = new JoystickButton(buttonbox2, 7);
 
   private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
   private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);
@@ -318,6 +319,8 @@ public class RobotContainer {
 
     incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
     decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
+
+    recalibrateButton.onTrue(multiSubsystemCommands.calibrate());
     /* 
      // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
      joystick.rightBumper()
@@ -348,29 +351,8 @@ public class RobotContainer {
   public Drive getDrive() {
     return drive;
   }
-  public void calibrateAndStartPIDs() {
-    // PID commands: we only want one of them so start/stop works correctly
-    Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
-    Command armPIDCommand = armCommands.runArmPID();
-    // Start elevator pid
-    if (elevatorSubsystem.isCalibrated()) {
-      elevatorCommands.runElevatorPID();
-      if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
-        CommandScheduler.getInstance().schedule(elevatorPIDCommand);
-      }
-    } else {
-      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
-      CommandScheduler.getInstance().schedule(calibCommand);
-    }
-
-    // Start arm pid
-    if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
-      CommandScheduler.getInstance().schedule(armPIDCommand);
-    }
-
-    // Reset PIDs
-    CommandScheduler.getInstance().schedule(elevatorCommands.resetElevatorPID());
-    CommandScheduler.getInstance().schedule(armCommands.resetArmPID());
+  public void calibrate() {
+    CommandScheduler.getInstance().schedule(multiSubsystemCommands.calibrate());
   }
 
   public void startIdleAnimations() {

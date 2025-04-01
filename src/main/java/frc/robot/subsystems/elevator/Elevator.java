@@ -183,7 +183,8 @@ public class Elevator extends SubsystemBase {
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-    _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
+    if (_isCalibrated)
+      _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
   }
 
   public boolean isCalibrated() {
@@ -235,6 +236,9 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/currentPosEnum", _currentPos);
     Logger.recordOutput("Elevator/desiredPosEnum", _desiredPos);
     Logger.recordOutput("Elevator/currentGamepieceMode", _currentMode);
+
+    // Run pid
+    runMotorsWithPID();
   }
 
 }

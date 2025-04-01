@@ -13,33 +13,59 @@ public final class ElevatorCommands {
         _elevator = elevator;
     }
 
-    public Command runElevatorPID() {
-        return Commands.run(() -> {
-            _elevator.runMotorsWithPID();
-        });
+    public Command calibrateElevator() {
+        return new Command() {
+            int spikeCounter = 0;
+
+            @Override
+            public void initialize() {
+                spikeCounter = 0;
+                _elevator.runMotorsDown();
+                _elevator.setIsCalibrated(false);
+            }
+
+            @Override
+            public void execute() {
+                if (_elevator.isAboveCurrentLimit()) {
+                    spikeCounter++;
+                }
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                _elevator.resetEncoders();
+                _elevator.stopMotors();
+                _elevator.setIsCalibrated(true);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return spikeCounter >= 3;
+            }
+        };
     }
 
     public Command decrementElevatorPosition() {
         return new InstantCommand(
-            () -> {
-                _elevator.decrementElevatorPosition();
-                
-            } , _elevator);  
+                () -> {
+                    _elevator.decrementElevatorPosition();
+
+                }, _elevator);
     }
 
     public Command incrementElevatorPosition() {
         return new InstantCommand(
-           () -> {
-            _elevator.incrementElevatorPosition();
-    
-           }, _elevator);
-    } 
+                () -> {
+                    _elevator.incrementElevatorPosition();
+
+                }, _elevator);
+    }
 
     public Command setElevatorSetpoint(ElevatorPosition setpoint) {
         return new InstantCommand(
-            () -> {
-            _elevator.setSetpoint(setpoint);
-            }, _elevator);
+                () -> {
+                    _elevator.setSetpoint(setpoint);
+                }, _elevator);
     }
 
     public Command waitUntilAtSetpoint() {

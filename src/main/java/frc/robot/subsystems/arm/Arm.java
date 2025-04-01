@@ -216,5 +216,8 @@ public class Arm extends SubsystemBase {
     Logger.recordOutput("Arm/currentPosEnum", _currentPos);
     Logger.recordOutput("Arm/desiredPosEnum", _desiredPos);
     Logger.recordOutput("Arm/intakeSpikeCounter", _intakeSpikeCounter);
+
+    // Run pid
+    runArmPID();
   }
 }

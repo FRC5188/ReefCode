@@ -244,7 +244,7 @@ public class RobotContainer {
       return DriveCommands.joystickApproach(
           drive,
           () -> -joystick.getLeftY() * speedMultiplier,
-          approachPose);
+          approachPose).alongWith(LEDsCommands.aligningWithReef());
   }
 
   private void configureBindings() {

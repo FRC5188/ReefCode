@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.elevator.io;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -41,7 +41,7 @@ public class RealElevatorIO implements ElevatorIO {
     }
 
     public void setElevatorSpeed(double speed) {
-         _primaryMotor.set(speed);
+        _primaryMotor.set(speed);
     }
 
     public void setElevatorVoltage(Voltage voltage) {

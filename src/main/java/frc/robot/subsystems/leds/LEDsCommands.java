@@ -1,5 +1,7 @@
 package frc.robot.subsystems.leds;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -62,6 +64,7 @@ public class LEDsCommands {
         _leds);
     }
     
+    
     //We have a piece and hasPiece animation has already run
     public Command elevatorOrArmIsMoving() {
       return new StartEndCommand(
@@ -102,10 +105,10 @@ public class LEDsCommands {
          };
     }
   
-    public static Command aligningWithReef() {
+    public static Command aligningWithReef(BooleanSupplier closeToReef) {
       return new StartEndCommand(
         () -> {
-          _leds.aligningWithReefAnimation();
+          _leds.aligningWithReefAnimation(closeToReef);
         }, 
         () -> {
           _leds.reset();

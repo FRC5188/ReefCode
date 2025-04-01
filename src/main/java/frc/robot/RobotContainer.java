@@ -244,7 +244,7 @@ public class RobotContainer {
       return DriveCommands.joystickApproach(
           drive,
           () -> -joystick.getLeftY() * speedMultiplier,
-          approachPose).alongWith(LEDsCommands.aligningWithReef());
+          approachPose).alongWith(LEDsCommands.aligningWithReef(() -> drive.getCloseToReef()));
   }
 
   private void configureBindings() {
@@ -272,7 +272,7 @@ public class RobotContainer {
     // drive.registerTelemetry(logger::telemeterize);
 
     intakeButton.onTrue(multiSubsystemCommands.loadCoral().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()).unless(() -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
-    spitButton.onTrue(armCommands.spit());
+    spitButton.onTrue(armCommands.spit().andThen(Commands.either(LEDCommands.pickingUpAlgae(), LEDCommands.pickingUpCoral(), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE)));
 
     StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
     L1Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L1));
@@ -280,8 +280,8 @@ public class RobotContainer {
     L3Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3), multiSubsystemCommands.moveToPosition(OverallPosition.L3), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
     L4Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L4));
 
-    gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
-    gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
+    gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE).alongWith(LEDCommands.pickingUpAlgae()));
+    gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL).alongWith(LEDCommands.pickingUpCoral()));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.

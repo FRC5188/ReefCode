@@ -63,9 +63,9 @@ public class MultiSubsystemCommands {
     }
 
     public Command calibrate() {
-        return _elevatorCommands.calibrateElevator()
-                .andThen(_elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow)
-                        .alongWith(_armCommands.setArmPosition(ArmPosition.Stow)));
+        return _armCommands.setArmPosition(ArmPosition.Stow)
+                .andThen(_elevatorCommands.calibrateElevator())
+                .andThen(_elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
     }
 
     public Command moveToPosition(OverallPosition setpoint) {

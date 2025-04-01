@@ -184,12 +184,6 @@ public class ArmCommands {
         };
     }
 
-    public Command runArmPID() {
-        return Commands.run(() -> {
-            _arm.runArmPID();
-        });
-    }
-
     public Command intakeForNumberOfRotations() {
         return new StartEndCommand(() -> {
             _arm.resetIntakeEncoders();

@@ -51,10 +51,8 @@ public class MultiSubsystemCommands {
 
     private Elevator _elevator;
     private Arm _arm;
-    private Climber _climber;
     private ElevatorCommands _elevatorCommands;
     private ArmCommands _armCommands;
-    private ClimberCommands _climberCommands;
 
     public MultiSubsystemCommands(Elevator elevator, Arm arm, ElevatorCommands elevatorCommands,
             ArmCommands armCommands) {
@@ -62,6 +60,12 @@ public class MultiSubsystemCommands {
         _arm = arm;
         _elevatorCommands = elevatorCommands;
         _armCommands = armCommands;
+    }
+
+    public Command calibrate() {
+        return _elevatorCommands.calibrateElevator()
+                .andThen(_elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow)
+                        .alongWith(_armCommands.setArmPosition(ArmPosition.Stow)));
     }
 
     public Command moveToPosition(OverallPosition setpoint) {
@@ -82,7 +86,7 @@ public class MultiSubsystemCommands {
     public Command scoreGamepieceAtPosition(OverallPosition setpoint) {
         return moveToPosition(setpoint)
                 .andThen(_armCommands.spit());
-    } 
+    }
 
     public Command loadCoral() {
         return moveToPosition(OverallPosition.Coral_Loading)
@@ -97,5 +101,5 @@ public class MultiSubsystemCommands {
                 .alongWith(_armCommands.intake())
                 .andThen(_armCommands.setArmPosition(ArmPosition.Stow));
     }
-    
+
 }

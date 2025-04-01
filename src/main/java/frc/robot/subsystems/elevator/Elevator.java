@@ -235,6 +235,9 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/currentPosEnum", _currentPos);
     Logger.recordOutput("Elevator/desiredPosEnum", _desiredPos);
     Logger.recordOutput("Elevator/currentGamepieceMode", _currentMode);
+
+    // Run pid
+    runMotorsWithPID();
   }
 
 }

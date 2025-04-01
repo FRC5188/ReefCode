@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.HardwareConstants;
 import frc.robot.HardwareConstants.CAN;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveCommands;
 
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
@@ -26,6 +28,7 @@ public class LEDs extends SubsystemBase {
     boolean _alreadyRunning = false;
     LEDAnimation _currentAnimation = LEDAnimation.None;
 
+    Drive _drive;
     Elevator _elevator;
 
     public enum LEDAnimation {
@@ -153,6 +156,17 @@ public class LEDs extends SubsystemBase {
         if (!_alreadyRunning) {
             runAnimation(LEDAnimation.Bounce);
             _alreadyRunning = false;
+        }
+    }
+
+    public void aligningWithReefAnimation() {
+        // If close enough to reef:
+        if (_drive.getCloseToReef()) {
+            runAnimation(LEDAnimation.SolidGreen);
+        }
+
+        else {
+            runAnimation(LEDAnimation.SolidRed);
         }
     }
 

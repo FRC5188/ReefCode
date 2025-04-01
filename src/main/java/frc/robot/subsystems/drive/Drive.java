@@ -42,6 +42,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -49,6 +50,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.FieldConstants;
 import frc.robot.HardwareConstants;
 import frc.robot.HardwareConstants.Mode;
 import frc.robot.subsystems.drive.io.GyroIO;
@@ -79,7 +81,8 @@ public class Drive extends SubsystemBase {
     private static final double ROBOT_MOI = 5.10;
     private static final double WHEEL_COF = 1.13; 
 
-
+    // For use in getCloseToReef() method: if robot is less than this distance from the reef, LEDs turn green
+    private static final double MAX_DISTANCE_TO_REEF = Units.inchesToMeters(50);
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -391,6 +394,19 @@ public class Drive extends SubsystemBase {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+  }
+
+  public boolean getCloseToReef() {
+
+      Translation2d reefTranslation = FieldConstants.Reef.centerOfReef;
+      double distanceToReef = getPose().getTranslation().getDistance(reefTranslation);
+
+      // If robot is within MAX_DISTANCE_TO_REEF from center of reef, LEDs can turn green.
+      if (distanceToReef <= MAX_DISTANCE_TO_REEF) {
+        return true;
+      }
+
+    return false;
   }
 
   /** Returns the maximum linear speed in meters per sec. */

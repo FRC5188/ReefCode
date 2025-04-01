@@ -271,7 +271,7 @@ public class RobotContainer {
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    intakeButton.onTrue(multiSubsystemCommands.loadCoral().unless(() -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
+    intakeButton.onTrue(multiSubsystemCommands.loadCoral().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()).unless(() -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
     spitButton.onTrue(armCommands.spit());
 
     StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));

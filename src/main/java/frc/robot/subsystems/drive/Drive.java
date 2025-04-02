@@ -82,7 +82,7 @@ public class Drive extends SubsystemBase {
     private static final double WHEEL_COF = 1.13; 
 
     // For use in getCloseToReef() method: if robot is less than this distance from the reef, LEDs turn green
-    private static final double MAX_DISTANCE_TO_REEF = Units.inchesToMeters(50);
+    private static final double MAX_DISTANCE_TO_REEF = Units.inchesToMeters(19.5);
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -398,8 +398,9 @@ public class Drive extends SubsystemBase {
 
   public boolean getCloseToReef() {
 
-      Translation2d reefTranslation = FieldConstants.Reef.centerOfReef;
-      double distanceToReef = getPose().getTranslation().getDistance(reefTranslation);
+      Pose2d currentPose =  getPose();
+      Pose2d reefFacePose = FieldConstants.getNearestReefFace(currentPose);
+      double distanceToReef = currentPose.getTranslation().getDistance(reefFacePose.getTranslation());
 
       // If robot is within MAX_DISTANCE_TO_REEF from center of reef, LEDs can turn green.
       if (distanceToReef <= MAX_DISTANCE_TO_REEF) {

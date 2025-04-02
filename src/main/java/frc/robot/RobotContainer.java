@@ -115,7 +115,7 @@ public class RobotContainer {
   private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
 
-  private final JoystickButton recalibrateButton = new JoystickButton(buttonbox2, 7);
+  private final JoystickButton recalibrateButton = new JoystickButton(buttonbox2, 3);
 
   private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
   private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);

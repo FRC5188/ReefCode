@@ -33,11 +33,11 @@ public class RealElevatorIO implements ElevatorIO {
     }
 
     public void updateInputs(ElevatorIOInputs inputs) {
-        inputs._elevatorMotorVoltage = _primaryMotor.getAppliedOutput() * _primaryMotor.getBusVoltage();
-        inputs._elevatorMotorCurrent = _primaryMotor.getOutputCurrent();
+        inputs._elevatorMotorVoltage = _secondaryMotor.getAppliedOutput() * _secondaryMotor.getBusVoltage();
+        inputs._elevatorMotorCurrent = _secondaryMotor.getOutputCurrent();
         inputs._elevatorPosition = _secondaryMotor.getEncoder().getPosition();
-        inputs._elevatorSpeed = _primaryMotor.get();
-        inputs._elevatorVelocity = _primaryMotor.getEncoder().getVelocity();
+        inputs._elevatorSpeed = _secondaryMotor.get();
+        inputs._elevatorVelocity = _secondaryMotor.getEncoder().getVelocity();
     }
 
     public void setElevatorSpeed(double speed) {

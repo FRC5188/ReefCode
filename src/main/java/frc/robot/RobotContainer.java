@@ -245,7 +245,7 @@ public class RobotContainer {
       return DriveCommands.joystickApproach(
           drive,
           () -> -joystick.getLeftY() * speedMultiplier,
-          approachPose).alongWith(LEDsCommands.aligningWithReef(() -> drive.getCloseToReef()));
+          approachPose).alongWith(LEDCommands.aligningWithReef(() -> drive.getCloseToReef()));
   }
 
   private void configureBindings() {
@@ -296,6 +296,7 @@ public class RobotContainer {
         .whileTrue(
             joystickApproach(
             () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.RIGHT)));
+            
 
     // Driver Left Bumper: Approach Nearest Left-Side Reef Branch
     joystick.leftBumper()

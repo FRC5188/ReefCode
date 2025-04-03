@@ -82,7 +82,7 @@ public class Drive extends SubsystemBase {
     private static final double WHEEL_COF = 1.13; 
 
     // For use in getCloseToReef() method: if robot is less than this distance from the reef, LEDs turn green
-    private static final double MAX_DISTANCE_TO_REEF = Units.inchesToMeters(19.5);
+    private static final double MAX_DISTANCE_TO_REEF = Units.inchesToMeters(20.5); // was 19.5
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;

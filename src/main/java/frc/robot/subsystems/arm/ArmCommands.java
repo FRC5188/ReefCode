@@ -116,7 +116,7 @@ public class ArmCommands {
                         counter = 0;
                     } else {
                         // Run the motors backwards until we see the piece in the upper light sensor
-                        _arm.setIntakeSpeed(-0.09);
+                        _arm.setIntakeSpeed(-0.09); // changed to -0.11 to prevent dropping piece while moving, seemed to work well
                         done = _arm.upperLightSensorSeesGamepiece();
                     }
                 }

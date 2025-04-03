@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.leds.LEDs;
@@ -105,20 +106,26 @@ public class LEDsCommands {
          };
     }
   
-    public static Command aligningWithReef(BooleanSupplier closeToReef) {
-      return new StartEndCommand(
-        () -> {
-          _leds.aligningWithReefAnimation(closeToReef);
-        }, 
-        () -> {
-          _leds.reset();
-        },
-         _leds) {
-        @Override
-        public boolean runsWhenDisabled() {
-          return false;
-        }
-       };
-  }
+  //   public Command aligningWithReef(BooleanSupplier closeToReef) {
+  //     return new StartEndCommand(
+  //       () -> {
+  //         _leds.aligningWithReefAnimation(closeToReef);
+  //       }, 
+  //       () -> {
+  //         _leds.reset();
+  //       },
+  //        _leds).repeatedly(); //{
+  //       // @Override
+  //       // public boolean runsWhenDisabled() {
+  //       //   return false;
+  //       // }
+  //     //  };
+  // }
+
+    public Command aligningWithReef(BooleanSupplier closeToReef) {
+      return new RunCommand(
+        () -> _leds.aligningWithReefAnimation(closeToReef), 
+        _leds).finallyDo((interrupted) -> _leds.reset());
+    }
 
 }

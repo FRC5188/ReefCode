@@ -357,7 +357,7 @@ public class RobotContainer {
   }
 
   public void startIdleAnimations() {
-    Command disabled1 = LEDCommands.disabledAnimation1();
+    Command disabled1 = ((LEDCommands.disabledAnimation1().withTimeout(20)).andThen(LEDCommands.disabledAnimation2().withTimeout(20)).repeatedly());
     if (!CommandScheduler.getInstance().isScheduled(disabled1))
       CommandScheduler.getInstance().schedule(disabled1);
   }

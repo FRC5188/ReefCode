@@ -40,7 +40,7 @@ public class ArmCommands {
             return new InstantCommand(
                     () -> {
                         _arm.setArmSetpoint(setpoint);
-                    });//.andThen(intakeForNumberOfRotations());
+                    }).andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {

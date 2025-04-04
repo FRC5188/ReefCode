@@ -10,10 +10,14 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.HardwareConstants;
 import frc.robot.HardwareConstants.CAN;
-import frc.robot.subsystems.elevator.Elevator;
+// import frc.robot.subsystems.elevator.Elevator;
+// import frc.robot.subsystems.drive.Drive;
+// import frc.robot.subsystems.drive.DriveCommands;
 
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
+
+import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -26,7 +30,8 @@ public class LEDs extends SubsystemBase {
     boolean _alreadyRunning = false;
     LEDAnimation _currentAnimation = LEDAnimation.None;
 
-    Elevator _elevator;
+    // Drive _drive;
+    // Elevator _elevator;
 
     public enum LEDAnimation {
         None(null, null, 0),
@@ -45,7 +50,7 @@ public class LEDs extends SubsystemBase {
 
         Bounce(null, new LarsonAnimation(0, 255, 0), 3),
 
-        SolidTeal(new LEDColor(0, 225, 174), null, 0),
+        SolidTeal(new LEDColor(0, 225, 100), null, 0),
 
         SolidCoral(new LEDColor(255, 80, 15), null, 0),
 
@@ -87,11 +92,7 @@ public class LEDs extends SubsystemBase {
                 _candle.clearAnimation(0);
                 _candle.setLEDs(0, 0, 0);
                 _candle.animate(animation.getAnimation());
-            } else if (animation == LEDAnimation.SolidRed) {
-                _candle.clearAnimation(0);
-                LEDColor color = animation.getColor();
-                _candle.setLEDs(color.getR(), color.getG(), color.getB(),0, 0, 
-                (int) Math.round(_numLEDs/_elevator.getElevatorMaxHeight() * _elevator.getCurrentPosInches()));
+            
             } else if (animation.getAnimation() == null) {
                 LEDColor color = animation.getColor();
                 _candle.clearAnimation(0);
@@ -153,6 +154,17 @@ public class LEDs extends SubsystemBase {
         if (!_alreadyRunning) {
             runAnimation(LEDAnimation.Bounce);
             _alreadyRunning = false;
+        }
+    }
+
+    public void aligningWithReefAnimation(BooleanSupplier closeToReef) {
+        // If close enough to reef:
+        if (closeToReef.getAsBoolean()) {
+            runAnimation(LEDAnimation.SolidGreen);
+        }
+
+        else {
+            runAnimation(LEDAnimation.SolidRed);
         }
     }
 

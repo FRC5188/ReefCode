@@ -44,26 +44,16 @@ public class VisionConstants {
   // Note: 0.0254 multiplier converts inches to meters
 
   // Camera 5
-  // Facing forward, not tilted
+  // Front right camera
   public static Transform3d robotToCamera5 =
-      new Transform3d(Units.inchesToMeters(13.25), Units.inchesToMeters(-11.5), Units.inchesToMeters(8.5), 
-      new Rotation3d(0.0, 0, 0));
+    new Transform3d(Units.inchesToMeters(9.287), Units.inchesToMeters(-10.9704),Units.inchesToMeters(7.9167),
+    new Rotation3d(0.0, Units.degreesToRadians(-15), Units.degreesToRadians(30)));
  
- // Camera 6 (Back left swerve module)
- // Tilted up 10 degrees, facing backwards
- public static Transform3d robotToCamera6 =
-      new Transform3d(Units.inchesToMeters(-12.75), Units.inchesToMeters(12.5), Units.inchesToMeters(8.75),
-      new Rotation3d(0.0, Units.degreesToRadians(+20.0),  Units.degreesToRadians(135)));
-
-//   // Camera 7
-//   public static Transform3d robotToCamera7 =
-//       new Transform3d(Units.inchesToMeters(14.125), Units.inchesToMeters(-8.5), Units.inchesToMeters(7.75), 
-//       new Rotation3d(0.0, 0, 0));
-
-//   // Camera 8
-//   public static Transform3d robotToCamera8 =
-//       new Transform3d(Units.inchesToMeters(14.125), Units.inchesToMeters(11.5), Units.inchesToMeters(8.25),
-//       new Rotation3d(0, Units.degreesToRadians(-10), 0));
+  // Camera 6
+  // Front left camera
+  public static Transform3d robotToCamera6 =
+    new Transform3d(Units.inchesToMeters(9.287), Units.inchesToMeters(10.9704), Units.inchesToMeters(7.9167),
+    new Rotation3d(0.0, Units.degreesToRadians(-15), Units.degreesToRadians(-30)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

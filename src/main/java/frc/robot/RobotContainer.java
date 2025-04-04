@@ -48,7 +48,6 @@ import frc.robot.subsystems.drive.io.GyroIOPigeon2;
 import frc.robot.subsystems.drive.io.ModuleIO;
 import frc.robot.subsystems.drive.io.ModuleIOSim;
 import frc.robot.subsystems.drive.io.ModuleIOTalonFX;
-import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
@@ -115,6 +114,8 @@ public class RobotContainer {
 
   private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
   private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
+
+  private final JoystickButton recalibrateButton = new JoystickButton(buttonbox2, 3);
 
   private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
   private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);
@@ -244,7 +245,7 @@ public class RobotContainer {
       return DriveCommands.joystickApproach(
           drive,
           () -> -joystick.getLeftY() * speedMultiplier,
-          approachPose);
+          approachPose).alongWith(LEDCommands.aligningWithReef(() -> drive.getCloseToReef()));
   }
 
   private void configureBindings() {
@@ -271,17 +272,17 @@ public class RobotContainer {
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    intakeButton.onTrue(multiSubsystemCommands.loadCoral().unless(() -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));//.raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
-    spitButton.onTrue(armCommands.spit());
+    intakeButton.onTrue(multiSubsystemCommands.loadCoral().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()).unless(() -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    spitButton.onTrue(armCommands.spit().andThen(Commands.either(LEDCommands.pickingUpAlgae(), LEDCommands.pickingUpCoral(), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE)));
 
     StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
     L1Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L1));
-    L2Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2), multiSubsystemCommands.moveToPosition(OverallPosition.L2), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
-    L3Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3), multiSubsystemCommands.moveToPosition(OverallPosition.L3), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    L2Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2).raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()), multiSubsystemCommands.moveToPosition(OverallPosition.L2), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    L3Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3).raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()), multiSubsystemCommands.moveToPosition(OverallPosition.L3), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
     L4Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L4));
 
-    gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE));
-    gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL));
+    gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE).alongWith(LEDCommands.pickingUpAlgae()));
+    gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL).alongWith(LEDCommands.pickingUpCoral()));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
@@ -295,6 +296,7 @@ public class RobotContainer {
         .whileTrue(
             joystickApproach(
             () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.RIGHT)));
+            
 
     // Driver Left Bumper: Approach Nearest Left-Side Reef Branch
     joystick.leftBumper()
@@ -318,6 +320,8 @@ public class RobotContainer {
 
     incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
     decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
+
+    recalibrateButton.onTrue(multiSubsystemCommands.calibrate());
     /* 
      // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
      joystick.rightBumper()
@@ -348,29 +352,8 @@ public class RobotContainer {
   public Drive getDrive() {
     return drive;
   }
-  public void calibrateAndStartPIDs() {
-    // PID commands: we only want one of them so start/stop works correctly
-    Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
-    Command armPIDCommand = armCommands.runArmPID();
-    // Start elevator pid
-    if (elevatorSubsystem.isCalibrated()) {
-      elevatorCommands.runElevatorPID();
-      if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
-        CommandScheduler.getInstance().schedule(elevatorPIDCommand);
-      }
-    } else {
-      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
-      CommandScheduler.getInstance().schedule(calibCommand);
-    }
-
-    // Start arm pid
-    if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
-      CommandScheduler.getInstance().schedule(armPIDCommand);
-    }
-
-    // Reset PIDs
-    CommandScheduler.getInstance().schedule(elevatorCommands.resetElevatorPID());
-    CommandScheduler.getInstance().schedule(armCommands.resetArmPID());
+  public void calibrate() {
+    CommandScheduler.getInstance().schedule(multiSubsystemCommands.calibrate());
   }
 
   public void startIdleAnimations() {

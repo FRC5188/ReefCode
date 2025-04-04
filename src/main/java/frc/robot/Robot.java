@@ -180,7 +180,7 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.schedule();
     }
 
-    m_robotContainer.calibrateAndStartPIDs();
+    m_robotContainer.calibrate();
     m_robotContainer.startEnabledLEDs();
   }
 
@@ -197,7 +197,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.calibrateAndStartPIDs();
+    m_robotContainer.calibrate();
     m_robotContainer.startEnabledLEDs();
   }
 

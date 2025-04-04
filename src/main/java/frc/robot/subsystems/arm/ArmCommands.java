@@ -40,7 +40,7 @@ public class ArmCommands {
             return new InstantCommand(
                     () -> {
                         _arm.setArmSetpoint(setpoint);
-                    }).andThen(intakeForNumberOfRotations());
+                    });//.andThen(intakeForNumberOfRotations());
         }
         return new InstantCommand(
                 () -> {
@@ -116,7 +116,7 @@ public class ArmCommands {
                         counter = 0;
                     } else {
                         // Run the motors backwards until we see the piece in the upper light sensor
-                        _arm.setIntakeSpeed(-0.09);
+                        _arm.setIntakeSpeed(-0.09); // changed to -0.11 to prevent dropping piece while moving, seemed to work well
                         done = _arm.upperLightSensorSeesGamepiece();
                     }
                 }
@@ -182,12 +182,6 @@ public class ArmCommands {
                 return _arm.upperLightSensorSeesGamepiece();
             }
         };
-    }
-
-    public Command runArmPID() {
-        return Commands.run(() -> {
-            _arm.runArmPID();
-        });
     }
 
     public Command intakeForNumberOfRotations() {

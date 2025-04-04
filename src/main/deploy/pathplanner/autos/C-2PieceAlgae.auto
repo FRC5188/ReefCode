@@ -9,15 +9,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Fast_A_R3"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "L4"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C_R5"
                 }
               }
             ]
@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Fast_R3_HP1"
+                  "pathName": "R5_HP2"
                 }
               },
               {
@@ -47,34 +47,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Fast_HP1_R.R2"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "L4"
                 }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
+              },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Fast_R.R2_HP1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
+                  "pathName": "HP2_R6"
                 }
               }
             ]
@@ -87,35 +68,28 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Fast_HP1_L.R2"
+                  "pathName": "BackR6"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L1"
+                  "name": "AlgaeL2"
                 }
               }
             ]
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stow"
-                }
-              }
-            ]
+            "name": "Stow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "FAST AUTOS",
+  "folder": "Reliable Autos",
   "choreoAuto": false
 }

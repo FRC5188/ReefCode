@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Fast_A_R3"
+                  "pathName": "A_R3"
                 }
               },
               {
@@ -24,13 +24,19 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Fast_R3_HP1"
+                  "pathName": "R3_HP1"
                 }
               },
               {
@@ -49,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Fast_HP1_R.R2"
+                  "pathName": "HP1_R2"
                 }
               },
               {
@@ -62,22 +68,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Fast_R.R2_HP1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
-                }
-              }
-            ]
+            "name": "Score"
           }
         },
         {
@@ -87,35 +80,28 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Fast_HP1_L.R2"
+                  "pathName": "BackR2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L1"
+                  "name": "AlgaeL2"
                 }
               }
             ]
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stow"
-                }
-              }
-            ]
+            "name": "Stow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "FAST AUTOS",
+  "folder": "Algae Autos",
   "choreoAuto": false
 }

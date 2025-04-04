@@ -96,7 +96,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void spit() {
-    double speed = (_currentMode == GamepieceMode.ALGAE) ? -0.5 : 0.3;
+    double speed = (_currentMode == GamepieceMode.ALGAE) ? -0.5 : 0.35;
     setIntakeSpeed(speed);
   }
 

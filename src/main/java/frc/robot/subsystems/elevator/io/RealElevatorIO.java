@@ -49,6 +49,6 @@ public class RealElevatorIO implements ElevatorIO {
     }
 
     public void resetEncoder() {
-        _primaryMotor.getEncoder().setPosition(0);
+        _secondaryMotor.getEncoder().setPosition(0);
     }
 }

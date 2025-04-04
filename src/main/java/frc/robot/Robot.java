@@ -48,6 +48,8 @@ public class Robot extends LoggedRobot {
   public static final double fieldWidth = Units.inchesToMeters(317);
   public static final Translation2d fieldCenter = new Translation2d(fieldLength / 2, fieldWidth / 2);
 
+  private boolean ranAutonomous = false;
+
   private final RobotContainer m_robotContainer = new RobotContainer();
 
   public Robot() {
@@ -182,6 +184,8 @@ public class Robot extends LoggedRobot {
 
     m_robotContainer.calibrate();
     m_robotContainer.startEnabledLEDs();
+
+    ranAutonomous = true;
   }
 
   @Override
@@ -197,7 +201,8 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.calibrate();
+    if (!ranAutonomous)
+      m_robotContainer.calibrate();
     m_robotContainer.startEnabledLEDs();
   }
 

@@ -30,8 +30,8 @@ public class ArmCommands {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
                 }, _arm).withTimeout(0.5)
-                .andThen(Commands.runOnce(() -> _arm.setArmSetpoint(ArmPosition.Stow), _arm).unless(() -> _arm.getCurrentPos() != ArmPosition.L4_Score));
-                
+                .andThen(Commands.runOnce(() -> _arm.setArmSetpoint(ArmPosition.Stow), _arm)
+                        .unless(() -> _arm.getCurrentPos() != ArmPosition.L4_Score));
 
     }
 
@@ -54,23 +54,22 @@ public class ArmCommands {
     }
 
     private Command intakeCoralWithAdjust() {
-        if (RobotState.isAutonomous()) {
-            return intakeCoral();
-        } else {
         return intakeCoral().andThen(moveArm(ArmPosition.Stow));
-        }
     }
 
     private Command intakeCoral() {
         Command c = new Command() {
             /*
-             * This command will run the intake at a fast speed until the lower light sensor detects the coral
+             * This command will run the intake at a fast speed until the lower light sensor
+             * detects the coral
              * Then, the speed will decrease and run until both sensors detect the coral
              * Then, the motor will turn off for a few cycles (~100 ms)
-             * Then, the motor will run at a slow speed in reverse until the upper light sensor detects the coral
+             * Then, the motor will run at a slow speed in reverse until the upper light
+             * sensor detects the coral
              * Then, the arm will go back to stow
              * 
-             * In the case that the lower and upper light sensors don't detect a piece when running reverse, 
+             * In the case that the lower and upper light sensors don't detect a piece when
+             * running reverse,
              * we assume there is no piece and start running at a fast speed again
              */
             boolean hasPieceDetected = false;
@@ -116,7 +115,8 @@ public class ArmCommands {
                         counter = 0;
                     } else {
                         // Run the motors backwards until we see the piece in the upper light sensor
-                        _arm.setIntakeSpeed(-0.09); // changed to -0.11 to prevent dropping piece while moving, seemed to work well
+                        _arm.setIntakeSpeed(-0.09); // changed to -0.11 to prevent dropping piece while moving, seemed
+                                                    // to work well
                         done = _arm.upperLightSensorSeesGamepiece();
                     }
                 }
@@ -134,6 +134,29 @@ public class ArmCommands {
         };
         c.addRequirements(_arm);
         return c;
+    }
+
+    public Command intakeCoralAuto() {
+        return new Command() {
+            @Override
+            public void execute() {
+                if (_arm.upperLightSensorSeesGamepiece()) {
+                    _arm.setIntakeSpeed(0.09);
+                } else {
+                    _arm.setIntakeSpeed(0.22); // 0.35
+                }
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                _arm.setIntakeSpeed(0);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return _arm.hasPiece();
+            }
+        };
     }
 
     private Command intakeAlgae() {
@@ -168,7 +191,7 @@ public class ArmCommands {
 
             @Override
             public void execute() {
-                double speed = -0.1; // -0.08
+                double speed = -0.09; // -0.08
                 _arm.setIntakeSpeed(speed);
             }
 
@@ -208,14 +231,14 @@ public class ArmCommands {
 
     public Command manualIntake() {
         return Commands.either(
-            new StartEndCommand(
-                () -> _arm.setIntakeSpeed(-0.1), 
-                () -> _arm.setIntakeSpeed(0),
-                _arm),
-            new StartEndCommand(
-                    () -> _arm.setIntakeSpeed(0.5), 
-                    () -> _arm.setIntakeSpeed(0),
-                    _arm),
+                new StartEndCommand(
+                        () -> _arm.setIntakeSpeed(-0.1),
+                        () -> _arm.setIntakeSpeed(0),
+                        _arm),
+                new StartEndCommand(
+                        () -> _arm.setIntakeSpeed(0.5),
+                        () -> _arm.setIntakeSpeed(0),
+                        _arm),
                 () -> _arm.getCurrentMode() == GamepieceMode.CORAL);
     }
 }

@@ -201,23 +201,23 @@ public class RobotContainer {
 
     // AutoAlignToReef + ScoreL1 (Move to L1, score)
     NamedCommands.registerCommand("L1",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L1));
+        multiSubsystemCommands.moveToPosition(OverallPosition.L1));
     
     // AutoAlignToReef + ScoreL2 (Move to L2, score)
     NamedCommands.registerCommand("L2",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L2)); 
+        multiSubsystemCommands.moveToPosition(OverallPosition.L2)); 
 
     // AutoAlignToReef + ScoreL3 (Move to L3, score)
     NamedCommands.registerCommand("L3",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L3));
+        multiSubsystemCommands.moveToPosition(OverallPosition.L3));
     
     // AutoAlignToReef + Move to L4 + Score
     NamedCommands.registerCommand("L4",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
+        multiSubsystemCommands.moveToPosition(OverallPosition.L4));
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
-        multiSubsystemCommands.loadCoral());
+        multiSubsystemCommands.loadCoralAuto());
     
     // AutoAlign + Algae Removal
      NamedCommands.registerCommand("AlgaeL2",
@@ -226,6 +226,10 @@ public class RobotContainer {
   // AutoAlign + Algae Removal
     NamedCommands.registerCommand("AlgaeL3",
      multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3));
+
+  // Moves the gamepiece back
+    NamedCommands.registerCommand("MovePiece", 
+      armCommands.moveGamepieceToLightSensor());
 
     NamedCommands.registerCommand("Stow", 
       multiSubsystemCommands.moveToPosition(OverallPosition.Stow));

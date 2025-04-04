@@ -64,6 +64,7 @@ public final class ElevatorCommands {
     public Command setElevatorSetpoint(ElevatorPosition setpoint) {
         return new InstantCommand(
                 () -> {
+                    System.out.println("RUNNING ELEVATOR CMD");
                     _elevator.setSetpoint(setpoint);
                 });
     }

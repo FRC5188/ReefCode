@@ -1,6 +1,7 @@
 package frc.robot.subsystems.leds;
 
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
@@ -16,6 +17,7 @@ import frc.robot.HardwareConstants.CAN;
 
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
+import com.ctre.phoenix.led.TwinkleAnimation;
 
 import java.util.function.BooleanSupplier;
 
@@ -48,7 +50,7 @@ public class LEDs extends SubsystemBase {
 
         PartyMode(null, new RainbowAnimation(100, 1, _numLEDs), 3),
 
-        Bounce(null, new LarsonAnimation(0, 255, 0), 3),
+        Bounce(null, new TwinkleAnimation(0, 255, 0), 3),
 
         SolidTeal(new LEDColor(0, 225, 100), null, 0),
 
@@ -171,6 +173,13 @@ public class LEDs extends SubsystemBase {
     public void disabledAnimation1() {
         if (!_alreadyRunning) {
             runAnimation(LEDAnimation.PartyMode);
+            _alreadyRunning = false;            
+        }
+    }
+
+    public void disabledAnimation2() {
+        if (!_alreadyRunning) {
+            runAnimation(LEDAnimation.Bounce);
             _alreadyRunning = false;            
         }
     }

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.039856557377049,
+        "y": 2.916137295081967
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.296269996869686,
+        "y": 2.9573188451517094
+      },
+      "isLocked": false,
+      "linkedName": "ScoreR6"
+    },
+    {
+      "anchor": {
+        "x": 3.6802254098360656,
+        "y": 2.6404200819672123
+      },
+      "prevControl": {
+        "x": 3.4458839304965028,
+        "y": 2.553333509747695
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "R6"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 59.99999999999999
+  },
+  "reversed": false,
+  "folder": "Move back from Score",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 59.99999999999999
+  },
+  "useDefaultConstraints": true
+}

@@ -1,8 +1,6 @@
-package frc.robot.subsystems.climber;
+package frc.robot.subsystems.climber.io;
 
 import org.littletonrobotics.junction.AutoLog;
-
-import frc.robot.subsystems.arm.ArmIO.ArmIOInputs;
 
 public interface ClimberIO {
     @AutoLog

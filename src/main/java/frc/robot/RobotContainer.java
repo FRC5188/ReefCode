@@ -6,28 +6,43 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.io.IOException;
+import java.lang.invoke.VarHandle.AccessMode;
+import java.util.function.Supplier;
+
+import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.FileVersionException;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.climber.ClimberCommands;
-import frc.robot.subsystems.climber.RealClimberIO;
-import frc.robot.subsystems.arm.RealArmIO;
+import frc.robot.subsystems.arm.io.RealArmIO;
+// import frc.robot.subsystems.climber.Climber;
+// import frc.robot.subsystems.climber.ClimberCommands;
+import frc.robot.subsystems.climber.io.RealClimberIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.Telemetry;
 import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.elevator.CmdElevatorCalibrate;
 import frc.robot.subsystems.drive.io.GyroIO;
 import frc.robot.subsystems.drive.io.GyroIOPigeon2;
 import frc.robot.subsystems.drive.io.ModuleIO;
@@ -35,13 +50,21 @@ import frc.robot.subsystems.drive.io.ModuleIOSim;
 import frc.robot.subsystems.drive.io.ModuleIOTalonFX;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
-import frc.robot.subsystems.elevator.RealElevatorIO;
+import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
+import frc.robot.subsystems.elevator.io.RealElevatorIO;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsCommands;
-import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
-import frc.robot.subsystems.presets.Preset;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.FieldConstants.ReefSide;
+
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 public class RobotContainer {
   private final Drive drive;
@@ -52,21 +75,20 @@ public class RobotContainer {
   private final ArmCommands armCommands = new ArmCommands(armSubsystem);
   private final LEDsCommands LEDCommands = new LEDsCommands(LEDSubsystem);
 
-  private final Climber climber = new Climber(new RealClimberIO());
-  private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
+  // private final Climber climber = new Climber(new RealClimberIO());
+  // private final ClimberCommands ClimberCommands = new ClimberCommands(climber);
 
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
 
-  /** I am single :( 
-   * hi zoe :3
-  */
-  private final Preset preset = new Preset();
+  private final Vision vision;
+  private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController climberstick = new CommandXboxController(3);
 
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
+  private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second max
                                                                                     // angular velocity
- 
+
   /* Setting up bindings for necessary control of the swerve drive platform */
   // private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
   //     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -74,26 +96,35 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-  private final CommandXboxController joystick = new CommandXboxController(0);
-  private final CommandXboxController climberstick = new CommandXboxController(1);
-
   private final GenericHID buttonbox1 = new GenericHID(1);
-  private final JoystickButton L1Button = new JoystickButton(buttonbox1, 1);
-  private final JoystickButton L2Button = new JoystickButton(buttonbox1, 2);
-  private final JoystickButton StowButton = new JoystickButton(buttonbox1, 3);
-  private final JoystickButton L3Button = new JoystickButton(buttonbox1, 4);
-  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 5);
-  private final JoystickButton LoadingButton = new JoystickButton(buttonbox1, 6);
-  private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
-  private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
-  private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
-
   private final GenericHID buttonbox2 = new GenericHID(2);
-  private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
-  private final JoystickButton incrementButton = new JoystickButton(buttonbox2, 4);
-  private final JoystickButton decrementButton = new JoystickButton(buttonbox2, 7);
+
+  private final JoystickButton StowButton = new JoystickButton(buttonbox2, 5);
+  private final JoystickButton L1Button = new JoystickButton(buttonbox2, 2);
+  private final JoystickButton L2Button = new JoystickButton(buttonbox1, 8);
+  private final JoystickButton L3Button = new JoystickButton(buttonbox1,5);
+  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 1);
+
+  private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
+  private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
+  
+  private final JoystickButton gamepieceModeToggle = new JoystickButton(buttonbox1, 10);
+
+  private final JoystickButton manualIntakeButton = new JoystickButton(buttonbox2, 1);
+
+  private final JoystickButton incrementElevatorButton = new JoystickButton(buttonbox2, 4);
+  private final JoystickButton decrementElevatorButton = new JoystickButton(buttonbox2, 7);
+
+  private final JoystickButton recalibrateButton = new JoystickButton(buttonbox2, 3);
+
+  private final JoystickButton dynamic = new JoystickButton(buttonbox2, 8);
+  private final JoystickButton qstatic = new JoystickButton(buttonbox2, 9);
+
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   // public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+  private double speedMultiplier = 0.9;
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -110,12 +141,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         
-        // vision =
-        //         new Vision(
-        //           drive::addVisionMeasurement,
-        //           new VisionIOPhotonVision(camera0Name, robotToCamera0),
-        //           new VisionIOPhotonVision(camera1Name, robotToCamera1));   
-
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(camera5Name, robotToCamera5)
+                );   
         break;
 
       case SIM:
@@ -128,11 +158,22 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-        //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+        /* We should be using this VisionIOPhotonVisionSim here but it's running too slow and 
+           causing the a loop overrun.  
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(camera7Name, robotToCamera7, drive::getPose),
+                new VisionIOPhotonVisionSim(camera8Name, robotToCamera8, drive::getPose)
+                );   */
+        vision = 
+            new Vision(
+                drive::addVisionMeasurement, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {});
+
         break;
 
       default:
@@ -145,139 +186,183 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = 
+            new Vision(
+                drive::addVisionMeasurement, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {}, 
+                new VisionIO() {});
         break;
     }
-    
 
     // All AutoAligns for reef will align to Left position
     //TODO: Add AutoAligns to all the commands.
 
     // AutoAlignToReef + ScoreL1 (Move to L1, score)
     NamedCommands.registerCommand("L1",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L1));
+        multiSubsystemCommands.moveToPosition(OverallPosition.L1));
     
     // AutoAlignToReef + ScoreL2 (Move to L2, score)
     NamedCommands.registerCommand("L2",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L2)); 
+        multiSubsystemCommands.moveToPosition(OverallPosition.L2)); 
 
     // AutoAlignToReef + ScoreL3 (Move to L3, score)
     NamedCommands.registerCommand("L3",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L3));
+        multiSubsystemCommands.moveToPosition(OverallPosition.L3));
     
     // AutoAlignToReef + Move to L4 + Score
     NamedCommands.registerCommand("L4",
-        multiSubsystemCommands.scoreGamepieceAtPosition(OverallPosition.L4));
+        multiSubsystemCommands.moveToPosition(OverallPosition.L4));
 
     // AutoAlign to Intake + Intake
     NamedCommands.registerCommand("Intake",
-        multiSubsystemCommands.loadGamepiece());
+        multiSubsystemCommands.loadCoralAuto());
+    
+    // AutoAlign + Algae Removal
+     NamedCommands.registerCommand("AlgaeL2",
+     multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2));
 
+  // AutoAlign + Algae Removal
+    NamedCommands.registerCommand("AlgaeL3",
+     multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3));
+
+  // Moves the gamepiece back
+    NamedCommands.registerCommand("MovePiece", 
+      armCommands.moveGamepieceToLightSensor());
+
+    NamedCommands.registerCommand("Stow", 
+      multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
+
+    NamedCommands.registerCommand("Score", 
+      armCommands.spit());
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // hide the joystick missing warnings
+    DriverStation.silenceJoystickConnectionWarning(true);
     configureBindings();
+  }
+
+  private Command joystickApproach(Supplier<Pose2d> approachPose)
+  {
+      return DriveCommands.joystickApproach(
+          drive,
+          () -> -joystick.getLeftY() * speedMultiplier,
+          approachPose).alongWith(LEDCommands.aligningWithReef(() -> drive.getCloseToReef()))
+          .withName("AutoAlign");
   }
 
   private void configureBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
     
+     
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
             () -> -joystick.getLeftY(),
             () -> -joystick.getLeftX(),
-            () -> -joystick.getRightX()));
+            () -> -joystick.getRightX())); 
 
-    climber.setDefaultCommand(
-      ClimberCommands.runClimber(
-        () -> -climberstick.getLeftY()));
 
-    
-    // drivetrain.setDefaultCommand(
-    //     // Drivetrain will execute this command periodically
-    //     drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-    //                                                                                        // negative Y (forward)
-    //         .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-    //         .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-    //     ));
+       //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand());
 
-    // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    // joystick.b().whileTrue(drivetrain
-    //     .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
-
-    // Run SysId routines when holding back/start and X/Y.
-    // Note that each routine should be run exactly once in a single log.
-    joystick.back().and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
-    joystick.back().and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
-    joystick.start().and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-    joystick.start().and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
-
-    //climberstick.start().and(climberstick.y()).onTrue(getAutonomousCommand())
+    // climber.setDefaultCommand(
+    //   ClimberCommands.runClimber(
+    //     () -> climberstick.getLeftY()));
 
     // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
  
     // drive.registerTelemetry(logger::telemeterize);
 
-    intakeButton.onTrue(multiSubsystemCommands.loadGamepiece().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()));
-    spitButton.onTrue(armCommands.spit());
+    intakeButton.onTrue(multiSubsystemCommands.loadCoral().raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()).unless(() -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    spitButton.onTrue(armCommands.spit().andThen(Commands.either(LEDCommands.pickingUpAlgae(), LEDCommands.pickingUpCoral(), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE)));
 
-    L1Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L1));
-    L2Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L2));
-    StowButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Stow));
-    L3Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L3));
-    L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
-    LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
-    L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+    StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
+    L1Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L1));
+    L2Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2), multiSubsystemCommands.moveToPosition(OverallPosition.L2), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    L3Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3), multiSubsystemCommands.moveToPosition(OverallPosition.L3), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    L4Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L4));
 
-    // Runs the preset to score unless the preset is invalid.
-    joystick.rightBumper().onTrue(
-    multiSubsystemCommands.scoreGamepieceAtPosition(() -> preset.getLevel()).unless(()
-    -> !preset.isPresetValid()));
+    gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE).alongWith(LEDCommands.pickingUpAlgae()));
+    gamepieceModeToggle.whileFalse(multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL).alongWith(LEDCommands.pickingUpCoral()));
 
-    // Resets the preset when we don't have a piece.
-    armSubsystem._hasPiece.onFalse(preset.resetPreset().andThen(LEDCommands.pickingUpCoral()));
+    // Run SysId routines when holding back/start and X/Y.
+    // Note that each routine should be run exactly once in a single log.
+    // dynamic.and(joystick.y()).whileTrue(drive.sysIdDynamic(Direction.kForward));
+    // dynamic.and(joystick.x()).whileTrue(drive.sysIdDynamic(Direction.kReverse));
+    // qstatic.and(joystick.y()).whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+    // qstatic.and(joystick.x()).whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
-    // Sets the level preset
-    presetButton.and(L1Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L1));
-    presetButton.and(L2Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L2));
-    presetButton.and(L3Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L3));
-    presetButton.and(L4Button).onTrue(preset.setPresetLevelCommand(OverallPosition.L4));
+    // Driver Right Bumper: Approach Nearest Right-Side Reef Branch
+    joystick.rightBumper()
+        .whileTrue(
+            joystickApproach(
+            () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.RIGHT)));
+            
 
-    incrementButton.onTrue(elevatorCommands.incrementElevatorPosition());
-    decrementButton.onTrue(elevatorCommands.decrementElevatorPosition());
+    // Driver Left Bumper: Approach Nearest Left-Side Reef Branch
+    joystick.leftBumper()
+        .whileTrue(
+            joystickApproach(
+                    () -> FieldConstants.getNearestReefBranch(drive.getPose(), ReefSide.LEFT)));
+
+    // a -button approach reef
+    joystick.a()
+        .whileTrue(
+            joystickApproach(
+                    () -> FieldConstants.getNearestReefFace(drive.getPose())));
+
+    // Set up robot for climb
+    climberstick.x()
+        .onTrue(
+          armCommands.moveArm(ArmPosition.Climbing)
+          .andThen(elevatorCommands.moveElevator(ElevatorPosition.Stow)));
+
+    manualIntakeButton.whileTrue(armCommands.manualIntake());
+
+    incrementElevatorButton.onTrue(elevatorCommands.incrementElevatorPosition());
+    decrementElevatorButton.onTrue(elevatorCommands.decrementElevatorPosition());
+
+    recalibrateButton.onTrue(multiSubsystemCommands.calibrate());
+    /* 
+     // Driver Left Bumper and Algae mode: Approach Nearest Reef Face
+     joystick.rightBumper()
+        .whileTrue(
+            joystickApproach(() -> FieldConstants.getNearestReefFace(drive.getPose())));
+
+    */
+
+    // Reset gyro to 0° when Y button is pressed
+    joystick.y()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    drive.setPose(
+                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                        drive)
+                        .ignoringDisable(true)); 
+
+    // // reset the field-centric heading on left bumper press
+    // joystick.leftBumper().onTrue(drive.runOnce(() -> drive.seedFieldCentric()));
+    joystick.leftTrigger(0.75).onTrue(armCommands.spit());
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoChooser.get();
   }
 
-  public void calibrateAndStartPIDs() {
-    // PID commands: we only want one of them so start/stop works correctly
-    Command elevatorPIDCommand = elevatorCommands.runElevatorPID();
-    Command armPIDCommand = armCommands.runArmPID();
-    // Start elevator pid
-    if (elevatorSubsystem.isCalibrated()) {
-      elevatorCommands.runElevatorPID();
-      if (!CommandScheduler.getInstance().isScheduled(elevatorPIDCommand)) {
-        CommandScheduler.getInstance().schedule(elevatorPIDCommand);
-      }
-    } else {
-      Command calibCommand = new CmdElevatorCalibrate(elevatorSubsystem).andThen(elevatorPIDCommand);
-      CommandScheduler.getInstance().schedule(calibCommand);
-    }
-
-    // Start arm pid
-    if (!CommandScheduler.getInstance().isScheduled(armPIDCommand)) {
-      CommandScheduler.getInstance().schedule(armPIDCommand);
-    }
-
-    // Set initial positions
-    CommandScheduler.getInstance().schedule(elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
-    CommandScheduler.getInstance().schedule(armCommands.setArmPosition(ArmPosition.Stow));
+  public Drive getDrive() {
+    return drive;
+  }
+  public void calibrate() {
+    CommandScheduler.getInstance().schedule(multiSubsystemCommands.calibrate());
   }
 
   public void startIdleAnimations() {
-    Command disabled1 = LEDCommands.disabledAnimation1();
+    Command disabled1 = ((LEDCommands.disabledAnimation1().withTimeout(20)).andThen(LEDCommands.disabledAnimation2().withTimeout(20)).repeatedly());
     if (!CommandScheduler.getInstance().isScheduled(disabled1))
       CommandScheduler.getInstance().schedule(disabled1);
   }
@@ -287,4 +372,5 @@ public class RobotContainer {
     if (!CommandScheduler.getInstance().isScheduled(initialLEDs))
       CommandScheduler.getInstance().schedule(initialLEDs);
   }
+  
 }

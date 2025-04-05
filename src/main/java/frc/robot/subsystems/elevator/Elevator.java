@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volt;
 
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -19,78 +21,68 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.elevator.io.ElevatorIO;
+import frc.robot.subsystems.elevator.io.ElevatorIOInputsAutoLogged;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 
 public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
-    L1(5),
-    L2(9),
-    L3(25.5),
-    L4(48),
-    Stow(0.5);
+    L1(7, 5),
+    L2(13, 18),
+    L3(29, 36),
+    L4(51.8, 50),
+    Stow(0.5, 0.5);
 
-    public final double setpoint;
+    final double coralHeight, algaeHeight;
 
-    private ElevatorPosition(double setpoint) {
-      this.setpoint = setpoint;
+    ElevatorPosition(double coralHeight, double algaeHeight) {
+      this.coralHeight = coralHeight;
+      this.algaeHeight = algaeHeight;
+    }
+
+    double getHeight(GamepieceMode mode) {
+      return (mode == GamepieceMode.ALGAE) ? this.algaeHeight : this.coralHeight;
     }
   }
 
   private static final double CALIBRATION_SPEED = -0.1;
-  private static final double HARD_STOP_CURRENT_LIMIT = 50;
+  private static final double HARD_STOP_CURRENT_LIMIT = 37;
 
-  private static final double INCREMENT_CONSTANT = 1;
-  private static final double DECREMENT_CONSTANT = 1;
+  private static final int INCREMENT_CONSTANT = 1;
+  private static final int DECREMENT_CONSTANT = 1;
 
-  private static final double ELEVATOR_MOTOR_KP = 0.75;
-  private static final double ELEVATOR_MOTOR_KI = 0.15; 
+  private static final double ELEVATOR_MOTOR_KP = 1.5; //0.75;
+  private static final double ELEVATOR_MOTOR_KI = 0;//0.15; 
   private static final double ELEVATOR_MOTOR_KD = 0;
-  private static final double ELEVATOR_PID_VEL = 220;
-  private static final double ELEVATOR_PID_ACC = 215;
+  private static final double ELEVATOR_PID_VEL = 400;
+  private static final double ELEVATOR_PID_ACC = 335;
 
-  private static final double ELEVATOR_MAX_INCHES = 48;
-  private static final double ELEVATOR_MAX_ROTATIONS = 36.4;
+  private static final double ELEVATOR_MAX_INCHES = 52; //48;
+  private static final double ELEVATOR_MAX_ROTATIONS = 87; // 36.4;
 
   private static final double MOTOR_CONVERSION = ELEVATOR_MAX_INCHES / ELEVATOR_MAX_ROTATIONS;
 
-  // In newtons
-  private static final double ELEVATOR_STAGE1_WEIGHT_N = 2.053 * 9.81;
-  private static final double ELEVATOR_STAGE2_WEIGHT_N = 7.554 * 9.81;
-  private static final double ELEVATOR_TOTAL_WEIGHT_N = ELEVATOR_STAGE1_WEIGHT_N + (ELEVATOR_STAGE2_WEIGHT_N);
-
-  // In m
-  private static final double SPOOL_DIAMETER = 0.0527;
-
-  private static final double ELEVATOR_STALL_TORQUE_LB_IN = 3.6;
-  private static final double ELEVATOR_STALL_CURRENT = 211;
-  private static final double ELEVATOR_KT = ELEVATOR_STALL_TORQUE_LB_IN / ELEVATOR_STALL_CURRENT;
-  private static final double GEAR_RATIO = 7.75;
-  private static final double NUMBER_OF_MOTORS = 2;
-  private static final double EFFECTIVE_KT = ELEVATOR_KT * NUMBER_OF_MOTORS * GEAR_RATIO;
-  private static final double ELEVATOR_RESISTANCE = 0.057;
-
-  private static final double FEEDFORWARD_CONSTANT = ((ELEVATOR_TOTAL_WEIGHT_N * SPOOL_DIAMETER * ELEVATOR_RESISTANCE) / (EFFECTIVE_KT)) - 0.65;
+  private static final double FEEDFORWARD_CONSTANT = 0.225;
 
   private boolean _isCalibrated;
+  private boolean _atSetpoint;
   private ElevatorPosition _currentPos;
   private ElevatorPosition _desiredPos;
+  private ElevatorPosition _prevPos;
   private MultiSubsystemCommands.GamepieceMode _currentMode;
+  private HashMap<String, Integer> _manualAdjustments;
 
   private ProfiledPIDController _elevatorMotorPID;
 
   private ElevatorIO _io;
   private ElevatorIOInputsAutoLogged _inputs;
-
-  
-
-  SysIdRoutine routine = new SysIdRoutine(new Config(),
-      new SysIdRoutine.Mechanism(this::setElevatorVoltage, this::populateLog, this));
 
   public Elevator(ElevatorIO io) {
     _io = io;
@@ -98,10 +90,16 @@ public class Elevator extends SubsystemBase {
 
     _elevatorMotorPID = new ProfiledPIDController(ELEVATOR_MOTOR_KP, ELEVATOR_MOTOR_KI, ELEVATOR_MOTOR_KD,
         new Constraints(ELEVATOR_PID_VEL, ELEVATOR_PID_ACC));
-    _elevatorMotorPID.setTolerance(0.5);
+    _elevatorMotorPID.setTolerance(1);
 
     _currentPos = ElevatorPosition.Stow;
     _desiredPos = ElevatorPosition.Stow;
+    _prevPos = ElevatorPosition.Stow;
+    _currentMode = GamepieceMode.CORAL;
+
+    _manualAdjustments = new HashMap<>();
+
+    setSetpoint(ElevatorPosition.Stow);
   }
 
   // Runs the motors down at the calibration speed
@@ -118,34 +116,58 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setSetpoint(ElevatorPosition setpoint) {
-    setSetpoint(setpoint.setpoint);
+    _prevPos = _currentPos;
     _desiredPos = setpoint;
+    String key = getManualAdjustKey();
+    setSetpoint(setpoint.getHeight(_currentMode) + _manualAdjustments.getOrDefault(key, 0));
   }
 
   // Sets the setpoint of the PID
   public void setSetpoint(double setpoint) {
     if (setpoint < 0.25 || setpoint > ELEVATOR_MAX_INCHES)
       return;
+    _atSetpoint = false;
     _elevatorMotorPID.reset(getCurrentPosInches());
     _elevatorMotorPID.setGoal(setpoint);
   }
 
   // Checks if it is at the setpoint
   public boolean isAtSetpoint() {
-    boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 0.5;
-    if (atSetpoint)
+    boolean atSetpoint = Math.abs(_elevatorMotorPID.getGoal().position - getCurrentPosInches()) <= 1;
+    if (atSetpoint) {
       _currentPos = _desiredPos;
+      _atSetpoint = true;
+    }
     return atSetpoint;
+  }
+
+  public void resetPID() {
+    _elevatorMotorPID.setGoal(ElevatorPosition.Stow.getHeight(_currentMode));
+    _elevatorMotorPID.reset(getCurrentPosInches());
+  }
+
+  private String getManualAdjustKey() {
+    return _desiredPos.toString() + _currentMode.toString();
   }
 
   // Increases elevator position
   public void incrementElevatorPosition() {
-    setSetpoint(_elevatorMotorPID.getGoal().position + INCREMENT_CONSTANT);
+    if (_currentPos == _desiredPos) {
+      String key = getManualAdjustKey();
+      Integer offset = _manualAdjustments.getOrDefault(key, 0) + INCREMENT_CONSTANT;
+      _manualAdjustments.put(key, offset);
+      setSetpoint(_currentPos);
+    }
   }
 
   // Decreases elevator position
   public void decrementElevatorPosition() {
-    setSetpoint(_elevatorMotorPID.getGoal().position - DECREMENT_CONSTANT);
+    if (_currentPos == _desiredPos) {
+      String key = getManualAdjustKey();
+      Integer offset = _manualAdjustments.getOrDefault(key, 0) - DECREMENT_CONSTANT;
+      _manualAdjustments.put(key, offset);
+      setSetpoint(_currentPos);
+    }
   }
 
   // Checks if above limit
@@ -161,8 +183,8 @@ public class Elevator extends SubsystemBase {
 
   // Runs motors with PID
   public void runMotorsWithPID() {
-  // _io.setElevatorSpeed();
-    _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
+    if (_isCalibrated)
+      _io.setElevatorVoltage(Voltage.ofBaseUnits(_elevatorMotorPID.calculate(getCurrentPosInches()) + FEEDFORWARD_CONSTANT, Volt));
   }
 
   public boolean isCalibrated() {
@@ -182,6 +204,10 @@ public class Elevator extends SubsystemBase {
     return _currentPos;
   }
 
+  public ElevatorPosition getPrevPos() {
+    return _prevPos;
+  }
+
   public GamepieceMode getCurrentMode() {
     return _currentMode;
   }
@@ -192,22 +218,6 @@ public class Elevator extends SubsystemBase {
 
   public double getElevatorMaxHeight() {
     return ELEVATOR_MAX_INCHES;
-  }
-
-  public void populateLog(SysIdRoutineLog log) {
-    log.motor("elevator_primary")
-        .voltage(Voltage.ofBaseUnits(_inputs._elevatorMotorVoltage, Volt))
-        .linearPosition(Distance.ofBaseUnits(Units.inchesToMeters(getCurrentPosInches()), Meters))
-        .linearVelocity(
-            LinearVelocity.ofBaseUnits(_inputs._elevatorVelocity * SPOOL_DIAMETER * Math.PI / 60, MetersPerSecond));
-  }
-
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return routine.quasistatic(direction);
-  }
-
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return routine.dynamic(direction);
   }
 
   @Override
@@ -225,6 +235,10 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/atSetpoint", isAtSetpoint());
     Logger.recordOutput("Elevator/currentPosEnum", _currentPos);
     Logger.recordOutput("Elevator/desiredPosEnum", _desiredPos);
+    Logger.recordOutput("Elevator/currentGamepieceMode", _currentMode);
+
+    // Run pid
+    runMotorsWithPID();
   }
 
 }

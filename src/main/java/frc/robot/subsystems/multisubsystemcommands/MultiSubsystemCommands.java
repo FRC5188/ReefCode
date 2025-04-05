@@ -1,12 +1,16 @@
 package frc.robot.subsystems.multisubsystemcommands;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberCommands;
 import frc.robot.subsystems.arm.ArmCommands;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorCommands;
@@ -15,12 +19,13 @@ import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 public class MultiSubsystemCommands {
     public enum OverallPosition {
         Stow(ElevatorPosition.Stow, ArmPosition.Stow),
-        Loading(ElevatorPosition.Stow, ArmPosition.Loading_Coral),
+        Coral_Loading(ElevatorPosition.Stow, ArmPosition.Loading),
+        Algae_Loading_L2(ElevatorPosition.L2, ArmPosition.Loading),
+        Algae_Loading_L3(ElevatorPosition.L3, ArmPosition.Loading),
         L1(ElevatorPosition.L1, ArmPosition.Stow),
         L2(ElevatorPosition.L2, ArmPosition.Stow),
         L3(ElevatorPosition.L3, ArmPosition.Stow),
-        L4(ElevatorPosition.L4, ArmPosition.Stow),
-        L4_Score(ElevatorPosition.L4, ArmPosition.L4_Score);
+        L4(ElevatorPosition.L4, ArmPosition.L4_Score);
 
         ElevatorPosition _elevatorSetpoint;
         ArmPosition _armSetpoint;
@@ -57,11 +62,19 @@ public class MultiSubsystemCommands {
         _armCommands = armCommands;
     }
 
-    public Command setOverallSetpoint(OverallPosition setpoint) {
-        return _elevatorCommands.setElevatorSetpoint(setpoint.getElevatorPosition())
-                .alongWith(_armCommands.setArmPosition(setpoint.getArmPosition()))
-                .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), setpoint.getElevatorPosition(),
-                        _arm.getCurrentPos(), setpoint.getArmPosition()));
+    public Command calibrate() {
+        return _armCommands.setArmPosition(ArmPosition.Stow)
+                .andThen(_elevatorCommands.calibrateElevator())
+                .andThen(_elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow))
+                .withName("Calibrate");
+    }
+
+    public Command moveToPosition(OverallPosition setpoint) {
+        return _armCommands.moveArm(ArmPosition.Transient)
+                .andThen(_elevatorCommands.moveElevator(setpoint.getElevatorPosition()))
+                .unless(() -> _elevator.getCurrentPos() == setpoint.getElevatorPosition())
+                .andThen(_armCommands.moveArm(setpoint.getArmPosition()))
+                .finallyDo(() -> System.out.println("MOVED TO POS"));
     }
 
     public Command setGamepieceMode(GamepieceMode mode) {
@@ -69,142 +82,35 @@ public class MultiSubsystemCommands {
                 () -> {
                     _elevator.setCurrentMode(mode);
                     _arm.setCurrentMode(mode);
-                }, _elevator, _arm);
-    }
-
-    public Command waitForOverallMechanism() {
-        return _elevatorCommands.waitUntilAtSetpoint()
-                .alongWith(_armCommands.waitUntilAtSetpoint());
-    }
-
-    private Command score(OverallPosition setpoint) {
-        if (setpoint == OverallPosition.L4) {
-            return setOverallSetpoint(OverallPosition.L4_Score)
-                    .andThen(waitForOverallMechanism())
-                    .andThen(_armCommands.spit())
-                    .andThen(setOverallSetpoint(OverallPosition.L4))
-                    .andThen(waitForOverallMechanism());
-        } else {
-            return _armCommands.spit();
-        }
-    }
-
-    public Command scoreGamepieceAtPosition(Supplier<OverallPosition> setpoint) {
-        return scoreGamepieceAtPosition(setpoint.get());
+                })
+                .withName("SetGamepieceMode");
     }
 
     public Command scoreGamepieceAtPosition(OverallPosition setpoint) {
-        if (setpoint == OverallPosition.Stow || setpoint == OverallPosition.Loading
-                || setpoint == OverallPosition.L4_Score) {
-            throw new RuntimeException("scoreGamepieceAtPosition cannot run to stow,loading,or L4_score");
-        }
-        return setOverallSetpoint(setpoint)
-                .andThen(waitForOverallMechanism())
-                .andThen(score(setpoint))
-                .andThen(setOverallSetpoint(OverallPosition.Stow));
-    }
-
-    public Command loadGamepiece() {
-        return Commands.either(loadAlgae(), loadCoral(), () -> _arm.getCurrentMode() == GamepieceMode.ALGAE);
+        return moveToPosition(setpoint)
+                .andThen(_armCommands.spit())
+                .withName("ScoreAtPosition");
     }
 
     public Command loadCoral() {
-        return setOverallSetpoint(OverallPosition.Loading)
-                .andThen(waitForOverallMechanism())
+        return moveToPosition(OverallPosition.Coral_Loading)
                 .andThen(_armCommands.intake())
-                .andThen(setOverallSetpoint(OverallPosition.Stow))
-                .andThen(_armCommands.moveGamepieceToLightSensor())
-                .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), ElevatorPosition.Stow,
-                        _arm.getCurrentPos(), ArmPosition.Loading_Coral));
-
+                .withName("LoadCoral");
     }
 
-    public Command loadAlgae() {
-        return setOverallSetpoint(OverallPosition.Loading)
-                .andThen(waitForOverallMechanism())
-                .andThen(_armCommands.intake())
-                .andThen(setOverallSetpoint(OverallPosition.Stow))
-                .unless(() -> !canMoveToPos(_elevator.getCurrentPos(), ElevatorPosition.L2,
-                _arm.getCurrentPos(), ArmPosition.Loading_Algae));
+    public Command loadCoralAuto() {
+        return moveToPosition(OverallPosition.Coral_Loading)
+                .andThen(_armCommands.intakeCoralAuto());
     }
 
-    public boolean canMoveToPos(ElevatorPosition currentElevator, ElevatorPosition desiredElevator,
-            ArmPosition currentArm, ArmPosition desiredArm) {
-        boolean canMoveArm = false;
-        boolean canMoveElevator = false;
-
-        if (_arm.getCurrentMode() == GamepieceMode.CORAL) {
-            switch (currentElevator) {
-                case L1:
-                case L2:
-                case L3:
-                    canMoveArm = (desiredArm != ArmPosition.L4_Score) && (desiredArm != ArmPosition.Loading_Coral);
-                    break;
-                case L4:
-                    canMoveArm = (desiredArm != ArmPosition.Loading_Coral);
-                    break;
-                case Stow:
-                    canMoveArm = (desiredArm != ArmPosition.L4_Score);
-                    break;
-                default:
-                    canMoveArm = false;
-                    break;
-            }
-
-            switch (desiredElevator) {
-                case L1:
-                case L2:
-                case L3:
-                    canMoveElevator = (currentArm != ArmPosition.L4_Score) && (currentArm != ArmPosition.Loading_Coral);
-                    break;
-                case L4:
-                    canMoveElevator = (currentArm != ArmPosition.Loading_Coral);
-                    break;
-                case Stow:
-                    canMoveElevator = (currentArm != ArmPosition.L4_Score);
-                    break;
-                default:
-                    canMoveElevator = false;
-                    break;
-            }
-        } else {
-            switch (currentElevator) {
-                case L1:
-                case L4:
-                    canMoveArm = false;
-                    break;
-                case L2:
-                case L3:
-                    canMoveArm = desiredArm != ArmPosition.Algae_Score;
-                    break;
-                case Stow:
-                    canMoveArm = desiredArm != ArmPosition.Loading_Algae;
-                    break;
-                default:
-                    canMoveArm = false;
-                    break;
-            }
-
-            switch (desiredElevator) {
-                case L1:
-                case L4:
-                    canMoveElevator = false;
-                    break;
-                case L2:
-                case L3:
-                    canMoveElevator = currentArm != ArmPosition.Algae_Score;
-                    break;
-                case Stow:
-                    canMoveElevator = currentArm != ArmPosition.Loading_Algae;
-                    break;
-                default:
-                    canMoveElevator = false;
-                    break;
-            }
+    public Command loadAlgae(OverallPosition position) {
+        if (position != OverallPosition.Algae_Loading_L2 && position != OverallPosition.Algae_Loading_L3) {
+            throw new IllegalArgumentException("Can Only Load Algae @ L2 or L3");
         }
-        System.out.println("Arm: " + canMoveArm + " Elevator: " + canMoveElevator);
-
-        return canMoveArm && canMoveElevator;
+        return moveToPosition(position)
+                .alongWith(_armCommands.intake())
+                .andThen(_armCommands.setArmPosition(ArmPosition.Stow)
+                .withName("LoadAlgae"));
     }
 
 }

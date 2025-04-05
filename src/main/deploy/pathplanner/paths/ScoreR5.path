@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.33452868852459,
+        "y": 2.604456967213115
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.180504780071455,
+        "y": 2.8473379695519756
+      },
+      "isLocked": false,
+      "linkedName": "R5"
+    },
+    {
+      "anchor": {
+        "x": 5.238627049180328,
+        "y": 3.036014344262295
+      },
+      "prevControl": {
+        "x": 5.484980192150553,
+        "y": 2.887814902147897
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "ScoreR5"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 120.9
+  },
+  "reversed": false,
+  "folder": "Move to Score",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 120.89912407537605
+  },
+  "useDefaultConstraints": true
+}

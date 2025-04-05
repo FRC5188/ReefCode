@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.418,
-        "y": 1.245
+        "x": 1.599,
+        "y": 0.670999999999999
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2040620895951974,
-        "y": 0.27841135001952744
+        "x": 3.1005000000000003,
+        "y": 1.402249999999999
       },
       "isLocked": false,
       "linkedName": "HP2"
     },
     {
       "anchor": {
-        "x": 4.839029126213592,
-        "y": 1.4862135922330106
+        "x": 6.298500000000001,
+        "y": 2.61125
       },
       "prevControl": {
-        "x": 4.617353569020709,
-        "y": 1.3706283538016897
+        "x": 5.664750000000001,
+        "y": 2.104250000000001
       },
       "nextControl": {
-        "x": 5.12442779806873,
-        "y": 1.6350250983462242
+        "x": 6.549834567430718,
+        "y": 2.8123176539445742
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.1,
-        "y": 4.05
+        "x": 5.658196721311475,
+        "y": 4.198821721311475
       },
       "prevControl": {
-        "x": 6.396,
-        "y": 3.1572499999999994
+        "x": 6.747000000000001,
+        "y": 4.52225
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R4"
+      "linkedName": "ScoreR4"
     }
   ],
   "rotationTargets": [
@@ -54,7 +54,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

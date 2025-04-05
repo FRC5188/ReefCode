@@ -18,22 +18,29 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.arm.io.ArmIO;
+import frc.robot.subsystems.arm.io.ArmIOInputsAutoLogged;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(80),
-    Loading_Coral(120),
-    Loading_Algae(50),
-    Loading(120),
-    L4_Score(45),
-    Algae_Score(60);
+    Stow(114, 114),
+    Loading(140, 78),
+    L4_Score(97, 102), // 86
+    Algae_Score(100, 100),
+    Transient(108, 108),
+    Climbing(50, 50);
 
-    double angle;
+    double coralAngle, algaeAngle;
 
-    ArmPosition(double angle) {
-      this.angle = angle;
+    ArmPosition(double coralAngle, double algaeAngle) {
+      this.coralAngle = coralAngle;
+      this.algaeAngle = algaeAngle;
+    }
+
+    double getAngle(GamepieceMode mode) {
+      return (mode == GamepieceMode.ALGAE) ? this.algaeAngle : this.coralAngle;
     }
   }
 
@@ -43,6 +50,7 @@ public class Arm extends SubsystemBase {
   private ArmIOInputsAutoLogged _inputs;
   private boolean _prevLightSensorVal;
   private boolean _hasGamepiece;
+  private boolean _atSetpoint;
   private int _intakeSpikeCounter;
   private ArmPosition _currentPos;
   private ArmPosition _desiredPos;
@@ -50,22 +58,16 @@ public class Arm extends SubsystemBase {
 
   private ProfiledPIDController _armPidController;
 
-  private static final double KP = 0.09;
-  private static final double KI = 0.01;
-  private static final double KD = 0;
-  private static final double PROFILE_VEL = 160;
-  private static final double PROFILE_ACC = 145;
+  private static final double KP = 0.1;//0.09;
+  private static final double KI = 0.00; //0.01;
+  private static final double KD = 0.01;
+  private static final double PROFILE_VEL = 330;
+  private static final double PROFILE_ACC = 300;
 
-  private static final double HAS_ALGAE_CURRENT = 2;
+  public static final double HAS_ALGAE_CURRENT = 40;
 
-  private static final double ARM_WEIGHT_N = 3.5 * 9.81;
-  private static final double ARM_STALL_TORQUE_NM = 3.6;
-  private static final double ARM_STALL_CURRENT = 211;
-  private static final double ARM_KT = ARM_STALL_TORQUE_NM / ARM_STALL_CURRENT;
-  private static final double ARM_RESISTANCE = 0.057;
-  private static final double ARM_MOMENT_METERS = 0.3928;
-  private static final double ARM_GEARING = 17;
-  private static final double ARM_FEEDFORWARD_COEFF = 0.53;
+  private static final double ARM_FEEDFORWARD_COEFF = 0.6;
+  private static final double ARM_FEEDFORWARD_ANGLE_OFFSET = -22.3;
 
   SysIdRoutine routine = new SysIdRoutine(new Config(),
       new SysIdRoutine.Mechanism(this::setArmVoltage, this::populateLog, this));
@@ -74,37 +76,52 @@ public class Arm extends SubsystemBase {
     _io = io;
     _inputs = new ArmIOInputsAutoLogged();
 
+    _currentMode = GamepieceMode.CORAL;
+
     _armPidController = new ProfiledPIDController(KP, KI, KD, new Constraints(PROFILE_VEL, PROFILE_ACC));
-    _armPidController.setTolerance(7);
+    _armPidController.setTolerance(5);
+    setArmSetpoint(ArmPosition.Stow);
   }
 
   public void setArmSetpoint(ArmPosition setpoint) {
-    if (setpoint == ArmPosition.Loading)
-      setpoint = (_currentMode == GamepieceMode.ALGAE) ? ArmPosition.Loading_Algae : ArmPosition.Loading_Coral;
-
     _armPidController.reset(_inputs._armEncoderPositionDegrees);
-    _armPidController.setGoal(setpoint.angle);
+    _armPidController.setGoal(setpoint.getAngle(_currentMode));
     _desiredPos = setpoint;
+    _atSetpoint = false;
   }
 
   public void setIntakeSpeed(double speed) {
+    if (_currentMode == GamepieceMode.ALGAE) speed *= -1;
     _io.setIntakeMotorSpeed(speed);
   }
 
-  public void setFeederSpeed(double speed) {
-    _io.setFeederMotorSpeed(speed);
-  }
-
   public void spit() {
-    setIntakeSpeed(0.5);
+    double speed = (_currentMode == GamepieceMode.ALGAE) ? -0.5 : 0.35;
+    setIntakeSpeed(speed);
   }
 
   public void clearHasGamepiece() {
     _hasGamepiece = false;
   }
 
+  public void setHasGamepiece() {
+    _hasGamepiece = true;
+  }
+
+  public void clearIntakeSpikeCounter() {
+    _intakeSpikeCounter = 0;
+  }
+
+  public double getIntakeSpikeCounter() {
+    return _intakeSpikeCounter;
+  }
+
   public void setArmVoltage(Voltage voltage) {
     _io.setArmMotorVoltage(voltage);
+  }
+
+  public double getIntakeCurrent() {
+    return _inputs._intakeMotorCurrent;
   }
 
   public void resetIntakeEncoders() {
@@ -112,37 +129,40 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean intakeAtDesiredRotations() {
-    return _inputs._intakeMotorPositionRotations <= -2;
+    return _inputs._intakeMotorPositionRotations <= -1;
   }
 
   public boolean hasPiece() {
-    boolean hasPiece;
+    boolean hasPiece = false;
+    // boolean _hasGamepiece = false;
     if (_currentMode == GamepieceMode.CORAL) {
-      boolean currentState = _inputs._lightSensorState;
-      hasPiece = _prevLightSensorVal && !currentState;
+      boolean currentState = _inputs._upperLightSensorState; 
+      hasPiece = (_prevLightSensorVal && !currentState) && _inputs._lowerLightSensorState;
+      //hasPiece = currentState;
       _prevLightSensorVal = currentState;
     } else {
-      if (_inputs._intakeMotorCurrent >= HAS_ALGAE_CURRENT) {
-        _intakeSpikeCounter++;
-      }
-      hasPiece = _intakeSpikeCounter >= 5;
+      hasPiece = _inputs._algaeLightSensorState;
     }
 
-    return hasPiece;
+    if (hasPiece) _hasGamepiece = true;
+
+    return _hasGamepiece;
   }
 
-  public void resetIntakeSpikeCounter() {
-    _intakeSpikeCounter = 0;
+  public boolean upperLightSensorSeesGamepiece() {
+    return _inputs._upperLightSensorState;
   }
 
-  public boolean lightSensorSeesGamepiece() {
-    return _inputs._lightSensorState;
+  public boolean lowerLightSensorSeesGamepiece() {
+    return _inputs._lowerLightSensorState;
   }
 
-  public boolean armAtSetpoint() {
+  public boolean isAtSetpoint() {
     boolean atSetpoint = _armPidController.atGoal();
-    if (atSetpoint)
+    if (atSetpoint) {
       _currentPos = _desiredPos;
+      _atSetpoint = true;
+    }
     return atSetpoint;
   }
 
@@ -150,9 +170,14 @@ public class Arm extends SubsystemBase {
     return _currentPos;
   }
 
+  public void resetPID(){
+    _armPidController.setGoal(ArmPosition.Stow.getAngle(_currentMode));
+    _armPidController.reset(_inputs._armEncoderPositionDegrees);
+  }
+
   public void runArmPID() {
-    double out = (_armPidController.calculate(_inputs._armEncoderPositionDegrees)
-        + ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees)));
+    double out = _armPidController.calculate(_inputs._armEncoderPositionDegrees)
+      + (ARM_FEEDFORWARD_COEFF * Math.cos(Units.degreesToRadians(_inputs._armEncoderPositionDegrees + ARM_FEEDFORWARD_ANGLE_OFFSET)));
     _io.setArmMotorVoltage(Voltage.ofBaseUnits(out, Volt));
   }
 
@@ -186,9 +211,13 @@ public class Arm extends SubsystemBase {
     Logger.processInputs("Arm", _inputs);
 
     Logger.recordOutput("Arm/desiredPos", _armPidController.getSetpoint().position);
-    Logger.recordOutput("Arm/hasPiece", hasPiece());
-    Logger.recordOutput("Arm/atSetpoint", armAtSetpoint());
+    Logger.recordOutput("Arm/hasPiece", _hasGamepiece);
+    Logger.recordOutput("Arm/atSetpoint", isAtSetpoint());
     Logger.recordOutput("Arm/currentPosEnum", _currentPos);
     Logger.recordOutput("Arm/desiredPosEnum", _desiredPos);
+    Logger.recordOutput("Arm/intakeSpikeCounter", _intakeSpikeCounter);
+
+    // Run pid
+    runArmPID();
   }
 }

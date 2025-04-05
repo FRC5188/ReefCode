@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.247,
-        "y": 6.779
+        "x": 1.6185000000000003,
+        "y": 7.34975
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9956867780812888,
-        "y": 5.868660610858647
+        "x": 2.367186778081289,
+        "y": 6.439410610858648
       },
       "isLocked": false,
       "linkedName": "HP1"
@@ -48,16 +48,16 @@
     },
     {
       "anchor": {
-        "x": 5.301,
-        "y": 2.622
+        "x": 5.238627049180328,
+        "y": 3.036014344262295
       },
       "prevControl": {
-        "x": 6.051253603043067,
-        "y": 3.1674757763543537
+        "x": 5.666348360655737,
+        "y": 2.5387643442622947
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R5"
+      "linkedName": "ScoreR5"
     }
   ],
   "rotationTargets": [
@@ -70,7 +70,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -79,7 +79,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 120.9
   },
   "reversed": false,
   "folder": "HP to Reef",

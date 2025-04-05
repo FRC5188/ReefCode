@@ -3,67 +3,60 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.696,
-        "y": 2.622
+        "x": 4.039856557377049,
+        "y": 2.916137295081967
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.484284606523374,
-        "y": 2.993397199875651
+        "x": 3.571212098601804,
+        "y": 2.4178008984523625
       },
       "isLocked": false,
-      "linkedName": "R6"
+      "linkedName": "ScoreR6"
     },
     {
       "anchor": {
-        "x": 2.521747572815534,
-        "y": 3.496796116504854
+        "x": 1.599,
+        "y": 0.670999999999999
       },
       "prevControl": {
-        "x": 2.571937204010619,
-        "y": 2.6310249783896342
-      },
-      "nextControl": {
-        "x": 2.385436893203884,
-        "y": 5.848155339805825
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.247,
-        "y": 6.779
-      },
-      "prevControl": {
-        "x": 2.163932038834951,
-        "y": 6.870485436893204
+        "x": 1.7602751563782437,
+        "y": 0.8620244066478749
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "HP1"
+      "linkedName": "HP2"
     }
   ],
-  "rotationTargets": [
+  "rotationTargets": [],
+  "constraintZones": [
     {
-      "waypointRelativePos": 1.0681992337164712,
-      "rotationDegrees": -53.8
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.42210144927536214,
+      "constraints": {
+        "maxVelocity": 10.0,
+        "maxAcceleration": 4.5,
+        "maxAngularVelocity": 600.0,
+        "maxAngularAcceleration": 800.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
     }
   ],
-  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 10.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 600.0,
+    "maxAngularAcceleration": 800.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -53.8
+    "rotation": 53.8
   },
   "reversed": false,
   "folder": "Reef to HP",
@@ -71,5 +64,5 @@
     "velocity": 0,
     "rotation": 59.99999999999999
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

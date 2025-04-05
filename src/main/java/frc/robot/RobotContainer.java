@@ -249,7 +249,8 @@ public class RobotContainer {
       return DriveCommands.joystickApproach(
           drive,
           () -> -joystick.getLeftY() * speedMultiplier,
-          approachPose).alongWith(LEDCommands.aligningWithReef(() -> drive.getCloseToReef()));
+          approachPose).alongWith(LEDCommands.aligningWithReef(() -> drive.getCloseToReef()))
+          .withName("AutoAlign");
   }
 
   private void configureBindings() {
@@ -281,8 +282,8 @@ public class RobotContainer {
 
     StowButton.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.Stow));
     L1Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L1));
-    L2Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2).raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()), multiSubsystemCommands.moveToPosition(OverallPosition.L2), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
-    L3Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3).raceWith(LEDCommands.intaking()).andThen(LEDCommands.hasPiece()).andThen(LEDCommands.elevatorOrArmIsMoving()), multiSubsystemCommands.moveToPosition(OverallPosition.L3), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    L2Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L2), multiSubsystemCommands.moveToPosition(OverallPosition.L2), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
+    L3Button.onTrue(Commands.either(multiSubsystemCommands.loadAlgae(OverallPosition.Algae_Loading_L3), multiSubsystemCommands.moveToPosition(OverallPosition.L3), () -> armSubsystem.getCurrentMode() == GamepieceMode.ALGAE));
     L4Button.onTrue(multiSubsystemCommands.moveToPosition(OverallPosition.L4));
 
     gamepieceModeToggle.whileTrue(multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE).alongWith(LEDCommands.pickingUpAlgae()));

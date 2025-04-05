@@ -103,7 +103,7 @@ public class RobotContainer {
   private final JoystickButton L1Button = new JoystickButton(buttonbox2, 2);
   private final JoystickButton L2Button = new JoystickButton(buttonbox1, 8);
   private final JoystickButton L3Button = new JoystickButton(buttonbox1,5);
-  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 2);
+  private final JoystickButton L4Button = new JoystickButton(buttonbox1, 1);
 
   private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
   private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);

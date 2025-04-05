@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase {
     L4(51.8, 50),
     Stow(0.5, 0.5);
 
-    double coralHeight, algaeHeight;
+    final double coralHeight, algaeHeight;
 
     ElevatorPosition(double coralHeight, double algaeHeight) {
       this.coralHeight = coralHeight;

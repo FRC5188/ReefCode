@@ -72,7 +72,8 @@ public class MultiSubsystemCommands {
         return _armCommands.moveArm(ArmPosition.Transient)
                 .andThen(_elevatorCommands.moveElevator(setpoint.getElevatorPosition()))
                 .unless(() -> _elevator.getCurrentPos() == setpoint.getElevatorPosition())
-                .andThen(_armCommands.moveArm(setpoint.getArmPosition()));
+                .andThen(_armCommands.moveArm(setpoint.getArmPosition()))
+                .finallyDo(() -> System.out.println("MOVED TO POS"));
     }
 
     public Command setGamepieceMode(GamepieceMode mode) {

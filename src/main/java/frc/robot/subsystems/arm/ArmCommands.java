@@ -138,7 +138,7 @@ public class ArmCommands {
     }
 
     public Command intakeCoralAuto() {
-        Command c = new Command() {
+        return new Command() {
             @Override
             public void execute() {
                 if (_arm.upperLightSensorSeesGamepiece()) {
@@ -158,8 +158,6 @@ public class ArmCommands {
                 return _arm.hasPiece();
             }
         };
-        c.addRequirements(_arm);
-        return c;
     }
 
     private Command intakeAlgae() {
@@ -190,7 +188,7 @@ public class ArmCommands {
     }
 
     public Command moveGamepieceToLightSensor() {
-        Command c = new Command() {
+        return new Command() {
 
             @Override
             public void execute() {
@@ -208,9 +206,6 @@ public class ArmCommands {
                 return _arm.upperLightSensorSeesGamepiece();
             }
         };
-        c.addRequirements(_arm);
-
-        return c;
     }
 
     public Command intakeForNumberOfRotations() {
@@ -225,13 +220,15 @@ public class ArmCommands {
     }
 
     public Command waitUntilAtSetpoint() {
-        Command c = new WaitUntilCommand(_arm::isAtSetpoint);
-        c.addRequirements(_arm);
-        return c;
+        return new WaitUntilCommand(_arm::isAtSetpoint);
     }
 
     public Command moveArm(ArmPosition pos) {
         return setArmPosition(pos).andThen(waitUntilAtSetpoint());
+    }
+
+    public Command resetArmPID() {
+        return Commands.runOnce(() -> _arm.resetPID());
     }
 
     public Command manualIntake() {

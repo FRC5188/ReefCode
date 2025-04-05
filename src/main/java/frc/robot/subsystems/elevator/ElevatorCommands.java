@@ -50,7 +50,8 @@ public final class ElevatorCommands {
                 () -> {
                     _elevator.decrementElevatorPosition();
 
-                }, _elevator);
+                }, _elevator)
+                .withName("DecrementElevator");
     }
 
     public Command incrementElevatorPosition() {
@@ -58,13 +59,13 @@ public final class ElevatorCommands {
                 () -> {
                     _elevator.incrementElevatorPosition();
 
-                }, _elevator);
+                }, _elevator)
+                .withName("IncrementElevator");
     }
 
     public Command setElevatorSetpoint(ElevatorPosition setpoint) {
         return new InstantCommand(
                 () -> {
-                    System.out.println("RUNNING ELEVATOR CMD");
                     _elevator.setSetpoint(setpoint);
                 });
     }

@@ -31,7 +31,8 @@ public class ArmCommands {
                     _arm.clearHasGamepiece();
                 }, _arm).withTimeout(0.5)
                 .andThen(Commands.runOnce(() -> _arm.setArmSetpoint(ArmPosition.Stow), _arm)
-                        .unless(() -> _arm.getCurrentPos() != ArmPosition.L4_Score));
+                        .unless(() -> _arm.getCurrentPos() != ArmPosition.L4_Score))
+                        .withName("Spit");
 
     }
 
@@ -208,13 +209,14 @@ public class ArmCommands {
     }
 
     public Command intakeForNumberOfRotations() {
-        return new StartEndCommand(() -> {
-            _arm.resetIntakeEncoders();
-            _arm.setIntakeSpeed(-0.175); // -0.1
-        },
+        return new StartEndCommand(
+                () -> {
+                    _arm.resetIntakeEncoders();
+                    _arm.setIntakeSpeed(-0.175); // -0.1
+                },
                 () -> {
                     _arm.setIntakeSpeed(0);
-                }).until(() -> _arm.intakeAtDesiredRotations());
+                }, _arm).until(() -> _arm.intakeAtDesiredRotations());
     }
 
     public Command waitUntilAtSetpoint() {
@@ -239,6 +241,7 @@ public class ArmCommands {
                         () -> _arm.setIntakeSpeed(0.5),
                         () -> _arm.setIntakeSpeed(0),
                         _arm),
-                () -> _arm.getCurrentMode() == GamepieceMode.CORAL);
+                () -> _arm.getCurrentMode() == GamepieceMode.CORAL)
+                .withName("ManualIntake");
     }
 }

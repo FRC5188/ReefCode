@@ -65,14 +65,16 @@ public class MultiSubsystemCommands {
     public Command calibrate() {
         return _armCommands.setArmPosition(ArmPosition.Stow)
                 .andThen(_elevatorCommands.calibrateElevator())
-                .andThen(_elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow));
+                .andThen(_elevatorCommands.setElevatorSetpoint(ElevatorPosition.Stow))
+                .withName("Calibrate");
     }
 
     public Command moveToPosition(OverallPosition setpoint) {
         return _armCommands.moveArm(ArmPosition.Transient)
                 .andThen(_elevatorCommands.moveElevator(setpoint.getElevatorPosition()))
                 .unless(() -> _elevator.getCurrentPos() == setpoint.getElevatorPosition())
-                .andThen(_armCommands.moveArm(setpoint.getArmPosition()));
+                .andThen(_armCommands.moveArm(setpoint.getArmPosition()))
+                .withName("MoveToPosition");
     }
 
     public Command setGamepieceMode(GamepieceMode mode) {
@@ -80,17 +82,20 @@ public class MultiSubsystemCommands {
                 () -> {
                     _elevator.setCurrentMode(mode);
                     _arm.setCurrentMode(mode);
-                }, _elevator, _arm);
+                })
+                .withName("SetGamepieceMode");
     }
 
     public Command scoreGamepieceAtPosition(OverallPosition setpoint) {
         return moveToPosition(setpoint)
-                .andThen(_armCommands.spit());
+                .andThen(_armCommands.spit())
+                .withName("ScoreAtPosition");
     }
 
     public Command loadCoral() {
         return moveToPosition(OverallPosition.Coral_Loading)
-                .andThen(_armCommands.intake());
+                .andThen(_armCommands.intake())
+                .withName("LoadCoral");
     }
 
     public Command loadCoralAuto() {
@@ -104,7 +109,8 @@ public class MultiSubsystemCommands {
         }
         return moveToPosition(position)
                 .alongWith(_armCommands.intake())
-                .andThen(_armCommands.setArmPosition(ArmPosition.Stow));
+                .andThen(_armCommands.setArmPosition(ArmPosition.Stow)
+                .withName("LoadAlgae"));
     }
 
 }

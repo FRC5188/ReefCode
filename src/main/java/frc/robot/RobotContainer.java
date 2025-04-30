@@ -40,6 +40,7 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsCommands;
 import frc.robot.subsystems.elevator.Elevator.ElevatorPosition;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands;
+import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.GamepieceMode;
 import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.OverallPosition;
 import frc.robot.subsystems.presets.Preset;
 
@@ -71,6 +72,9 @@ public class RobotContainer {
   // private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
   //     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
   //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+  
+
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -87,6 +91,7 @@ public class RobotContainer {
   private final JoystickButton intakeButton = new JoystickButton(buttonbox1, 7);
   private final JoystickButton L4_scoreButton = new JoystickButton(buttonbox1, 8);
   private final JoystickButton spitButton = new JoystickButton(buttonbox1, 9);
+  private final JoystickButton toggleGamepieceMode = new JoystickButton(buttonbox1, 10);
 
   private final GenericHID buttonbox2 = new GenericHID(2);
   private final JoystickButton presetButton = new JoystickButton(buttonbox2, 2);
@@ -228,6 +233,7 @@ public class RobotContainer {
     L4Button.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4));
     LoadingButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.Loading));
     L4_scoreButton.onTrue(multiSubsystemCommands.setOverallSetpoint(OverallPosition.L4_Score));
+    toggleGamepieceMode.onFalse(Commands.runOnce(() -> multiSubsystemCommands.setGamepieceMode(GamepieceMode.CORAL))).onTrue(Commands.runOnce(() -> multiSubsystemCommands.setGamepieceMode(GamepieceMode.ALGAE)));
 
     // Runs the preset to score unless the preset is invalid.
     joystick.rightBumper().onTrue(

@@ -82,7 +82,7 @@ public class RobotContainer {
   private final MultiSubsystemCommands multiSubsystemCommands = new MultiSubsystemCommands(elevatorSubsystem,
       armSubsystem, elevatorCommands, armCommands);
 
-  private final Vision vision;
+  // private final Vision vision;
   private final CommandXboxController joystick = new CommandXboxController(0);
   private final CommandXboxController climberstick = new CommandXboxController(3);
 
@@ -140,11 +140,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera5Name, robotToCamera5)
-                );   
+        // vision =
+        //     new Vision(
+        //         drive::addVisionMeasurement,
+        //         new VisionIOPhotonVision(camera5Name, robotToCamera5)
+        //         );   
         break;
 
       case SIM:
@@ -165,13 +165,13 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera7Name, robotToCamera7, drive::getPose),
                 new VisionIOPhotonVisionSim(camera8Name, robotToCamera8, drive::getPose)
                 );   */
-        vision = 
-            new Vision(
-                drive::addVisionMeasurement, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {});
+        // vision = 
+        //     new Vision(
+        //         drive::addVisionMeasurement, 
+        //         new VisionIO() {}, 
+        //         new VisionIO() {}, 
+        //         new VisionIO() {}, 
+        //         new VisionIO() {});
 
         break;
 
@@ -185,13 +185,13 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision = 
-            new Vision(
-                drive::addVisionMeasurement, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {}, 
-                new VisionIO() {});
+        // vision = 
+        //     new Vision(
+        //         drive::addVisionMeasurement, 
+        //         new VisionIO() {}, 
+        //         new VisionIO() {}, 
+        //         new VisionIO() {}, 
+        //         new VisionIO() {});
         break;
     }
 

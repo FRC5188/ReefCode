@@ -29,7 +29,7 @@ public class ArmCommands {
                 () -> {
                     _arm.setIntakeSpeed(0);
                     _arm.clearHasGamepiece();
-                }, _arm).withTimeout(0.5)
+                }, _arm).withTimeout(0.5)   
                 .andThen(Commands.runOnce(() -> _arm.setArmSetpoint(ArmPosition.Stow), _arm).unless(() -> _arm.getCurrentPos() != ArmPosition.L4_Score));
                 
 
@@ -150,7 +150,7 @@ public class ArmCommands {
                 if (interrupted) {
                     _arm.setIntakeSpeed(0);
                 } else {
-                    _arm.setIntakeSpeed(0.05);
+                    _arm.setIntakeSpeed(0.1);
                 }
             }
 

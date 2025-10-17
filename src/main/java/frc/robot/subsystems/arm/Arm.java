@@ -25,12 +25,12 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(114, 114),
-    Loading(140, 78),
-    L4_Score(86, 102), //100
-    Algae_Score(100, 100),
-    Transient(108, 108),
-    Climbing(50, 50);
+    Stow(-6, -6),
+    Loading(17.5, -15),
+    L4_Score(-32, 5), //100
+    Algae_Score(100, 100), //100, 100 
+    Transient(-17, -17), // 108, 108  
+    Climbing(50, 50); //50 ,50 
 
     double coralAngle, algaeAngle;
 
@@ -58,9 +58,9 @@ public class Arm extends SubsystemBase {
 
   private ProfiledPIDController _armPidController;
 
-  private static final double KP = 0.1;//0.09;
-  private static final double KI = 0.00; //0.01;
-  private static final double KD = 0.01;
+  private static final double KP = 0.095;//0.09; was 0.06
+  private static final double KI = 0.05; //0.01;
+  private static final double KD = 0.01; //0.01; was 0.006
   private static final double PROFILE_VEL = 330;
   private static final double PROFILE_ACC = 300;
 

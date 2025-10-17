@@ -63,7 +63,6 @@ public class MultiSubsystemCommands {
         _elevatorCommands = elevatorCommands;
         _armCommands = armCommands;
     }
-
     public Command moveToPosition(OverallPosition setpoint) {
         return _armCommands.moveArm(ArmPosition.Transient)
                 .andThen(_elevatorCommands.moveElevator(setpoint.getElevatorPosition()))
@@ -71,6 +70,7 @@ public class MultiSubsystemCommands {
                 .andThen(_armCommands.moveArm(setpoint.getArmPosition()));
     }
 
+    
     public Command setGamepieceMode(GamepieceMode mode) {
         return new InstantCommand(
                 () -> {
@@ -78,7 +78,7 @@ public class MultiSubsystemCommands {
                     _arm.setCurrentMode(mode);
                 }, _elevator, _arm);
     }
-
+    
     public Command scoreGamepieceAtPosition(OverallPosition setpoint) {
         return moveToPosition(setpoint)
                 .andThen(_armCommands.spit());

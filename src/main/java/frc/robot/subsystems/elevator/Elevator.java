@@ -36,9 +36,9 @@ public class Elevator extends SubsystemBase {
   public enum ElevatorPosition {
     L1(7, 5),
     L2(13, 18),
-    L3(29, 36),
+    L3(28.5, 36),
     L4(51.8, 50),
-    Stow(0.5, 0.5);
+    Stow(0.8, 0.8);
 
     double coralHeight, algaeHeight;
 

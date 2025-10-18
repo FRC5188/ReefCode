@@ -142,7 +142,7 @@ public class ArmCommands {
             @Override
             public void initialize() {
                 this.addRequirements(_arm);
-                _arm.setIntakeSpeed(0.5);
+                _arm.setIntakeSpeed(0.5); // 0.5
             }
 
             @Override

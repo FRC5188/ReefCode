@@ -21,8 +21,8 @@ import frc.robot.HardwareConstants.DIO;
 
 public class RealArmIO implements ArmIO {
 
-    private static final double POS_AT_90 = 0.419; //0.419
-    private static final double POS_AT_0 = 0.169; //0.169
+    private static final double POS_AT_90 = 0.1538; //0.419 55.4 
+    private static final double POS_AT_0 = -0.09; //0.169 -34
     private static final double ENCODER_CONVERSION = (POS_AT_90 - POS_AT_0) / 90.0;
     private static final double CORAL_LASERCAN_DISTANCE_MM = 50;
     private static final double ALGAE_LASERCAN_DISTANCE_MM = 20;

@@ -25,11 +25,11 @@ import frc.robot.subsystems.multisubsystemcommands.MultiSubsystemCommands.Gamepi
 
 public class Arm extends SubsystemBase {
   public enum ArmPosition {
-    Stow(-6, -6),
-    Loading(17.5, -15),
-    L4_Score(-32, 5), //100
+    Stow(202, 202),
+    Loading(208, 163),
+    L4_Score(165, 165), //100
     Algae_Score(100, 100), //100, 100 
-    Transient(-17, -17), // 108, 108  
+    Transient(170, 170), // 108, 108  
     Climbing(50, 50); //50 ,50 
 
     double coralAngle, algaeAngle;
